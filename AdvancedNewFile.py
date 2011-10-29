@@ -8,8 +8,8 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         self.count = 0
         self.window = self.view.window()
         self.root = self.get_root()
-        self.show_filename_input()
         self.is_python = is_python
+        self.show_filename_input()
 
     def get_root(self):
         try:
