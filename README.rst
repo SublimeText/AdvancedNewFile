@@ -22,3 +22,6 @@ Keymaps
 -------
 super+alt+n offers input file relative path for current project (opened file)
 shift+super+alt+n also creates __init__.py in all new folders.
+
+
+Thanks to Mike Yumatov (@yumike) for idea about this plugin.
