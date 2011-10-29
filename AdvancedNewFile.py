@@ -23,7 +23,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         if self.is_python:
             caption = '%s (creates __init__.py in new dirs)' % caption
         self.window.show_input_panel(
-            'Enter a path for a new file', initial,
+            caption, initial,
             self.entered_filename, self.update_filename_input, None
         )
     
