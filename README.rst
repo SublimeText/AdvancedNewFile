@@ -14,7 +14,7 @@ Installation
 1. Clone or copy this repository into:
 
 - OS X: ~/Library/Application Support/Sublime Text 2/Packages/
-- Windows: %APPDATA%/Sublime Text 2/Packages/
+- Windows: %APPDATA%/Roaming/Sublime Text 2/Packages/
 - Linux: ~/.config/sublime-text-2/Packages/
 
 
