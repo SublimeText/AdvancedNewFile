@@ -1,4 +1,4 @@
 [
-	{ "keys": ["super+alt+n"], "command": "advanced_new_file"},
-	{ "keys": ["shift+super+alt+n"], "command": "advanced_new_file", "args": {"is_python": true}}
+	{ "keys": ["ctrl+alt+n"], "command": "advanced_new_file"},
+	{ "keys": ["shift+ctrl+alt+n"], "command": "advanced_new_file", "args": {"is_python": true}}
 ]
