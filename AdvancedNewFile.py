@@ -11,9 +11,15 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         self.is_python = is_python
         self.show_filename_input()
 
-    def get_root(self):
+    def get_root(self, target=None):
         try:
             root = self.window.folders()[0]
+            
+            if target:
+                for folder in self.window.folders():
+                    basename = os.path.basename(folder)
+                    if basename == target:
+                        root = folder
         except IndexError:
             root = os.path.abspath(os.path.dirname(self.view.file_name()))
         return root
@@ -32,7 +38,19 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         pass
 
     def entered_filename(self, filename):
-        file_path = os.path.join(self.root, filename)
+        base = self.root
+        
+        if ":" in filename:
+            parts = filename.split(":")
+            # someone did something 
+            # weird lets bail
+            if len(parts) > 2:
+                return
+            filename = parts[1]
+            base = self.get_root(parts[0])
+
+        file_path = os.path.join(base, filename)
+
         if not os.path.exists(file_path):
             self.create(file_path)
         self.window.run_command('open_file', {"file": file_path})
