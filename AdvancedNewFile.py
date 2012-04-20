@@ -10,6 +10,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         self.root = self.get_root()
         self.is_python = is_python
         self.show_filename_input()
+        self.top_level_split_char = ":"
 
     def get_root(self, target=None):
         try:
@@ -40,14 +41,10 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
     def entered_filename(self, filename):
         base = self.root
         
-        if ":" in filename:
-            parts = filename.split(":")
-            # someone did something 
-            # weird lets bail
-            if len(parts) > 2:
-                return
-            filename = parts[1]
+        if self.top_level_split_char in filename:
+            parts = filename.split(self.top_level_split_char)
             base = self.get_root(parts[0])
+            filename = self.top_level_split_char.join(parts[1:])
 
         file_path = os.path.join(base, filename)
 
