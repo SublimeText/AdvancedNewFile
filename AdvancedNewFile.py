@@ -35,7 +35,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         file_path = os.path.join(self.root, filename)
         if not os.path.exists(file_path):
             self.create(file_path)
-        self.window.run_command('open_file', {"file": file_path})
+        self.window.open_file(file_path)
         
     def create(self, filename):
         base, filename = os.path.split(filename)
