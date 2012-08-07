@@ -1,15 +1,19 @@
 import os
 import sublime, sublime_plugin
+import re
 
 
 class AdvancedNewFileCommand(sublime_plugin.TextCommand):
 
-    def run(self, edit, is_python=False):
+    def run(self, edit, is_python=False, is_fill=True):
         self.count = 0
         self.window = self.view.window()
         self.root = self.get_root()
         self.is_python = is_python
-        self.show_filename_input()
+        path=''
+        if is_fill:
+            path=self.get_cursor_path()
+        self.show_filename_input(path)
 
     def get_root(self):
         try:
@@ -49,3 +53,16 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
             os.mkdir(base)
         if self.is_python:
             open(os.path.join(base, '__init__.py'), 'w').close()
+
+
+    def get_cursor_path(self):
+        view = self.view
+        for region in view.sel():
+            syntax = view.syntax_name(region.begin())
+            if re.match(".*string.quoted.double", syntax) or re.match(".*string.quoted.single", syntax):
+                path=view.substr(view.extract_scope(region.begin()))
+                path = re.sub('^"|\'', '',  re.sub('"|\'$', '', path.strip()))
+                return path
+
+            else:
+                return ""
