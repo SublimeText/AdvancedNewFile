@@ -65,7 +65,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         if not os.path.exists(file_path):
             self.create(file_path)
         if not os.path.isdir(file_path):
-            self.window.open_file(file_path)
+            view = self.window.open_file(file_path)
         self.clear()
 
     def clear(self):
@@ -74,6 +74,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
     def create(self, filename):
         base, filename = os.path.split(filename)
         self.create_folder(base)
+        open(os.path.join(base, filename), "a").close()
 
     def create_folder(self, base):
         if not os.path.exists(base):
@@ -82,7 +83,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
                 self.create_folder(parent)
             os.mkdir(base)
         if self.is_python:
-            open(os.path.join(base, '__init__.py'), 'w').close()
+            open(os.path.join(base, '__init__.py'), 'a').close()
 
 
 class PathAutocomplete(sublime_plugin.EventListener):
