@@ -64,7 +64,8 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
 
         if not os.path.exists(file_path):
             self.create(file_path)
-        self.window.open_file(file_path)
+        if not os.path.isdir(file_path):
+            self.window.open_file(file_path)
         self.clear()
 
     def clear(self):
