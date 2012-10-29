@@ -7,7 +7,6 @@ import copy
 class AdvancedNewFileCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, is_python=False):
-        self.count = 0
         self.top_level_split_char = ":"
         self.is_python = is_python
         self.window = self.view.window()
@@ -88,28 +87,25 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
 class PathAutocomplete(sublime_plugin.EventListener):
     path = ""
     root = ""
-    prev_sug = []
+    prev_suggestions = []
     prev_base = ""
-    prev_remove = ""
-    prev_dir = ""
+    prev_directory = ""
 
     def map_function(self, val):
         return os.path.basename(val)
 
     def on_query_completions(self, view, prefix, locations):
-        sug = []
-        base = ""
+        suggestions = []
+
         if (view.name() == "AdvancedNewFileCreation"):
-            path = PathAutocomplete.root + "/"
+            root_path = PathAutocomplete.root + "/"
             prev_base = PathAutocomplete.prev_base
-            prev_dir = PathAutocomplete.prev_dir
-            # if (prev_base, prev_base) not in PathAutocomplete.prev_sug:
-            #     PathAutocomplete.prev_sug.append((prev_base, prev_base))
+            prev_directory = PathAutocomplete.prev_directory
 
             base = os.path.basename(PathAutocomplete.path)
             directory = os.path.dirname(PathAutocomplete.path)
-            if base == "" or (base == prev_base and directory == prev_dir):
-                return PathAutocomplete.prev_sug
+            if base == "" or (base == prev_base and directory == prev_directory):
+                return PathAutocomplete.prev_suggestions
 
             # Project folders
             if directory == "":
@@ -118,25 +114,21 @@ class PathAutocomplete(sublime_plugin.EventListener):
 
                 for folder in folders:
                     if folder.find(base) == 0:
-                        sug.append((folder + ":", folder + ":"))
+                        suggestions.append((folder + ":", folder + ":"))
 
             # Directories
-            path = os.path.join(path, directory)
+            path = os.path.join(root_path, directory)
 
             for filename in os.listdir(path):
                 if os.path.isdir(os.path.join(path, filename)):
                     if filename.find(base) == 0:
-                        sug.append((filename + "/", filename + "/"))
-            sug.append((base, base))
-            PathAutocomplete.prev_dir = copy.deepcopy(directory)
+                        suggestions.append((filename + "/", filename + "/"))
+            #suggestions.append((base, base))
+            PathAutocomplete.prev_directory = copy.deepcopy(directory)
             PathAutocomplete.prev_base = copy.deepcopy(base)
-            PathAutocomplete.prev_sug = copy.deepcopy(sug)
+            PathAutocomplete.prev_suggestions = copy.deepcopy(suggestions)
 
-        return sug
-
-    @staticmethod
-    def clear_path():
-        PathAutocomplete.path = ""
+        return suggestions
 
     @staticmethod
     def set_path(path_input):
@@ -148,8 +140,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
 
     @staticmethod
     def clear():
-        PathAutocomplete.prev_sug = []
+        PathAutocomplete.prev_suggestions = []
         PathAutocomplete.prev_base = ""
         PathAutocomplete.path = ""
-        PathAutocomplete.prev_dir = ""
-        PathAutocomplete.prev_remove = ""
+        PathAutocomplete.prev_directory = ""
