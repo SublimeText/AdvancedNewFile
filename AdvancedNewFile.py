@@ -17,7 +17,6 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
     def get_root(self, target=None):
         try:
             root = self.window.folders()[0]
-
             if target:
                 for folder in self.window.folders():
                     basename = os.path.basename(folder)
@@ -49,6 +48,8 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
             base = self.get_root(parts[0])
             PathAutocomplete.set_root(base)
             path = self.top_level_split_char.join(parts[1:])
+        else:
+            PathAutocomplete.set_root(self.get_root())
 
         PathAutocomplete.set_path(path)
 
@@ -68,7 +69,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         self.clear()
 
     def clear(self):
-        PathAutocomplete.clear_path()
+        PathAutocomplete.clear()
 
     def create(self, filename):
         base, filename = os.path.split(filename)
@@ -87,61 +88,50 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
 class PathAutocomplete(sublime_plugin.EventListener):
     path = ""
     root = ""
-    prev_completions = []
-    prev_path = ""
     prev_sug = []
     prev_base = ""
+    prev_remove = ""
+    prev_dir = ""
 
     def map_function(self, val):
         return os.path.basename(val)
 
     def on_query_completions(self, view, prefix, locations):
         sug = []
+        base = ""
         if (view.name() == "AdvancedNewFileCreation"):
             path = PathAutocomplete.root + "/"
-            base = PathAutocomplete.prev_base
-            if (base, base) not in PathAutocomplete.prev_sug:
-                PathAutocomplete.prev_sug.append((base, base))
+            prev_base = PathAutocomplete.prev_base
+            prev_dir = PathAutocomplete.prev_dir
+            # if (prev_base, prev_base) not in PathAutocomplete.prev_sug:
+            #     PathAutocomplete.prev_sug.append((prev_base, prev_base))
 
-            if ":" in PathAutocomplete.path:
-                split_path = PathAutocomplete.path.split(":")
-
-                if split_path[-1] == "":
-                    return PathAutocomplete.prev_sug
-
-            if "/" in PathAutocomplete.path:
-                split_path = PathAutocomplete.path.split("/")
-
-                if split_path[-1] == "":
-                    return PathAutocomplete.prev_sug
-
-            if PathAutocomplete.path == "" or PathAutocomplete.prev_base == PathAutocomplete.path:
+            base = os.path.basename(PathAutocomplete.path)
+            directory = os.path.dirname(PathAutocomplete.path)
+            if base == "" or (base == prev_base and directory == prev_dir):
                 return PathAutocomplete.prev_sug
-            # Project folders
-            folders = sublime.active_window().folders()
-            folders = map(self.map_function, folders)
 
-            for folder in folders:
-                if folder.find(PathAutocomplete.path) == 0:
-                    sug.append((folder + ":", folder + ":"))
+            # Project folders
+            if directory == "":
+                folders = sublime.active_window().folders()
+                folders = map(self.map_function, folders)
+
+                for folder in folders:
+                    if folder.find(base) == 0:
+                        sug.append((folder + ":", folder + ":"))
 
             # Directories
-            split_path = PathAutocomplete.path.split("/")
-
-            for t in split_path[0:-1]:
-                path += t + "/"
-
-            base = split_path[-1]
+            path = os.path.join(path, directory)
 
             for filename in os.listdir(path):
                 if os.path.isdir(os.path.join(path, filename)):
                     if filename.find(base) == 0:
                         sug.append((filename + "/", filename + "/"))
-        print "-----"
-        #sug.append((base, base))
-        PathAutocomplete.prev_base = copy.deepcopy(base)
-        PathAutocomplete.prev_sug = copy.deepcopy(sug)
-        print sug
+            sug.append((base, base))
+            PathAutocomplete.prev_dir = copy.deepcopy(directory)
+            PathAutocomplete.prev_base = copy.deepcopy(base)
+            PathAutocomplete.prev_sug = copy.deepcopy(sug)
+
         return sug
 
     @staticmethod
@@ -155,3 +145,11 @@ class PathAutocomplete(sublime_plugin.EventListener):
     @staticmethod
     def set_root(root_input):
         PathAutocomplete.root = root_input
+
+    @staticmethod
+    def clear():
+        PathAutocomplete.prev_sug = []
+        PathAutocomplete.prev_base = ""
+        PathAutocomplete.path = ""
+        PathAutocomplete.prev_dir = ""
+        PathAutocomplete.prev_remove = ""
