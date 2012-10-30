@@ -26,7 +26,7 @@ Top level folders can be specified by typing in the name of the folder followed 
 You can create an alias to quickly navigate to a directory. Simply type in the alias followed by a colon, as with specifying a top level folder. Then specify the path as you would normally. Note that a top level folder with the same name as an alias will take precedence. For more information, see "Settings"
 
 ### Tab Autocompletion:
-After typing in a partial path, simply hit tab to autocomplete it. Continue to hit tab to cycle through the options.
+After typing in a partial path, simply hit tab to autocomplete it. Continue to hit tab to cycle through the options. Currently, this leverages the built in autocomplete functionality. Future may leverage a custom completion. As such, text in the input field will also include stings seperated by predefined word separators.
 
 ## Keymaps
 

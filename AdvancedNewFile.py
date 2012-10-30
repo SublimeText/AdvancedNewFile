@@ -68,16 +68,14 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         )
 
         view.set_name("AdvancedNewFileCreation")
-        view.settings().set("auto_complete", True)
         view.settings().set("tab_size", 0)
         view.settings().set("translate_tabs_to_spaces", True)
         temp = view.settings().get("word_separators")
         temp = temp.replace(".", "")
-        print temp
         view.settings().set("word_separators", temp)
         # May be useful to see the popup for debugging
         # if DEBUG:
-        #     view.settings().set("auto_complete_selector", 'text')
+        #     view.settings().set("auto_complete", True)
         PathAutocomplete.set_root(self.root, True)
 
     def update_filename_input(self, path):

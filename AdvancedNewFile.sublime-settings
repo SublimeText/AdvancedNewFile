@@ -18,6 +18,6 @@
 
     // A boolean value specifying if regular files should be included in the auto
     // complete options.
-    "show_files": true
+    "show_files": false
 
 }
