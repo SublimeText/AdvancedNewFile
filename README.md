@@ -46,6 +46,9 @@ A string that will be automatically inserted into the new file creation input.
 `use_cursor_text`:
 A boolean value determining if text from a buffer, currently bound by single or double quotes, will be auto inserted into the new file generation input field.
 
+`show_files`:
+A boolean value determining if regular files should be included in the autocompletion list.
+
 ## Notes
 Thanks to Dima Kukushkin ([xobb1t](https://github.com/xobb1t)) for the original work on this plugin.
 

@@ -1,13 +1,13 @@
 import os
 import sublime
 import sublime_plugin
-import copy
 import re
 
 SETTINGS = [
     "alias",
     "default_initial",
-    "use_cursor_text"
+    "use_cursor_text",
+    "show_files"
 ]
 DEBUG = True
 PLATFORM = sublime.platform()
@@ -22,6 +22,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         self.root = self.get_root()
         settings = get_settings(self.view)
         self.aliases = settings.get("alias")
+        PathAutocomplete.set_show_files(settings.get("show_files"))
         PathAutocomplete.set_aliases(self.aliases)
         path = settings.get("default_initial", "")
         if settings.get("use_cursor_text", False):
@@ -75,8 +76,8 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         print temp
         view.settings().set("word_separators", temp)
         # May be useful to see the popup for debugging
-        if DEBUG:
-            view.settings().set("auto_complete_selector", 'text')
+        # if DEBUG:
+        #     view.settings().set("auto_complete_selector", 'text')
         PathAutocomplete.set_root(self.root, True)
 
     def update_filename_input(self, path):
@@ -148,6 +149,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
     path_empty = True
     prev_root = ""
     default_root = True
+    show_files = False
 
     def map_function(self, val):
         return os.path.basename(val)
@@ -161,12 +163,19 @@ class PathAutocomplete(sublime_plugin.EventListener):
 
         base = os.path.basename(PathAutocomplete.path)
         directory = os.path.dirname(PathAutocomplete.path)
+
+        # If base is empty, we may be cycling through directory options
         if base == "":
             return True
+        # Ensures the correct directory is used if the default root is specified
+        # using an alias.
         if base == prev_base and \
         directory == prev_directory and \
         prev_root == root_path and \
         PathAutocomplete.default_root:
+            return True
+        # Continue completions if file names are completed.
+        if os.path.isfile(os.path.join(root_path, PathAutocomplete.path)):
             return True
         return False
 
@@ -205,10 +214,13 @@ class PathAutocomplete(sublime_plugin.EventListener):
             path = os.path.join(root_path, directory)
             if os.path.exists(path):
                 for filename in os.listdir(path):
-                    if os.path.isdir(os.path.join(path, filename)):
+                    if PathAutocomplete.show_files or os.path.isdir(os.path.join(path, filename)):
                         if filename.find(base) == 0:
                             # Need to find a better way to do the auto complete.
-                            suggestions.append((" " + filename + sep, filename + sep))
+                            if os.path.isdir(os.path.join(path, filename)):
+                                suggestions.append((" " + filename + sep, filename + sep))
+                            else:
+                                suggestions.append((" " + filename, filename))
                 #suggestions.append((base, base))
                 PathAutocomplete.prev_directory = directory
                 PathAutocomplete.prev_base = base
@@ -231,14 +243,24 @@ class PathAutocomplete(sublime_plugin.EventListener):
 
     @staticmethod
     def clear():
+        PathAutocomplete.path = ""
+        PathAutocomplete.root = ""
         PathAutocomplete.prev_suggestions = []
         PathAutocomplete.prev_base = ""
-        PathAutocomplete.path = ""
         PathAutocomplete.prev_directory = ""
+        PathAutocomplete.aliases = {}
+        PathAutocomplete.path_empty = True
+        PathAutocomplete.prev_root = ""
+        PathAutocomplete.default_root = True
+        PathAutocomplete.show_files = False
 
     @staticmethod
     def set_aliases(aliases):
         PathAutocomplete.aliases = aliases
+
+    @staticmethod
+    def set_show_files(show_files):
+        PathAutocomplete.show_files = show_files
 
 
 def get_settings(view):

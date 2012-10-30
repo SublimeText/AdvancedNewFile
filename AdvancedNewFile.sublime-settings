@@ -14,5 +14,10 @@
     // text bound by single or double quotes will be read in. 
     // NOTE: A value read from within quotes will override the default 
     // initial string.
-    "use_cursor_text": false
+    "use_cursor_text": false,
+
+    // A boolean value specifying if regular files should be included in the auto
+    // complete options.
+    "show_files": true
+
 }
