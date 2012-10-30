@@ -9,7 +9,7 @@ SETTINGS = [
     "default_initial",
     "use_cursor_text"
 ]
-DEBUG = False
+DEBUG = True
 PLATFORM = sublime.platform()
 
 
@@ -70,23 +70,25 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         view.settings().set("auto_complete", True)
         view.settings().set("tab_size", 0)
         view.settings().set("translate_tabs_to_spaces", True)
+        temp = view.settings().get("word_separators")
+        temp = temp.replace(".", "")
+        print temp
+        view.settings().set("word_separators", temp)
         # May be useful to see the popup for debugging
-        # view.settings().set("auto_complete_selector", 'text')
-        PathAutocomplete.set_root(self.root)
+        if DEBUG:
+            view.settings().set("auto_complete_selector", 'text')
+        PathAutocomplete.set_root(self.root, True)
 
     def update_filename_input(self, path):
-
         if self.top_level_split_char in path:
             parts = path.split(self.top_level_split_char)
             base = self.get_root(parts[0])
-            PathAutocomplete.set_root(base)
+            PathAutocomplete.set_root(base, False)
             path = self.top_level_split_char.join(parts[1:])
-            empty = False
         else:
-            PathAutocomplete.set_root(self.get_root())
-            empty = True
+            PathAutocomplete.set_root(self.get_root(), True)
 
-        PathAutocomplete.set_path(path, empty)
+        PathAutocomplete.set_path(path)
 
     def entered_filename(self, filename):
         base = self.root
@@ -144,24 +146,41 @@ class PathAutocomplete(sublime_plugin.EventListener):
     prev_directory = ""
     aliases = {}
     path_empty = True
+    prev_root = ""
+    default_root = True
 
     def map_function(self, val):
         return os.path.basename(val)
 
+    def continue_previous_autocomplete(self):
+        sep = os.sep
+        root_path = PathAutocomplete.root + sep
+        prev_base = PathAutocomplete.prev_base
+        prev_directory = PathAutocomplete.prev_directory
+        prev_root = PathAutocomplete.prev_root
+
+        base = os.path.basename(PathAutocomplete.path)
+        directory = os.path.dirname(PathAutocomplete.path)
+        if base == "":
+            return True
+        if base == prev_base and \
+        directory == prev_directory and \
+        prev_root == root_path and \
+        PathAutocomplete.default_root:
+            return True
+        return False
+
     def on_query_completions(self, view, prefix, locations):
         suggestions = []
-
         if (view.name() == "AdvancedNewFileCreation"):
             sep = os.sep
             root_path = PathAutocomplete.root + sep
-            prev_base = PathAutocomplete.prev_base
-            prev_directory = PathAutocomplete.prev_directory
             aliases = PathAutocomplete.aliases
 
             base = os.path.basename(PathAutocomplete.path)
             directory = os.path.dirname(PathAutocomplete.path)
 
-            if base == "" or (base == prev_base and directory == prev_directory):
+            if self.continue_previous_autocomplete():
                 if DEBUG:
                     print "AdvancedNewFileDebug - (Prev) Suggestions"
                     print PathAutocomplete.prev_suggestions
@@ -169,7 +188,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
                 return PathAutocomplete.prev_suggestions
 
             # Project folders
-            if directory == "" and PathAutocomplete.path_empty:
+            if directory == "" and PathAutocomplete.default_root:
                 folders = sublime.active_window().folders()
                 folders = map(self.map_function, folders)
 
@@ -184,34 +203,31 @@ class PathAutocomplete(sublime_plugin.EventListener):
 
             # Directories
             path = os.path.join(root_path, directory)
-
-            for filename in os.listdir(path):
-                if os.path.isdir(os.path.join(path, filename)):
-                    if filename.find(base) == 0:
-                        if base[0] == ".":
-                            filename = filename[1:]
-                        # Space keeps it from matching previous entries
-                        # Kind of a hack of a fix, but seems to work.
-                        suggestions.append((" " + filename + sep, filename + sep))
-            #suggestions.append((base, base))
-            PathAutocomplete.prev_directory = copy.deepcopy(directory)
-            PathAutocomplete.prev_base = copy.deepcopy(base)
-            PathAutocomplete.prev_suggestions = copy.deepcopy(suggestions)
-
-            if DEBUG:
-                print "AdvancedNewFileDebug - Suggestions:"
-                print suggestions
+            if os.path.exists(path):
+                for filename in os.listdir(path):
+                    if os.path.isdir(os.path.join(path, filename)):
+                        if filename.find(base) == 0:
+                            # Need to find a better way to do the auto complete.
+                            suggestions.append((" " + filename + sep, filename + sep))
+                #suggestions.append((base, base))
+                PathAutocomplete.prev_directory = directory
+                PathAutocomplete.prev_base = base
+                PathAutocomplete.prev_suggestions = suggestions
+                PathAutocomplete.prev_root = root_path
+                if DEBUG:
+                    print "AdvancedNewFileDebug - Suggestions:"
+                    print suggestions
 
         return suggestions
 
     @staticmethod
-    def set_path(path_input, empty):
+    def set_path(path_input):
         PathAutocomplete.path = path_input
-        PathAutocomplete.path_empty = empty
 
     @staticmethod
-    def set_root(root_input):
+    def set_root(root_input, default_root):
         PathAutocomplete.root = root_input
+        PathAutocomplete.default_root = default_root
 
     @staticmethod
     def clear():
