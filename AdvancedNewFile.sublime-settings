@@ -1,0 +1,10 @@
+{
+    // This setting contains a dictionar of aliases. 
+    // The keys represent the alias names, the values
+    // represent the paths. 
+    // NOTE: These should be absolute paths. Also, these paths should 
+    // match your systems convention. For example, Windows machines should 
+    // have paths similar to "C:\\Users\\username\\Desktop". *nix systems should
+    // have paths similar to "/home/username/desktop".
+    "alias": {}
+}

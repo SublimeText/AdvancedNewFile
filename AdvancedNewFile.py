@@ -3,6 +3,12 @@ import sublime
 import sublime_plugin
 import copy
 
+SETTINGS = [
+    "alias"
+]
+DEBUG = False
+PLATFORM = sublime.platform()
+
 
 class AdvancedNewFileCommand(sublime_plugin.TextCommand):
 
@@ -11,18 +17,35 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         self.is_python = is_python
         self.window = self.view.window()
         self.root = self.get_root()
+        settings = get_settings(self.view)
+        self.aliases = settings.get("alias")
+        PathAutocomplete.set_aliases(self.aliases)
         self.show_filename_input()
 
     def get_root(self, target=None):
         try:
+            # Default to a folder
             root = self.window.folders()[0]
             if target:
+            # If a target exists, search through folders and aliases
+            # Folders take precedence over aliases.
                 for folder in self.window.folders():
                     basename = os.path.basename(folder)
                     if basename == target:
                         root = folder
+                        break
+                for alias in self.aliases.keys():
+                    if alias == target:
+                        root = self.aliases.get(alias)
+                        break
         except IndexError:
-            root = os.path.abspath(os.path.dirname(self.view.file_name()))
+            # If no folders exists, should create a file at the current directory
+            filename = self.view.filename()
+            root = os.path.abspath(os.path.dirname(filename))
+
+        if DEBUG:
+            print "AdvancedNewFileDebug - root: " + root
+
         return root
 
     def show_filename_input(self, initial=''):
@@ -62,10 +85,12 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
 
         file_path = os.path.join(base, filename)
 
+        if DEBUG:
+            print "AdvancedNewFileDebug - Creating file at: " + file_path
         if not os.path.exists(file_path):
             self.create(file_path)
         if not os.path.isdir(file_path):
-            view = self.window.open_file(file_path)
+            self.window.open_file(file_path)
         self.clear()
 
     def clear(self):
@@ -92,6 +117,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
     prev_suggestions = []
     prev_base = ""
     prev_directory = ""
+    aliases = {}
 
     def map_function(self, val):
         return os.path.basename(val)
@@ -100,13 +126,19 @@ class PathAutocomplete(sublime_plugin.EventListener):
         suggestions = []
 
         if (view.name() == "AdvancedNewFileCreation"):
-            root_path = PathAutocomplete.root + "/"
+            sep = os.sep
+            root_path = PathAutocomplete.root + sep
             prev_base = PathAutocomplete.prev_base
             prev_directory = PathAutocomplete.prev_directory
+            aliases = PathAutocomplete.aliases
 
             base = os.path.basename(PathAutocomplete.path)
             directory = os.path.dirname(PathAutocomplete.path)
             if base == "" or (base == prev_base and directory == prev_directory):
+                if DEBUG:
+                    print "AdvancedNewFileDebug - (Prev) Suggestions"
+                    print PathAutocomplete.prev_suggestions
+
                 return PathAutocomplete.prev_suggestions
 
             # Project folders
@@ -118,17 +150,27 @@ class PathAutocomplete(sublime_plugin.EventListener):
                     if folder.find(base) == 0:
                         suggestions.append((folder + ":", folder + ":"))
 
+            # Aliases
+            if directory == "":
+                for alias in aliases:
+                    if alias.find(base) == 0:
+                        suggestions.append((alias + ":", alias + ":"))
+
             # Directories
             path = os.path.join(root_path, directory)
 
             for filename in os.listdir(path):
                 if os.path.isdir(os.path.join(path, filename)):
                     if filename.find(base) == 0:
-                        suggestions.append((filename + "/", filename + "/"))
+                        suggestions.append((filename + sep, filename + sep))
             #suggestions.append((base, base))
             PathAutocomplete.prev_directory = copy.deepcopy(directory)
             PathAutocomplete.prev_base = copy.deepcopy(base)
             PathAutocomplete.prev_suggestions = copy.deepcopy(suggestions)
+
+        if DEBUG:
+            print "AdvancedNewFileDebug - Suggestions:"
+            print suggestions
 
         return suggestions
 
@@ -146,3 +188,27 @@ class PathAutocomplete(sublime_plugin.EventListener):
         PathAutocomplete.prev_base = ""
         PathAutocomplete.path = ""
         PathAutocomplete.prev_directory = ""
+
+    @staticmethod
+    def set_aliases(aliases):
+        PathAutocomplete.aliases = aliases
+
+
+def get_settings(view):
+    settings = sublime.load_settings("AdvancedNewFile.sublime-settings")
+    project_settings = view.settings().get('AdvancedNewFile', {})
+    local_settings = {}
+
+    for setting in SETTINGS:
+        local_settings[setting] = settings.get(setting)
+
+    for key in project_settings:
+        if key in SETTINGS:
+            if key == "alias":
+                local_settings[key] = dict(local_settings[key].items() + project_settings.get(key).items())
+            else:
+                local_settings[key] = project_settings[key]
+        else:
+            print "AdvancedNewFile: Invalid key '" + key + "' in project settings."
+
+    return local_settings
