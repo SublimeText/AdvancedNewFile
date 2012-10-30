@@ -1,18 +1,19 @@
-# AdvancedNewFile -- Advanced file creation for Sublime Text 2
+# AdvancedNewFile
+Advanced file creation for Sublime Text 2
 
 ## Overview
 
-This plugin allows for faster file creation within a project. Please see the "Features" section for more detailed information about advanced features.
+This plugin allows for faster file creation within a project. Please see the [Features](https://github.com/skuroda/Sublime-AdvancedNewFile#features) section for more detailed information about advanced features.
 
 ## Installation
-Clone or copy this repository into:
+Clone or copy this repository into the packages directory. By default, they are located at:
 
 * OS X: ~/Library/Application Support/Sublime Text 2/Packages/
 * Windows: %APPDATA%/Roaming/Sublime Text 2/Packages/
 * Linux: ~/.config/sublime-text-2/Packages/
 
 ## Usage
-Simply type in the path (along with the new file name), and the entire directory structure will be created if it does not exist. Note, by default, this plugin takes an arbitrary folder from the project. If you have more than one folder in the project, you will need to specify it. For more information on this, see "Selecting top level folders" in the Features section.
+Simply type in the path (along with the new file name), and the entire directory structure will be created if it does not exist. Note, by default, this plugin takes an arbitrary folder from the project. If you have more than one folder in the project, you will need to specify it. For more information on this, see [Selecting top level folders](https://github.com/skuroda/Sublime-AdvancedNewFile#selecting-top-level-folders) in the Features section.
 
 ## Features
 ### __init__.py creation:
