@@ -6,5 +6,8 @@
     // match your systems convention. For example, Windows machines should 
     // have paths similar to "C:\\Users\\username\\Desktop". *nix systems should
     // have paths similar to "/home/username/desktop".
-    "alias": {}
+    "alias": {},
+
+    // A default initial value to fill the create new file input path with.
+    "default_initial": ""
 }

@@ -40,6 +40,8 @@ Create files relative to the current project. In addition, creates `__init__.py`
 `alias`: 
 A dictionary that contains a set of aliases tied to a directory. For each entry, the key represents the alias name and the value represents the path. Paths should be absolute. In addition, that paths specified should match the system style paths. For example, a Windows systems should have a path similar to `C:\\Users\\username\\Desktop` *nix systems should have paths similar to `/home/username/desktop`.
 
+`default_initial`:
+A string that will be automatically inserted into the new file creation input.
 
 ## Notes
 Thanks to Dima Kukushkin ([xobb1t](https://github.com/xobb1t)) for the original work on this plugin.

@@ -4,7 +4,8 @@ import sublime_plugin
 import copy
 
 SETTINGS = [
-    "alias"
+    "alias",
+    "default_initial"
 ]
 DEBUG = False
 PLATFORM = sublime.platform()
@@ -20,7 +21,8 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         settings = get_settings(self.view)
         self.aliases = settings.get("alias")
         PathAutocomplete.set_aliases(self.aliases)
-        self.show_filename_input()
+
+        self.show_filename_input(settings.get("default_initial"))
 
     def get_root(self, target=None):
         try:
