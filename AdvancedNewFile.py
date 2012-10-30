@@ -65,15 +65,18 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         PathAutocomplete.set_root(self.root)
 
     def update_filename_input(self, path):
+
         if self.top_level_split_char in path:
             parts = path.split(self.top_level_split_char)
             base = self.get_root(parts[0])
             PathAutocomplete.set_root(base)
             path = self.top_level_split_char.join(parts[1:])
+            empty = False
         else:
             PathAutocomplete.set_root(self.get_root())
+            empty = True
 
-        PathAutocomplete.set_path(path)
+        PathAutocomplete.set_path(path, empty)
 
     def entered_filename(self, filename):
         base = self.root
@@ -99,7 +102,8 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
     def create(self, filename):
         base, filename = os.path.split(filename)
         self.create_folder(base)
-        open(os.path.join(base, filename), "a").close()
+        if filename != "":
+            open(os.path.join(base, filename), "a").close()
 
     def create_folder(self, base):
         if not os.path.exists(base):
@@ -118,6 +122,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
     prev_base = ""
     prev_directory = ""
     aliases = {}
+    path_empty = True
 
     def map_function(self, val):
         return os.path.basename(val)
@@ -134,6 +139,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
 
             base = os.path.basename(PathAutocomplete.path)
             directory = os.path.dirname(PathAutocomplete.path)
+
             if base == "" or (base == prev_base and directory == prev_directory):
                 if DEBUG:
                     print "AdvancedNewFileDebug - (Prev) Suggestions"
@@ -142,7 +148,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
                 return PathAutocomplete.prev_suggestions
 
             # Project folders
-            if directory == "":
+            if directory == "" and PathAutocomplete.path_empty:
                 folders = sublime.active_window().folders()
                 folders = map(self.map_function, folders)
 
@@ -151,7 +157,6 @@ class PathAutocomplete(sublime_plugin.EventListener):
                         suggestions.append((folder + ":", folder + ":"))
 
             # Aliases
-            if directory == "":
                 for alias in aliases:
                     if alias.find(base) == 0:
                         suggestions.append((alias + ":", alias + ":"))
@@ -162,21 +167,24 @@ class PathAutocomplete(sublime_plugin.EventListener):
             for filename in os.listdir(path):
                 if os.path.isdir(os.path.join(path, filename)):
                     if filename.find(base) == 0:
-                        suggestions.append((filename + sep, filename + sep))
+                        # Space keeps it from matching previous entries
+                        # Kind of a hack of a fix, but seems to work.
+                        suggestions.append((" " + filename + sep, filename + sep))
             #suggestions.append((base, base))
             PathAutocomplete.prev_directory = copy.deepcopy(directory)
             PathAutocomplete.prev_base = copy.deepcopy(base)
             PathAutocomplete.prev_suggestions = copy.deepcopy(suggestions)
 
-        if DEBUG:
-            print "AdvancedNewFileDebug - Suggestions:"
-            print suggestions
+            if DEBUG:
+                print "AdvancedNewFileDebug - Suggestions:"
+                print suggestions
 
         return suggestions
 
     @staticmethod
-    def set_path(path_input):
+    def set_path(path_input, empty):
         PathAutocomplete.path = path_input
+        PathAutocomplete.path_empty = empty
 
     @staticmethod
     def set_root(root_input):
