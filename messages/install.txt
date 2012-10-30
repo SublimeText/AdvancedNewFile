@@ -1,0 +1,7 @@
+Thank you for installing the AdvancedNewFile plugin.
+
+For more information please visit https://github.com/skuroda/Sublime-AdvancedNewFile.
+
+If you have any questions, comments, or run into issues, please let me know! Hope you enjoy the plugin.
+
+Thank you!
