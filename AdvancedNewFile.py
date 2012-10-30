@@ -6,7 +6,8 @@ import re
 
 SETTINGS = [
     "alias",
-    "default_initial"
+    "default_initial",
+    "use_cursor_text"
 ]
 DEBUG = False
 PLATFORM = sublime.platform()
@@ -69,7 +70,8 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         view.settings().set("auto_complete", True)
         view.settings().set("tab_size", 0)
         view.settings().set("translate_tabs_to_spaces", True)
-
+        # May be useful to see the popup for debugging
+        # view.settings().set("auto_complete_selector", 'text')
         PathAutocomplete.set_root(self.root)
 
     def update_filename_input(self, path):
@@ -126,17 +128,10 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         view = self.view
 
         for region in view.sel():
-            print region
             syntax = view.syntax_name(region.begin())
-            print syntax
             if re.match(".*string.quoted.double", syntax) or re.match(".*string.quoted.single", syntax):
-
                 path = view.substr(view.extract_scope(region.begin()))
-                print "path is " + path
                 path = re.sub('^"|\'', '',  re.sub('"|\'$', '', path.strip()))
-                print "2path is " + path
-                return path
-
             else:
                 return ""
 
@@ -193,6 +188,8 @@ class PathAutocomplete(sublime_plugin.EventListener):
             for filename in os.listdir(path):
                 if os.path.isdir(os.path.join(path, filename)):
                     if filename.find(base) == 0:
+                        if base[0] == ".":
+                            filename = filename[1:]
                         # Space keeps it from matching previous entries
                         # Kind of a hack of a fix, but seems to work.
                         suggestions.append((" " + filename + sep, filename + sep))
