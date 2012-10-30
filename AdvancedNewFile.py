@@ -2,6 +2,7 @@ import os
 import sublime
 import sublime_plugin
 import copy
+import re
 
 SETTINGS = [
     "alias",
@@ -21,8 +22,13 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         settings = get_settings(self.view)
         self.aliases = settings.get("alias")
         PathAutocomplete.set_aliases(self.aliases)
+        path = settings.get("default_initial", "")
+        if settings.get("use_cursor_text", False):
+            tmp = self.get_cursor_path()
+            if tmp != "":
+                path = tmp
 
-        self.show_filename_input(settings.get("default_initial"))
+        self.show_filename_input(path)
 
     def get_root(self, target=None):
         try:
@@ -115,6 +121,24 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
             os.mkdir(base)
         if self.is_python:
             open(os.path.join(base, '__init__.py'), 'a').close()
+
+    def get_cursor_path(self):
+        view = self.view
+
+        for region in view.sel():
+            print region
+            syntax = view.syntax_name(region.begin())
+            print syntax
+            if re.match(".*string.quoted.double", syntax) or re.match(".*string.quoted.single", syntax):
+
+                path = view.substr(view.extract_scope(region.begin()))
+                print "path is " + path
+                path = re.sub('^"|\'', '',  re.sub('"|\'$', '', path.strip()))
+                print "2path is " + path
+                return path
+
+            else:
+                return ""
 
 
 class PathAutocomplete(sublime_plugin.EventListener):

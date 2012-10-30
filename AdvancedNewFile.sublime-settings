@@ -1,7 +1,6 @@
 {
-    // This setting contains a dictionar of aliases. 
-    // The keys represent the alias names, the values
-    // represent the paths. 
+    // This setting contains a dictionar of aliases. The keys represent the 
+    //alias names, the values represent the paths. 
     // NOTE: These should be absolute paths. Also, these paths should 
     // match your systems convention. For example, Windows machines should 
     // have paths similar to "C:\\Users\\username\\Desktop". *nix systems should
@@ -9,5 +8,11 @@
     "alias": {},
 
     // A default initial value to fill the create new file input path with.
-    "default_initial": ""
+    "default_initial": "",
+
+    // A boolean defining if cursor text should be used. Currently, only
+    // text bound by single or double quotes will be read in. 
+    // NOTE: A value read from within quotes will override the default 
+    // initial string.
+    "use_cursor_text": false
 }
