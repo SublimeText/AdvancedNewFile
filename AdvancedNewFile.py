@@ -13,23 +13,30 @@ DEBUG = False
 PLATFORM = sublime.platform()
 
 
-class AdvancedNewFileCommand(sublime_plugin.TextCommand):
+class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
-    def run(self, edit, is_python=False):
+    def run(self, is_python=False):
         self.top_level_split_char = ":"
         self.is_python = is_python
-        self.window = self.view.window()
         self.root, path = self.split_path()
+        self.view = self.window.active_view()
+
+        # Settings will be based on the view
         settings = get_settings(self.view)
         self.aliases = settings.get("alias")
+
+        # Set some default values for the auto complete
         PathAutocomplete.set_show_files(settings.get("show_files"))
         PathAutocomplete.set_aliases(self.aliases)
+
+        # Search for initial string
         path = settings.get("default_initial", "")
         if settings.get("use_cursor_text", False):
             tmp = self.get_cursor_path()
             if tmp != "":
                 path = tmp
 
+        # Get user input
         self.show_filename_input(path)
 
     def split_path(self, path=""):
@@ -40,7 +47,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
                 path = "".join(parts[1:])
             elif "~/" == path[0:2] or "~\\" == path[0:2]:
                 root = os.path.expanduser("~")
-                path = "".join(path[2:])
+                path = path[2:]
             else:
                 root = self.window.folders()[0]
         except IndexError:
@@ -53,7 +60,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         return root, path
 
     def translate_alias(self, target):
-        if target == "":
+        if target == "" and self.view != None:
             filename = self.view.file_name()
             if filename != None:
                 root = os.path.dirname(filename)
@@ -88,6 +95,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         # May be useful to see the popup for debugging
         # if DEBUG:
         #     view.settings().set("auto_complete", True)
+
         PathAutocomplete.set_root(self.root, True)
 
     def update_filename_input(self, path_in):
@@ -131,8 +139,10 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
             open(os.path.join(base, '__init__.py'), 'a').close()
 
     def get_cursor_path(self):
-        view = self.view
+        if self.view == None:
+            return
 
+        view = self.view
         for region in view.sel():
             syntax = view.syntax_name(region.begin())
             if re.match(".*string.quoted.double", syntax) or re.match(".*string.quoted.single", syntax):
@@ -268,8 +278,10 @@ class PathAutocomplete(sublime_plugin.EventListener):
 
 def get_settings(view):
     settings = sublime.load_settings("AdvancedNewFile.sublime-settings")
-    project_settings = view.settings().get('AdvancedNewFile', {})
+    project_settings = {}
     local_settings = {}
+    if view != None:
+        project_settings = view.settings().get('AdvancedNewFile', {})
 
     for setting in SETTINGS:
         local_settings[setting] = settings.get(setting)
