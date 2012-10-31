@@ -13,11 +13,14 @@ Clone or copy this repository into the packages directory. By default, they are 
 * Linux: ~/.config/sublime-text-2/Packages/
 
 ## Usage
-Simply type in the path (along with the new file name), and the entire directory structure will be created if it does not exist. Note, by default, this plugin takes an arbitrary folder from the project. If you have more than one folder in the project, you will need to specify it. For more information on this, see [Selecting top level folders](https://github.com/skuroda/Sublime-AdvancedNewFile#selecting-top-level-folders) in the Features section.
+Simply type in the path (along with the new file name), and the entire directory structure will be created if it does not exist. If the newly specified path ends as a directory (e.g. with `/`), then each text entry will be used to generate a directory. For more advanced usage of this plugin, be sure to look at [Advanced Path Specification](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage) and [Features](https://github.com/skuroda/Sublime-AdvancedNewFile#features)
 
-## Features
-### __init__.py creation:
-This plugin may optionally create `__init__` in the created directories. This can be done by utilizing the correct keymap (`shift+super+alt+n (shift+ctrl+alt+n on windows)`) by default.
+**Default directory:**
+If the plugin is launched without folders, the default directory will be your home directory. If, however, the plugin is launched in a window that contains open folders, the top most folder in the view will be taken as the default directory.
+
+## Advanced Path Usage
+### Home directory:
+To begin at the home directory simply start with `~/` like you would in the shell.
 
 ### Selecting top level folders:
 Top level folders can be specified by typing in the name of the folder followed by a colon. Then specify the path as you would normally.
@@ -27,14 +30,14 @@ You can create an alias to quickly navigate to a directory. Simply type in the a
 
 In addition to specifying an alias, you can also simply specify a colon, without any preceding text. This create the directory structure, beginning at the same location as the file currently in the view, if it exists. If the current view does not have a file name, it will default to the first folder in the window.
 
+If an invalid alias and top level directory is specified, the plugin will default to using your home directory as root.
+
+## Features
+### __init__.py creation:
+This plugin may optionally create `__init__` in the created directories. This can be done by utilizing the correct keymap (`shift+super+alt+n (shift+ctrl+alt+n on windows)`) by default.
+
 ### Tab Autocompletion:
-After typing in a partial path, simply hit tab to autocomplete it. Continue to hit tab to cycle through the options. Currently, this leverages the built in autocomplete functionality. Future may leverage a custom completion. As such, text in the input field will also include stings seperated by predefined word separators.
-
-### Home directory:
-To begin at the home directory simply start with `~/` like you would in the shell.
-
-### Default directory:
-If the plugin is launched without folders, the default directory will be your home directory. If, however, the plugin is launched in a window that contains open folders, the top most folder in the view will be taken as the default directory.
+After typing in a partial path, simply hit tab to autocomplete it. Continue to hit tab to cycle through the options. Currently, this leverages the built in autocomplete functionality. As such, text in the input field will also include stings seperated by predefined word separators.
 
 ## Keymaps
 
