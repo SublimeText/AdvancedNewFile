@@ -30,6 +30,12 @@ In addition to specifying an alias, you can also simply specify a colon, without
 ### Tab Autocompletion:
 After typing in a partial path, simply hit tab to autocomplete it. Continue to hit tab to cycle through the options. Currently, this leverages the built in autocomplete functionality. Future may leverage a custom completion. As such, text in the input field will also include stings seperated by predefined word separators.
 
+### Home directory:
+To begin at the home directory simply start with `~/` like you would in the shell.
+
+### Default directory:
+If the plugin is launched without folders, the default directory will be your home directory. If, however, the plugin is launched in a window that contains open folders, the top most folder in the view will be taken as the default directory.
+
 ## Keymaps
 
 `super+alt+n (ctrl+alt+n on windows)`:

@@ -19,7 +19,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         self.top_level_split_char = ":"
         self.is_python = is_python
         self.window = self.view.window()
-        self.root = self.get_root()
+        self.root, path = self.split_path()
         settings = get_settings(self.view)
         self.aliases = settings.get("alias")
         PathAutocomplete.set_show_files(settings.get("show_files"))
@@ -32,34 +32,41 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
 
         self.show_filename_input(path)
 
-    def get_root(self, target=None):
+    def split_path(self, path=""):
         try:
-            # Default to a folder
-            root = self.window.folders()[0]
-            if target != None:
-            # If a target exists, search through folders and aliases
-            # Folders take precedence over aliases.
-                if target == "":
-                    filename = self.view.file_name()
-                    if filename != None:
-                        root = os.path.dirname(filename)
-                else:
-                    for folder in self.window.folders():
-                        basename = os.path.basename(folder)
-                        if basename == target:
-                            root = folder
-                            break
-                    for alias in self.aliases.keys():
-                        if alias == target:
-                            root = self.aliases.get(alias)
-                            break
+            if self.top_level_split_char in path:
+                parts = path.split(self.top_level_split_char)
+                root = self.translate_alias(parts[0])
+                path = "".join(parts[1:])
+            elif "~/" == path[0:2] or "~\\" == path[0:2]:
+                root = os.path.expanduser("~")
+                path = "".join(path[2:])
+            else:
+                root = self.window.folders()[0]
         except IndexError:
-            # If no folders exists, should create a file at the current directory
-            filename = self.view.filename()
-            root = os.path.abspath(os.path.dirname(filename))
+            root = os.path.expanduser("~")
 
         if DEBUG:
             print "AdvancedNewFileDebug - root: " + root
+            print "AdvancedNewFileDebug - path: " + path
+
+        return root, path
+
+    def translate_alias(self, target):
+        if target == "":
+            filename = self.view.file_name()
+            if filename != None:
+                root = os.path.dirname(filename)
+        else:
+            for folder in self.window.folders():
+                basename = os.path.basename(folder)
+                if basename == target:
+                    root = folder
+                    break
+            for alias in self.aliases.keys():
+                if alias == target:
+                    root = self.aliases.get(alias)
+                    break
 
         return root
 
@@ -83,26 +90,18 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         #     view.settings().set("auto_complete", True)
         PathAutocomplete.set_root(self.root, True)
 
-    def update_filename_input(self, path):
-        if self.top_level_split_char in path:
-            parts = path.split(self.top_level_split_char)
-            base = self.get_root(parts[0])
+    def update_filename_input(self, path_in):
+        base, path = self.split_path(path_in)
+        if self.top_level_split_char in path_in:
             PathAutocomplete.set_root(base, False)
-            path = self.top_level_split_char.join(parts[1:])
         else:
-            PathAutocomplete.set_root(self.get_root(), True)
+            PathAutocomplete.set_root(base, True)
 
         PathAutocomplete.set_path(path)
 
     def entered_filename(self, filename):
-        base = self.root
-
-        if self.top_level_split_char in filename:
-            parts = filename.split(self.top_level_split_char)
-            base = self.get_root(parts[0])
-            filename = self.top_level_split_char.join(parts[1:])
-
-        file_path = os.path.join(base, filename)
+        base, path = self.split_path(filename)
+        file_path = os.path.join(base, path)
 
         if DEBUG:
             print "AdvancedNewFileDebug - Creating file at: " + file_path
@@ -110,6 +109,7 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
             self.create(file_path)
         if not os.path.isdir(file_path):
             self.window.open_file(file_path)
+
         self.clear()
 
     def clear(self):
