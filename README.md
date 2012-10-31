@@ -66,6 +66,16 @@ A boolean value determining if text from a buffer, currently bound by single or 
 
 A boolean value determining if regular files should be included in the autocompletion list.
 
+### Project Specific Settings
+All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
+
+    "settings":
+    {
+        "AdvancedNewFile":
+        {
+            "default_initial": "/project/specific/path"
+        }
+    }
 ## Notes
 Thanks to Dima Kukushkin ([xobb1t](https://github.com/xobb1t)) for the original work on this plugin.
 
