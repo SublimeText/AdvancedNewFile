@@ -60,6 +60,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         return root, path
 
     def translate_alias(self, target):
+        root = None
         if target == "" and self.view != None:
             filename = self.view.file_name()
             if filename != None:
@@ -74,6 +75,10 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 if alias == target:
                     root = self.aliases.get(alias)
                     break
+        if root == None:
+            root = os.path.expanduser("~")
+            if DEBUG:
+                print "Warning: No alias found for '" + target + "'"
 
         return root
 

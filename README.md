@@ -39,10 +39,12 @@ If the plugin is launched without folders, the default directory will be your ho
 ## Keymaps
 
 `super+alt+n (ctrl+alt+n on windows)`:
-Create files relative to the current project.
+
+General keymap to create new files.
 
 `shift+super+alt+n (shift+ctrl+alt+n on windows)`:
-Create files relative to the current project. In addition, creates `__init__.py` in all new folders.
+
+In addition to creating the folders specified, new folders will also contain an `__init__.py` file.
 
 ## Settings
 `alias`: 
