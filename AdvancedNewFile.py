@@ -9,7 +9,7 @@ SETTINGS = [
     "use_cursor_text",
     "show_files"
 ]
-DEBUG = True
+DEBUG = False
 PLATFORM = sublime.platform()
 
 
@@ -36,18 +36,23 @@ class AdvancedNewFileCommand(sublime_plugin.TextCommand):
         try:
             # Default to a folder
             root = self.window.folders()[0]
-            if target:
+            if target != None:
             # If a target exists, search through folders and aliases
             # Folders take precedence over aliases.
-                for folder in self.window.folders():
-                    basename = os.path.basename(folder)
-                    if basename == target:
-                        root = folder
-                        break
-                for alias in self.aliases.keys():
-                    if alias == target:
-                        root = self.aliases.get(alias)
-                        break
+                if target == "":
+                    filename = self.view.file_name()
+                    if filename != None:
+                        root = os.path.dirname(filename)
+                else:
+                    for folder in self.window.folders():
+                        basename = os.path.basename(folder)
+                        if basename == target:
+                            root = folder
+                            break
+                    for alias in self.aliases.keys():
+                        if alias == target:
+                            root = self.aliases.get(alias)
+                            break
         except IndexError:
             # If no folders exists, should create a file at the current directory
             filename = self.view.filename()
