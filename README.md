@@ -13,7 +13,7 @@ Clone or copy this repository into the packages directory. By default, they are 
 * Linux: ~/.config/sublime-text-2/Packages/
 
 ## Usage
-Simply type in the path (along with the new file name), and the entire directory structure will be created if it does not exist. If the newly specified path ends as a directory (e.g. with `/`), then each text entry will be used to generate a directory. For more advanced usage of this plugin, be sure to look at [Advanced Path Specification](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage) and [Features](https://github.com/skuroda/Sublime-AdvancedNewFile#features)
+Simply type in the path (along with the new file name), and the entire directory structure will be created if it does not exist. If the newly specified path ends as a directory (e.g. with `/`), then each text entry will be used to generate a directory. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage) and [Features](https://github.com/skuroda/Sublime-AdvancedNewFile#features)
 
 **Default directory:**
 If the plugin is launched without folders, the default directory will be your home directory. If, however, the plugin is launched in a window that contains open folders, the top most folder in the view will be taken as the default directory.
@@ -26,7 +26,7 @@ To begin at the home directory simply start with `~/` like you would in the shel
 Top level folders can be specified by typing in the name of the folder followed by a colon. Then specify the path as you would normally.
 
 ### Aliases:
-You can create an alias to quickly navigate to a directory. Simply type in the alias followed by a colon, as with specifying a top level folder. Then specify the path as you would normally. Note that a top level folder with the same name as an alias will take precedence. For more information, see "Settings"
+You can create an alias to quickly navigate to a directory. Simply type in the alias followed by a colon, as with specifying a top level folder. Then specify the path as you would normally. Note that a top level folder with the same name as an alias will take precedence. For more information, see [Settings](https://github.com/skuroda/Sublime-AdvancedNewFile#settings)
 
 In addition to specifying an alias, you can also simply specify a colon, without any preceding text. This create the directory structure, beginning at the same location as the file currently in the view, if it exists. If the current view does not have a file name, it will default to the first folder in the window.
 

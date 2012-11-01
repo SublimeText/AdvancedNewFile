@@ -42,9 +42,9 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
     def split_path(self, path=""):
         try:
             if self.top_level_split_char in path:
-                parts = path.split(self.top_level_split_char)
+                parts = path.split(self.top_level_split_char, 1)
                 root = self.translate_alias(parts[0])
-                path = "".join(parts[1:])
+                path = parts[1]
             elif "~/" == path[0:2] or "~\\" == path[0:2]:
                 root = os.path.expanduser("~")
                 path = path[2:]
