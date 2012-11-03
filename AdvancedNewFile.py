@@ -54,8 +54,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             root = os.path.expanduser("~")
 
         if DEBUG:
-            print "AdvancedNewFileDebug - root: " + root
-            print "AdvancedNewFileDebug - path: " + path
+            print "AdvancedNewFile[Debug]: root is " + root
+            print "AdvancedNewFile[Debug]: path is " + path
 
         return root, path
 
@@ -73,12 +73,11 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     break
             for alias in self.aliases.keys():
                 if alias == target:
-                    root = self.aliases.get(alias)
+                    root = os.path.expanduser(self.aliases.get(alias))
                     break
         if root == None:
             root = os.path.expanduser("~")
-            if DEBUG:
-                print "Warning: No alias found for '" + target + "'"
+            print "AdvancedNewFile[Warning]: No alias found for '" + target + "'"
 
         return root
 
@@ -117,7 +116,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         file_path = os.path.join(base, path)
 
         if DEBUG:
-            print "AdvancedNewFileDebug - Creating file at: " + file_path
+            print "AdvancedNewFile[Debug]: Creating file at " + file_path
         if not os.path.exists(file_path):
             self.create(file_path)
         if not os.path.isdir(file_path):
@@ -209,7 +208,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
 
             if self.continue_previous_autocomplete():
                 if DEBUG:
-                    print "AdvancedNewFileDebug - (Prev) Suggestions"
+                    print "AdvancedNewFile[Debug]: (Prev) Suggestions"
                     print PathAutocomplete.prev_suggestions
 
                 return PathAutocomplete.prev_suggestions
@@ -245,7 +244,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
                 PathAutocomplete.prev_suggestions = suggestions
                 PathAutocomplete.prev_root = root_path
                 if DEBUG:
-                    print "AdvancedNewFileDebug - Suggestions:"
+                    print "AdvancedNewFile[Debug]: Suggestions:"
                     print suggestions
 
         return suggestions
@@ -298,6 +297,6 @@ def get_settings(view):
             else:
                 local_settings[key] = project_settings[key]
         else:
-            print "AdvancedNewFile: Invalid key '" + key + "' in project settings."
+            print "AdvancedNewFile[Warning]: Invalid key '" + key + "' in project settings."
 
     return local_settings
