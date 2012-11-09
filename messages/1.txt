@@ -1,4 +1,1 @@
-AdvancedNewFile
----------------
-
 The repository has now been transferred to the proper URL. If you experienced any issues while this transition was occuring, my apologies. Please take a look at the README for new enhancments if you have not done so already.
