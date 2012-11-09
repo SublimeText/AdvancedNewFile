@@ -99,6 +99,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         # May be useful to see the popup for debugging
         # if DEBUG:
         #     view.settings().set("auto_complete", True)
+        #     view.settings().set("auto_complete_selector", "text")
 
         PathAutocomplete.set_root(self.root, True)
 
