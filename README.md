@@ -19,6 +19,23 @@ Clone or copy this repository into the packages directory. By default, they are 
 * Windows: %APPDATA%/Roaming/Sublime Text 2/Packages/
 * Linux: ~/.config/sublime-text-2/Packages/
 
+## Keymaps
+If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager.
+
+### Windows
+There is a known coflict with the popular plugin ZenCoding (also note that this plugin is no longer supported). I have looked through the key maps for the plugin replacing it [Emmet](https://github.com/sergeche/emmet-sublime), and have not seen any key conflicts.
+
+`ctrl+alt+n`: General keymap to create new files.
+
+`ctrl+shift+alt+n`: In addition to creating the folders specified, new folders will also contain an `__init__.py` file.
+
+### OS X and Linux
+The super keys for Linux and OS X are the Windows and command key respectively.
+
+`super+alt+n`: General keymap to create new files. 
+
+`shift+super+alt+n`: In addition to creating the folders specified, new folders will also contain an `__init__.py` file.
+
 ## Usage
 Simply type in the path (along with the new file name), and the entire directory structure will be created if it does not exist. If the newly specified path ends as a directory (e.g. with `/`), then each text entry will be used to generate a directory. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage) and [Features](https://github.com/skuroda/Sublime-AdvancedNewFile#features)
 
@@ -46,20 +63,10 @@ This plugin may optionally create `__init__` in the created directories. This ca
 ### Tab Autocompletion:
 After typing in a partial path, simply hit tab to autocomplete it. Continue to hit tab to cycle through the options. Currently, this leverages the built in autocomplete functionality. As such, text in the input field will also include stings seperated by predefined word separators.
 
-## Keymaps
-
-`super+alt+n (ctrl+alt+n on windows)`:
-
-General keymap to create new files.
-
-`shift+super+alt+n (shift+ctrl+alt+n on windows)`:
-
-In addition to creating the folders specified, new folders will also contain an `__init__.py` file.
-
 ## Settings
 `alias`: 
 
-A dictionary that contains a set of aliases tied to a directory. For each entry, the key represents the alias name and the value represents the path. Paths should be absolute. In addition, that paths specified should match the system style paths. For example, a Windows systems should have a path similar to `C:\\Users\\username\\Desktop` *nix systems should have paths similar to `/home/username/desktop`.
+A dictionary that contains a set of aliases tied to a directory. For each entry, the key represents the alias name and the value represents the path. Paths should be absolute. In addition, that paths specified should match the system style paths. For example, a Windows systems should have a path similar to `C:\\Users\\username\\Desktop` *nix systems should have paths similar to `/home/username/desktop`. Rather than an absolute path, you may also specify your alias from your home directory, by beginning your alias path with `~/`
 
 `default_initial`:
 
@@ -83,6 +90,7 @@ All of the above settings can also be specified as part of the project specific 
             "default_initial": "/project/specific/path"
         }
     }
+
 ## Notes
 Thanks to Dima Kukushkin ([xobb1t](https://github.com/xobb1t)) for the original work on this plugin.
 
