@@ -19,6 +19,12 @@ Clone or copy this repository into the packages directory. By default, they are 
 * Windows: %APPDATA%/Roaming/Sublime Text 2/Packages/
 * Linux: ~/.config/sublime-text-2/Packages/
 
+## Usage
+Simply type in the path (along with the new file name), and the entire directory structure will be created if it does not exist. If the newly specified path ends as a directory (e.g. with `/`), then each text entry will be used to generate a directory. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage) and [Features](https://github.com/skuroda/Sublime-AdvancedNewFile#features)
+
+**Default directory:**
+If the plugin is launched without folders, the default directory will be your home directory. If, however, the plugin is launched in a window that contains open folders, the top most folder in the view will be taken as the default directory.
+
 ## Keymaps
 If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager.
 
@@ -35,12 +41,6 @@ The super keys for Linux and OS X are the Windows and command key respectively.
 `super+alt+n`: General keymap to create new files. 
 
 `shift+super+alt+n`: In addition to creating the folders specified, new folders will also contain an `__init__.py` file.
-
-## Usage
-Simply type in the path (along with the new file name), and the entire directory structure will be created if it does not exist. If the newly specified path ends as a directory (e.g. with `/`), then each text entry will be used to generate a directory. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage) and [Features](https://github.com/skuroda/Sublime-AdvancedNewFile#features)
-
-**Default directory:**
-If the plugin is launched without folders, the default directory will be your home directory. If, however, the plugin is launched in a window that contains open folders, the top most folder in the view will be taken as the default directory.
 
 ## Advanced Path Usage
 ### Home directory:
@@ -66,7 +66,7 @@ After typing in a partial path, simply hit tab to autocomplete it. Continue to h
 ## Settings
 `alias`: 
 
-A dictionary that contains a set of aliases tied to a directory. For each entry, the key represents the alias name and the value represents the path. Paths should be absolute. In addition, that paths specified should match the system style paths. For example, a Windows systems should have a path similar to `C:\\Users\\username\\Desktop` *nix systems should have paths similar to `/home/username/desktop`. Rather than an absolute path, you may also specify your alias from your home directory, by beginning your alias path with `~/`
+A dictionary that contains a set of aliases tied to a directory. For each entry, the key represents the alias name and the value represents the path. Paths may be either absolute or relative. For absolute paths, use your system specific style (e.g. Windows `C:\\Users\\username\\Desktop`, *nix `/home/username/desktop/`. Relative paths are created from the location of the current view. If the current view does not exists on disk, then the base of the relative path is the home directory. You may also specify your alias from your home directory, by beginning your alias path with `~/`
 
 `default_initial`:
 
@@ -80,6 +80,8 @@ A boolean value determining if text from a buffer, currently bound by single or 
 
 A boolean value determining if regular files should be included in the autocompletion list.
 
+`show_path`:
+A boolean value used to determine if the path of the file to be created should be displayed in the status bar.
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
 

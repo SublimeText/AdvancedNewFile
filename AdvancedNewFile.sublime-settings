@@ -18,6 +18,10 @@
 
     // A boolean value specifying if regular files should be included in the auto
     // complete options.
-    "show_files": false
+    "show_files": false,
+
+    // A boolean specifying if the file path being created should be displayed in 
+    // the status bar.
+    "show_path": true
 
 }

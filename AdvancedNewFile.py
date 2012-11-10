@@ -7,7 +7,8 @@ SETTINGS = [
     "alias",
     "default_initial",
     "use_cursor_text",
-    "show_files"
+    "show_files",
+    "show_path"
 ]
 DEBUG = False
 PLATFORM = sublime.platform()
@@ -24,7 +25,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         # Settings will be based on the view
         settings = get_settings(self.view)
         self.aliases = settings.get("alias")
-
+        self.show_path = settings.get("show_path")
         # Set some default values for the auto complete
         PathAutocomplete.set_show_files(settings.get("show_files"))
         PathAutocomplete.set_aliases(self.aliases)
@@ -73,13 +74,21 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     break
             for alias in self.aliases.keys():
                 if alias == target:
-                    root = os.path.expanduser(self.aliases.get(alias))
+                    alias_path = self.aliases.get(alias)
+                    if re.search(r"^\.{1,2}[/\\]", alias_path) != None:
+                        if self.view.file_name() != None:
+                            alias_root = os.path.dirname(self.view.file_name())
+                        else:
+                            alias_root = os.path.expanduser("~")
+                        root = os.path.join(alias_root, alias_path)
+                    else:
+                        root = os.path.expanduser(alias_path)
                     break
         if root == None:
             root = os.path.expanduser("~")
             print "AdvancedNewFile[Warning]: No alias found for '" + target + "'"
 
-        return root
+        return os.path.abspath(root)
 
     def show_filename_input(self, initial=''):
         caption = 'Enter a path for a new file'
@@ -110,6 +119,9 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         else:
             PathAutocomplete.set_root(base, True)
 
+        if self.show_path:
+            self.view.set_status("AdvancedNewFile", "Creating file at %s " % os.path.join(base, path))
+
         PathAutocomplete.set_path(path)
 
     def entered_filename(self, filename):
@@ -126,6 +138,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         self.clear()
 
     def clear(self):
+        self.view.erase_status("AdvancedNewFile")
         PathAutocomplete.clear()
 
     def create(self, filename):
