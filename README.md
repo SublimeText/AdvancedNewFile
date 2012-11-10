@@ -29,7 +29,7 @@ If the plugin is launched without folders, the default directory will be your ho
 If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager.
 
 ### Windows
-There is a known coflict with the popular plugin ZenCoding (also note that this plugin is no longer supported). I have looked through the key maps for the plugin replacing it [Emmet](https://github.com/sergeche/emmet-sublime), and have not seen any key conflicts.
+There is a known coflict with the popular plugin [ZenCoding](https://github.com/sublimator/ZenCoding). 
 
 `ctrl+alt+n`: General keymap to create new files.
 
@@ -52,13 +52,25 @@ Top level folders can be specified by typing in the name of the folder followed 
 ### Aliases:
 You can create an alias to quickly navigate to a directory. Simply type in the alias followed by a colon, as with specifying a top level folder. Then specify the path as you would normally. Note that a top level folder with the same name as an alias will take precedence. For more information, see [Settings](https://github.com/skuroda/Sublime-AdvancedNewFile#settings)
 
-In addition to specifying an alias, you can also simply specify a colon, without any preceding text. This create the directory structure, beginning at the same location as the file currently in the view, if it exists. If the current view does not have a file name, it will default to the first folder in the window.
+Alias paths may be relative or absolute. If relative, the current view will be used as the base location. If the current view does not exist on disk, the home directory will be used as the base. When specifying absolute paths, be sure to use the system specific style (e.g. Windows `C:\\Users\\username\\Desktop`, *nix `/home/username/desktop/`). In addition, you may specify an alias from the home directory by using `~/`.
+
+In addition to specifying an alias, you can also simply specify a colon, without any preceding text. Using this will use the current working directory as the path base, if a view exists and is saved on disk. If the current view does not exist on disk, it will default to the first folder in the window or to the home directory if no folders exist in the window.
 
 If an invalid alias and top level directory is specified, the plugin will default to using your home directory as root.
 
+Sample aliases:
+
+    {
+        "alias": {
+            "Desktop": "~/Desktop/"
+        }
+    }
+
+To use the above alias, when specifying a new file enter `Desktop:testDir/testFile`, which would then create a file at `<home_directory>/testDir/testFile`.
+    
 ## Features
 ### __init__.py creation:
-This plugin may optionally create `__init__` in the created directories. This can be done by utilizing the correct keymap (`shift+super+alt+n (shift+ctrl+alt+n on windows)`) by default.
+This plugin may optionally create `__init__` in the created directories. Please reference [Key Maps](https://github.com/skuroda/Sublime-AdvancedNewFile#keymaps) to see the default key bindings to do this.
 
 ### Tab Autocompletion:
 After typing in a partial path, simply hit tab to autocomplete it. Continue to hit tab to cycle through the options. Currently, this leverages the built in autocomplete functionality. As such, text in the input field will also include stings seperated by predefined word separators.
@@ -66,7 +78,7 @@ After typing in a partial path, simply hit tab to autocomplete it. Continue to h
 ## Settings
 `alias`: 
 
-A dictionary that contains a set of aliases tied to a directory. For each entry, the key represents the alias name and the value represents the path. Paths may be either absolute or relative. For absolute paths, use your system specific style (e.g. Windows `C:\\Users\\username\\Desktop`, *nix `/home/username/desktop/`. Relative paths are created from the location of the current view. If the current view does not exists on disk, then the base of the relative path is the home directory. You may also specify your alias from your home directory, by beginning your alias path with `~/`
+A dictionary that contains a set of aliases tied to a directory. For more information, see [Aliases](https://github.com/skuroda/Sublime-AdvancedNewFile#aliases)
 
 `default_initial`:
 
@@ -81,6 +93,7 @@ A boolean value determining if text from a buffer, currently bound by single or 
 A boolean value determining if regular files should be included in the autocompletion list.
 
 `show_path`:
+
 A boolean value used to determine if the path of the file to be created should be displayed in the status bar.
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
