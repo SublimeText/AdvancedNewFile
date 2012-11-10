@@ -1,0 +1,4 @@
+New Features:
+
+- Add setting to display path for file to be created in status bar.
+- Add support for relative paths in alias.
