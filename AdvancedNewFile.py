@@ -8,7 +8,9 @@ SETTINGS = [
     "default_initial",
     "use_cursor_text",
     "show_files",
-    "show_path"
+    "show_path",
+    "default_root",
+    "default_path"
 ]
 DEBUG = False
 PLATFORM = sublime.platform()
@@ -17,15 +19,21 @@ PLATFORM = sublime.platform()
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
     def run(self, is_python=False):
+        self.root = None
         self.top_level_split_char = ":"
         self.is_python = is_python
-        self.root, path = self.split_path()
         self.view = self.window.active_view()
 
         # Settings will be based on the view
         settings = get_settings(self.view)
         self.aliases = settings.get("alias")
         self.show_path = settings.get("show_path")
+        default_root = self.get_default_root(settings.get("default_root"))
+        if default_root == "path":
+            self.root = os.path.expanduser(settings.get("default_path"))
+            default_root = ""
+        self.root, path = self.split_path(default_root)
+
         # Set some default values for the auto complete
         PathAutocomplete.set_show_files(settings.get("show_files"))
         PathAutocomplete.set_aliases(self.aliases)
@@ -40,6 +48,21 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         # Get user input
         self.show_filename_input(path)
 
+    def get_default_root(self, string):
+        root = ""
+
+        if string == "home":
+            root = "~/"
+        elif string == "current":
+            root = ":"
+        elif string == "top_folder":
+            pass
+        elif string == "path":
+            root = "path"
+        else:
+            print "Invalid specifier for \"default_root\""
+        return root
+
     def split_path(self, path=""):
         try:
             if self.top_level_split_char in path:
@@ -50,7 +73,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 root = os.path.expanduser("~")
                 path = path[2:]
             else:
-                root = self.window.folders()[0]
+                root = self.root or self.window.folders()[0]
         except IndexError:
             root = os.path.expanduser("~")
 
@@ -85,7 +108,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                         root = os.path.expanduser(alias_path)
                     break
         if root == None:
-            root = os.path.expanduser("~")
+            #root = os.path.expanduser("~")
+            root = self.root
             print "AdvancedNewFile[Warning]: No alias found for '" + target + "'"
 
         return os.path.abspath(root)
@@ -114,6 +138,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
     def update_filename_input(self, path_in):
         base, path = self.split_path(path_in)
+
         if self.top_level_split_char in path_in:
             PathAutocomplete.set_root(base, False)
         else:

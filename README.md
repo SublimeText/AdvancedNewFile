@@ -20,16 +20,16 @@ Clone or copy this repository into the packages directory. By default, they are 
 * Linux: ~/.config/sublime-text-2/Packages/
 
 ## Usage
-Simply type in the path (along with the new file name), and the entire directory structure will be created if it does not exist. If the newly specified path ends as a directory (e.g. with `/`), then each text entry will be used to generate a directory. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage) and [Features](https://github.com/skuroda/Sublime-AdvancedNewFile#features)
+Simply type in the path (along with the new file name), and the entire directory structure will be created if it does not exist. If the newly specified path ends as a directory (e.g. with `/`), then each text entry will be used to generate a directory. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage).
 
 **Default directory:**
-If the plugin is launched without folders, the default directory will be your home directory. If, however, the plugin is launched in a window that contains open folders, the top most folder in the view will be taken as the default directory.
+If the plugin is launched without folders, the specified default root will be used. If this cannot be resolved, the home directory will be used. This is a configurable item. See [Settings](https://github.com/skuroda/Sublime-AdvancedNewFile#settings) (`default_root`) for more information.
 
 ## Keymaps
 If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager.
 
 ### Windows
-There is a known coflict with the popular plugin [ZenCoding](https://github.com/sublimator/ZenCoding). 
+There is a known conflict with the popular plugin [ZenCoding](https://github.com/sublimator/ZenCoding). 
 
 `ctrl+alt+n`: General keymap to create new files.
 
@@ -41,39 +41,6 @@ The super keys for Linux and OS X are the Windows and command key respectively.
 `super+alt+n`: General keymap to create new files. 
 
 `shift+super+alt+n`: In addition to creating the folders specified, new folders will also contain an `__init__.py` file.
-
-## Advanced Path Usage
-### Home directory:
-To begin at the home directory simply start with `~/` like you would in the shell.
-
-### Selecting top level folders:
-Top level folders can be specified by typing in the name of the folder followed by a colon. Then specify the path as you would normally.
-
-### Aliases:
-You can create an alias to quickly navigate to a directory. Simply type in the alias followed by a colon, as with specifying a top level folder. Then specify the path as you would normally. Note that a top level folder with the same name as an alias will take precedence. For more information, see [Settings](https://github.com/skuroda/Sublime-AdvancedNewFile#settings)
-
-Alias paths may be relative or absolute. If relative, the current view will be used as the base location. If the current view does not exist on disk, the home directory will be used as the base. When specifying absolute paths, be sure to use the system specific style (e.g. Windows `C:\\Users\\username\\Desktop`, *nix `/home/username/desktop/`). In addition, you may specify an alias from the home directory by using `~/`.
-
-In addition to specifying an alias, you can also simply specify a colon, without any preceding text. Using this will use the current working directory as the path base, if a view exists and is saved on disk. If the current view does not exist on disk, it will default to the first folder in the window or to the home directory if no folders exist in the window.
-
-If an invalid alias and top level directory is specified, the plugin will default to using your home directory as root.
-
-Sample aliases:
-
-    {
-        "alias": {
-            "Desktop": "~/Desktop/"
-        }
-    }
-
-To use the above alias, when specifying a new file enter `Desktop:testDir/testFile`, which would then create a file at `<home_directory>/testDir/testFile`.
-    
-## Features
-### __init__.py creation:
-This plugin may optionally create `__init__` in the created directories. Please reference [Key Maps](https://github.com/skuroda/Sublime-AdvancedNewFile#keymaps) to see the default key bindings to do this.
-
-### Tab Autocompletion:
-After typing in a partial path, simply hit tab to autocomplete it. Continue to hit tab to cycle through the options. Currently, this leverages the built in autocomplete functionality. As such, text in the input field will also include stings seperated by predefined word separators.
 
 ## Settings
 `alias`: 
@@ -95,6 +62,22 @@ A boolean value determining if regular files should be included in the autocompl
 `show_path`:
 
 A boolean value used to determine if the path of the file to be created should be displayed in the status bar.
+
+`default_root`:
+
+This value is used to determine the default root when using AdvancedNewFile. It must be one of the following values:
+
+* `top_folder`- The default path will be the top level folder in the window. Note this is the Default value on a clean install.
+* `current_view` - The default path will be the directory of the current active view.
+* `home` - The default path will be your home directory.
+* `path` - The default path will be defined by the setting `default_path`
+
+If the top level folder or directory for the current view cannot be resolved, the home directory will be used.
+
+`default_path`:
+
+This path is used as the default if `path` has been specified for the setting `default_root`. 
+
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
 
@@ -105,6 +88,42 @@ All of the above settings can also be specified as part of the project specific 
             "default_initial": "/project/specific/path"
         }
     }
+
+
+## Features
+#### __init__.py creation:
+This plugin may optionally create `__init__` in the created directories. Please reference [Key Maps](https://github.com/skuroda/Sublime-AdvancedNewFile#keymaps) to see the default key bindings to do this.
+
+#### Tab Autocompletion:
+After typing in a partial path, simply press tab to autocomplete it. Continue to press tab to cycle through the options.
+
+### Advanced Path Usage
+#### Home directory:
+To begin at the home directory simply start with `~/` like you would in the shell.
+
+#### Aliases:
+You can create an alias to quickly navigate to a directory. Simply type in the alias followed by a colon. Then specify the path as you would normally. Note, in an event a specified alias conflicts with a [predefined alias](https://github.com/skuroda/Sublime-AdvancedNewFile#predefined-aliases), the predefined alias will take precedence.
+
+Alias paths may be relative or absolute. If relative, the current view will be used as the base location. If the current view does not exist on disk, the home directory will be used as the base. When specifying absolute paths, be sure to use the system specific style (e.g. Windows `C:\\Users\\username\\Desktop`, OS X and Linix `/home/username/desktop/`). In addition, you may specify an alias from the home directory by using `~/`.
+
+If an invalid alias is specified, the plugin will default to the specified `default_root`. If the default root cannot be resolved, such as no top level folders existing, the home directory will be used as the root.
+
+Sample aliases:
+
+    {
+        "alias": {
+            "Desktop": "~/Desktop/"
+        }
+    }
+
+To use the above alias, when specifying a new file enter `Desktop:testDir/testFile`, which would then create a file at `<home_directory>/Desktop/testDir/testFile`.
+    
+##### Predefined Aliases
+###### Top level folders in window
+Top level folders can be specified by typing in the name of the folder followed by a colon. Then specify the path as you would normally. 
+
+###### Current Working Directory
+To specify the current working directory, simply type a colon, without any preceding text. 
 
 ## Notes
 Thanks to Dima Kukushkin ([xobb1t](https://github.com/xobb1t)) for the original work on this plugin.

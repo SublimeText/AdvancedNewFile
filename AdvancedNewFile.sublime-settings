@@ -22,6 +22,19 @@
 
     // A boolean specifying if the file path being created should be displayed in 
     // the status bar.
-    "show_path": true
+    "show_path": true,
 
+    // This value specifies the default directory when using AdvancedNewFile.
+    // Note it must be one of these values:
+    //  top_folder - Default will be the top level folder in the window.
+    //  current - Default will be the directory of the current view.
+    //  home - Default will be the home folder (~/)
+    //  path - Default will be defined by the setting "default_path"
+    // If the current view or top folder cannot be resolved, the home directory
+    // will be used.
+    "default_root": "top_folder",
+
+    // A string specifying the default root to use. For this to be utilized, 
+    // "default_root" must be set to "path"
+    "default_path": "~/Desktop"
 }
