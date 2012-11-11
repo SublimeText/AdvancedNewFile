@@ -106,9 +106,9 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         temp = temp.replace(".", "")
         view.settings().set("word_separators", temp)
         # May be useful to see the popup for debugging
-        # if DEBUG:
-        #     view.settings().set("auto_complete", True)
-        #     view.settings().set("auto_complete_selector", "text")
+        if DEBUG:
+            view.settings().set("auto_complete", True)
+            view.settings().set("auto_complete_selector", "text")
 
         PathAutocomplete.set_root(self.root, True)
 
@@ -183,9 +183,6 @@ class PathAutocomplete(sublime_plugin.EventListener):
     default_root = True
     show_files = False
 
-    def map_function(self, val):
-        return os.path.basename(val)
-
     def continue_previous_autocomplete(self):
         sep = os.sep
         root_path = PathAutocomplete.root + sep
@@ -212,57 +209,100 @@ class PathAutocomplete(sublime_plugin.EventListener):
         return False
 
     def on_query_completions(self, view, prefix, locations):
+        if view.name() != "AdvancedNewFileCreation":
+            return []
+
+        if self.continue_previous_autocomplete():
+            if DEBUG:
+                print "AdvancedNewFile[Debug]: (Prev) Suggestions"
+                print PathAutocomplete.prev_suggestions
+
+            return PathAutocomplete.prev_suggestions
+
         suggestions = []
-        if (view.name() == "AdvancedNewFileCreation"):
-            sep = os.sep
-            root_path = PathAutocomplete.root + sep
-            aliases = PathAutocomplete.aliases
+        suggestions_w_spaces = []
+        root_path = PathAutocomplete.root + os.sep
+        directory, base = os.path.split(PathAutocomplete.path)
 
-            base = os.path.basename(PathAutocomplete.path)
-            directory = os.path.dirname(PathAutocomplete.path)
-
-            if self.continue_previous_autocomplete():
-                if DEBUG:
-                    print "AdvancedNewFile[Debug]: (Prev) Suggestions"
-                    print PathAutocomplete.prev_suggestions
-
-                return PathAutocomplete.prev_suggestions
-
+        if directory == "" and PathAutocomplete.default_root:
             # Project folders
-            if directory == "" and PathAutocomplete.default_root:
-                folders = sublime.active_window().folders()
-                folders = map(self.map_function, folders)
-
-                for folder in folders:
-                    if folder.find(base) == 0:
-                        suggestions.append((folder + ":", folder + ":"))
-
+            sugg, sugg_w_spaces = self.generate_project_auto_complete(base)
+            suggestions += sugg
+            suggestions_w_spaces += sugg_w_spaces
             # Aliases
-                for alias in aliases:
-                    if alias.find(base) == 0:
-                        suggestions.append((alias + ":", alias + ":"))
+            sugg, sugg_w_spaces = self.generate_alias_auto_complete(base)
+            suggestions += sugg
+            suggestions_w_spaces += sugg_w_spaces
 
-            # Directories
-            path = os.path.join(root_path, directory)
-            if os.path.exists(path):
-                for filename in os.listdir(path):
-                    if PathAutocomplete.show_files or os.path.isdir(os.path.join(path, filename)):
-                        if filename.find(base) == 0:
-                            # Need to find a better way to do the auto complete.
-                            if os.path.isdir(os.path.join(path, filename)):
-                                suggestions.append((" " + filename + sep, filename + sep))
-                            else:
-                                suggestions.append((" " + filename, filename))
-                #suggestions.append((base, base))
-                PathAutocomplete.prev_directory = directory
-                PathAutocomplete.prev_base = base
-                PathAutocomplete.prev_suggestions = suggestions
-                PathAutocomplete.prev_root = root_path
-                if DEBUG:
-                    print "AdvancedNewFile[Debug]: Suggestions:"
-                    print suggestions
+        # Directories
+        path = os.path.join(root_path, directory)
+        if os.path.exists(path):
+            sugg, sugg_w_spaces = self.generate_relative_auto_complete(path, base)
+            suggestions += sugg
+            suggestions_w_spaces += sugg_w_spaces
+
+        # If suggestions exist, use complete name
+        # else remove base prefix
+        if len(suggestions) > 0:
+            for name in suggestions_w_spaces:
+                suggestions.append((" " + name, name))
+        else:
+            for name in suggestions_w_spaces:
+                temp = name
+                name = name[len(base) - 1:]
+                suggestions.append((" " + temp, name))
+
+        # Previous used to determine cycling through entries.
+        PathAutocomplete.prev_directory = directory
+        PathAutocomplete.prev_base = base
+        PathAutocomplete.prev_suggestions = suggestions
+        PathAutocomplete.prev_root = root_path
+
+        if DEBUG:
+            print "AdvancedNewFile[Debug]: Suggestions:"
+            print suggestions
 
         return suggestions
+
+    def generate_project_auto_complete(self, base):
+        folders = sublime.active_window().folders()
+        folders = map(lambda f: os.path.basename(f), folders)
+        return self.generate_auto_complete(base, folders)
+
+    def generate_alias_auto_complete(self, base):
+        return self.generate_auto_complete(base, PathAutocomplete.aliases)
+
+    def generate_auto_complete(self, base, iterable_var):
+        sugg = []
+        sugg_w_spaces = []
+        for entry in iterable_var:
+            if entry.find(base) == 0:
+                if " " in base:
+                    sugg_w_spaces.append(entry + ":")
+                else:
+                    sugg.append((entry + ":", entry + ":"))
+        return sugg, sugg_w_spaces
+
+    def generate_relative_auto_complete(self, path, base):
+        sep = os.sep
+        sugg = []
+        sugg_w_spaces = []
+        for filename in os.listdir(path):
+            if PathAutocomplete.show_files or os.path.isdir(os.path.join(path, filename)):
+                if filename.find(base) == 0:
+                    # Need to find a better way to do the auto complete.
+                    if " " in base:
+                        if os.path.isdir(os.path.join(path, filename)):
+                            sugg_w_spaces.append(filename + sep)
+                        else:
+                            sugg_w_spaces.append(filename)
+                    else:
+                        if os.path.isdir(os.path.join(path, filename)):
+                            sugg.append((" " + filename + sep, filename + sep))
+                        else:
+                            sugg.append((" " + filename, filename))
+
+        return sugg, sugg_w_spaces
 
     @staticmethod
     def set_path(path_input):
