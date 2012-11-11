@@ -120,7 +120,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             PathAutocomplete.set_root(base, True)
 
         if self.show_path:
-            self.view.set_status("AdvancedNewFile", "Creating file at %s " % os.path.join(base, path))
+            self.view.set_status("AdvancedNewFile", "Creating file at %s " % \
+                os.path.abspath(os.path.join(base, path)))
 
         PathAutocomplete.set_path(path)
 
