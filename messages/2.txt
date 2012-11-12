@@ -1,4 +1,10 @@
-New Features:
+New Features/Enhancements:
 
-- Add setting to display path for file to be created in status bar.
+- Add setting to display path for file to be created in status bar. - Default true
+- Add setting to set default base path (home, current, top_folder, path). - Default "top_folder" 
 - Add support for relative paths in alias.
+
+Please see the README for more information about the new settings.
+
+Bug Fixes:
+- Auto complete bug for files with spaces in their name
