@@ -36,5 +36,5 @@
 
     // A string specifying the default root to use. For this to be utilized, 
     // "default_root" must be set to "path"
-    "default_path": "~/Desktop"
+    "default_path": "~"
 }
