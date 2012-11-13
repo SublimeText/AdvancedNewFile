@@ -20,10 +20,10 @@ Clone or copy this repository into the packages directory. By default, they are 
 * Linux: ~/.config/sublime-text-2/Packages/
 
 ## Usage
-Simply bring up the AdvancedNewFile input through the appropriate [key binding](https://github.com/skuroda/Sublime-AdvancedNewFile). Then, enter the path, along with the file name into the input field. Upon pressing enter, the file will be created. In addition, if the directories specified do not yet exists, they will also be created. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage).
+Simply bring up the AdvancedNewFile input through the appropriate [key binding](https://github.com/skuroda/Sublime-AdvancedNewFile). Then, enter the path, along with the file name into the input field. Upon pressing enter, the file will be created. In addition, if the directories specified do not yet exists, they will also be created. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage). By default, the path to the file being created will be filled shown in the status bar as you enter the path information.
 
 **Default directory:**
-If the plugin is launched without folders, the specified default root will be used. If this cannot be resolved, the home directory will be used. This is a configurable item. See [Settings](https://github.com/skuroda/Sublime-AdvancedNewFile#settings) (`default_root`) for more information.
+The default directory is specified by the `default_root` setting. By default, it will be the top directory of the folders listed in the window. If this cannot be resolved, the home directory will be used. See [Settings](https://github.com/skuroda/Sublime-AdvancedNewFile#settings) (`default_root`) for more information.
 
 ## Keymaps
 If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager.
@@ -72,7 +72,7 @@ This value is used to determine the default root when using AdvancedNewFile. It 
 * `home` - The default path will be your home directory.
 * `path` - The default path will be defined by the setting `default_path`
 
-If the top level folder or directory for the current view cannot be resolved, the home directory will be used.
+If the current view's directory cannot be resolved, the top level folder in the window will be used. If the top level folder in the window cannot be resolved either, the home directory will be used.
 
 `default_path`:
 
