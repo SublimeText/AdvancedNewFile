@@ -20,7 +20,7 @@ Clone or copy this repository into the packages directory. By default, they are 
 * Linux: ~/.config/sublime-text-2/Packages/
 
 ## Usage
-Simply type in the path (along with the new file name), and the entire directory structure will be created if it does not exist. If the newly specified path ends as a directory (e.g. with `/`), then each text entry will be used to generate a directory. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage).
+Simply bring up the AdvancedNewFile input through the appropriate [key binding](https://github.com/skuroda/Sublime-AdvancedNewFile). Then, enter the path, along with the file name into the input field. Upon pressing enter, the file will be created. In addition, if the directories specified do not yet exists, they will also be created. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage).
 
 **Default directory:**
 If the plugin is launched without folders, the specified default root will be used. If this cannot be resolved, the home directory will be used. This is a configurable item. See [Settings](https://github.com/skuroda/Sublime-AdvancedNewFile#settings) (`default_root`) for more information.
