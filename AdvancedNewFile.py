@@ -10,7 +10,8 @@ SETTINGS = [
     "show_files",
     "show_path",
     "default_root",
-    "default_path"
+    "default_path",
+    "os_specific_alias"
 ]
 DEBUG = False
 PLATFORM = sublime.platform()
@@ -26,7 +27,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
         # Settings will be based on the view
         settings = get_settings(self.view)
-        self.aliases = settings.get("alias")
+        self.aliases = self.get_aliases(settings)
         self.show_path = settings.get("show_path")
         default_root = self.get_default_root(settings.get("default_root"))
         if default_root == "path":
@@ -47,6 +48,15 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
         # Get user input
         self.show_filename_input(path)
+
+    def get_aliases(self, settings):
+        aliases = settings.get("alias")
+        all_os_aliases = settings.get("os_specific_alias")
+        for key in all_os_aliases:
+            if PLATFORM.lower() in all_os_aliases.get(key):
+                aliases[key] = all_os_aliases.get(key).get(PLATFORM.lower())
+
+        return aliases
 
     def get_default_root(self, string):
         root = ""
@@ -209,14 +219,15 @@ class PathAutocomplete(sublime_plugin.EventListener):
     show_files = False
 
     def continue_previous_autocomplete(self):
+        pac = PathAutocomplete
         sep = os.sep
-        root_path = PathAutocomplete.root + sep
-        prev_base = PathAutocomplete.prev_base
-        prev_directory = PathAutocomplete.prev_directory
-        prev_root = PathAutocomplete.prev_root
+        root_path = pac.root + sep
+        prev_base = pac.prev_base
+        prev_directory = pac.prev_directory
+        prev_root = pac.prev_root
 
-        base = os.path.basename(PathAutocomplete.path)
-        directory = os.path.dirname(PathAutocomplete.path)
+        base = os.path.basename(pac.path)
+        directory = os.path.dirname(pac.path)
 
         # If base is empty, we may be cycling through directory options
         if base == "":
@@ -226,10 +237,10 @@ class PathAutocomplete(sublime_plugin.EventListener):
         if base == prev_base and \
         directory == prev_directory and \
         prev_root == root_path and \
-        PathAutocomplete.default_root:
+        pac.default_root:
             return True
         # Continue completions if file names are completed.
-        if os.path.isfile(os.path.join(root_path, PathAutocomplete.path)):
+        if os.path.isfile(os.path.join(root_path, pac.path)):
             return True
         return False
 
@@ -237,19 +248,20 @@ class PathAutocomplete(sublime_plugin.EventListener):
         if view.name() != "AdvancedNewFileCreation":
             return []
 
+        pac = PathAutocomplete
         if self.continue_previous_autocomplete():
             if DEBUG:
                 print "AdvancedNewFile[Debug]: (Prev) Suggestions"
-                print PathAutocomplete.prev_suggestions
+                print pac.prev_suggestions
 
-            return PathAutocomplete.prev_suggestions
+            return pac.prev_suggestions
 
         suggestions = []
         suggestions_w_spaces = []
-        root_path = PathAutocomplete.root + os.sep
-        directory, base = os.path.split(PathAutocomplete.path)
+        root_path = pac.root + os.sep
+        directory, base = os.path.split(pac.path)
 
-        if directory == "" and PathAutocomplete.default_root:
+        if directory == "" and pac.default_root:
             # Project folders
             sugg, sugg_w_spaces = self.generate_project_auto_complete(base)
             suggestions += sugg
@@ -278,10 +290,10 @@ class PathAutocomplete(sublime_plugin.EventListener):
                 suggestions.append((" " + temp, name))
 
         # Previous used to determine cycling through entries.
-        PathAutocomplete.prev_directory = directory
-        PathAutocomplete.prev_base = base
-        PathAutocomplete.prev_suggestions = suggestions
-        PathAutocomplete.prev_root = root_path
+        pac.prev_directory = directory
+        pac.prev_base = base
+        pac.prev_suggestions = suggestions
+        pac.prev_root = root_path
 
         if DEBUG:
             print "AdvancedNewFile[Debug]: Suggestions:"

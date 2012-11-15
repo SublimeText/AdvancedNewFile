@@ -7,6 +7,13 @@
     // have paths similar to "/home/username/desktop".
     "alias": {},
 
+    // This is a secondary field for aliases. These aliases will be platform specific.
+    // The key for the entry will still represent the name to be used for the alias.
+    // Rather than being just a string path, the value will be a nested dictionary.
+    // The dictionary may have one of three keys, "windows", "linux", or "osx".
+    // The path used for this alias will be based on the operating system being used.
+    "os_specific_alias": {},
+
     // A default initial value to fill the create new file input path with.
     "default_initial": "",
 
