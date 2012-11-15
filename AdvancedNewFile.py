@@ -15,6 +15,7 @@ SETTINGS = [
 ]
 DEBUG = False
 PLATFORM = sublime.platform()
+VIEW_NAME = "AdvancedNewFileCreation"
 
 
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
@@ -74,12 +75,13 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         return root
 
     def split_path(self, path=""):
+        HOME_REGEX = r"^~[/\\]"
         try:
             if self.top_level_split_char in path:
                 parts = path.split(self.top_level_split_char, 1)
                 root = self.translate_alias(parts[0])
                 path = parts[1]
-            elif "~/" == path[0:2] or "~\\" == path[0:2]:
+            elif re.match(HOME_REGEX, path):
                 root = os.path.expanduser("~")
                 path = path[2:]
             else:
@@ -94,10 +96,11 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         return root, path
 
     def translate_alias(self, target):
+        RELATIVE_REGEX = r"^\.{1,2}[/\\]"
         root = None
-        if target == "" and self.view != None:
+        if target == "" and self.view is not None:
             filename = self.view.file_name()
-            if filename != None:
+            if filename is not None:
                 root = os.path.dirname(filename)
         else:
             for folder in self.window.folders():
@@ -108,8 +111,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             for alias in self.aliases.keys():
                 if alias == target:
                     alias_path = self.aliases.get(alias)
-                    if re.search(r"^\.{1,2}[/\\]", alias_path) != None:
-                        if self.view.file_name() != None:
+                    if re.search(RELATIVE_REGEX, alias_path) is not None:
+                        if self.view.file_name() is not None:
                             alias_root = os.path.dirname(self.view.file_name())
                         else:
                             alias_root = os.path.expanduser("~")
@@ -117,8 +120,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     else:
                         root = os.path.expanduser(alias_path)
                     break
-        if root == None:
-            #root = os.path.expanduser("~")
+        if root is None:
             root = self.root
             print "AdvancedNewFile[Warning]: No alias found for '" + target + "'"
 
@@ -133,7 +135,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             self.entered_filename, self.update_filename_input, self.clear
         )
 
-        view.set_name("AdvancedNewFileCreation")
+        view.set_name(VIEW_NAME)
         view.settings().set("tab_size", 0)
         view.settings().set("translate_tabs_to_spaces", True)
         temp = view.settings().get("word_separators")
@@ -245,7 +247,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
         return False
 
     def on_query_completions(self, view, prefix, locations):
-        if view.name() != "AdvancedNewFileCreation":
+        if view.name() != VIEW_NAME:
             return []
 
         pac = PathAutocomplete
