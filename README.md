@@ -6,8 +6,10 @@ Advanced file creation for Sublime Text 2
 This plugin allows for faster file creation within a project. Please see the [Features](https://github.com/skuroda/Sublime-AdvancedNewFile#features) section for more detailed information about advanced features.
 
 ## Installation
+Note with either method, you may need to restart Sublime Text 2 for the plugin to load.
+
 ### Package Control
-Installation through [package control](http://wbond.net/sublime_packages/package_control) is recommended. It will handle updating your packages as they become available. To install, do the following. Note you made need to restart Sublime Text prior to the plugin loading.
+Installation through [package control](http://wbond.net/sublime_packages/package_control) is recommended. It will handle updating your packages as they become available. To install, do the following.
 
 * In the Command Palette, enter `Package Control: Install Package`
 * Search for `AdvancedNewFile`
