@@ -7,7 +7,7 @@ This plugin allows for faster file creation within a project. Please see the [Fe
 
 ## Installation
 ### Package Control
-Installation through [package control](http://wbond.net/sublime_packages/package_control) is recommended. It will handle updating your packages as they become available. To install, do the following.
+Installation through [package control](http://wbond.net/sublime_packages/package_control) is recommended. It will handle updating your packages as they become available. To install, do the following. Note you made need to restart Sublime Text prior to the plugin loading.
 
 * In the Command Palette, enter `Package Control: Install Package`
 * Search for `AdvancedNewFile`

@@ -160,6 +160,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             if self.view != None:
                 self.view.set_status("AdvancedNewFile", "Creating file at %s " % \
                     os.path.abspath(os.path.join(base, path)))
+            else:
+                sublime.status_message("Unable to fill status bar without view")
 
         PathAutocomplete.set_path(path)
 
