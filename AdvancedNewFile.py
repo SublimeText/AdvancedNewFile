@@ -157,8 +157,9 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             PathAutocomplete.set_root(base, True)
 
         if self.show_path:
-            self.view.set_status("AdvancedNewFile", "Creating file at %s " % \
-                os.path.abspath(os.path.join(base, path)))
+            if self.view != None:
+                self.view.set_status("AdvancedNewFile", "Creating file at %s " % \
+                    os.path.abspath(os.path.join(base, path)))
 
         PathAutocomplete.set_path(path)
 
@@ -176,7 +177,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         self.clear()
 
     def clear(self):
-        self.view.erase_status("AdvancedNewFile")
+        if self.view != None:
+            self.view.erase_status("AdvancedNewFile")
         PathAutocomplete.clear()
 
     def create(self, filename):
