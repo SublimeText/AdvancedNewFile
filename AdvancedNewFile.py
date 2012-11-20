@@ -16,6 +16,7 @@ SETTINGS = [
 DEBUG = False
 PLATFORM = sublime.platform()
 VIEW_NAME = "AdvancedNewFileCreation"
+WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
 
 
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
@@ -76,15 +77,24 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
     def split_path(self, path=""):
         HOME_REGEX = r"^~[/\\]"
+        root = None
         try:
-            if self.top_level_split_char in path:
+            if PLATFORM == "windows":
+                if re.match(WIN_ROOT_REGEX, path):
+                    root = path[0:3]
+                    if os.path.isdir(root):
+                        path = path[3:]
+                    else:
+                        root = None
+
+            if self.top_level_split_char in path and root == None:
                 parts = path.split(self.top_level_split_char, 1)
                 root = self.translate_alias(parts[0])
                 path = parts[1]
-            elif re.match(HOME_REGEX, path):
+            elif re.match(HOME_REGEX, path) and root == None:
                 root = os.path.expanduser("~")
                 path = path[2:]
-            else:
+            elif root == None:
                 root = self.root or self.window.folders()[0]
         except IndexError:
             root = os.path.expanduser("~")
