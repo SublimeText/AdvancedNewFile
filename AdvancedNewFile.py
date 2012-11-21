@@ -85,38 +85,42 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     root = path[0:3]
                     path = path[3:]
 
+            # Parse if alias
             if self.top_level_split_char in path and root == None:
                 parts = path.split(self.top_level_split_char, 1)
                 root = self.translate_alias(parts[0])
                 path = parts[1]
+            # Parse if tilde used
             elif re.match(HOME_REGEX, path) and root == None:
                 root = os.path.expanduser("~")
                 path = path[2:]
+            # Default
             elif root == None:
                 root = self.root or self.window.folders()[0]
-
         except IndexError:
             root = os.path.expanduser("~")
 
         if DEBUG:
             print "AdvancedNewFile[Debug]: root is " + root
             print "AdvancedNewFile[Debug]: path is " + path
-
         return root, path
 
     def translate_alias(self, target):
         RELATIVE_REGEX = r"^\.{1,2}[/\\]"
         root = None
+        # Special alias - current file
         if target == "" and self.view is not None:
             filename = self.view.file_name()
             if filename is not None:
                 root = os.path.dirname(filename)
         else:
+            # Folder aliases
             for folder in self.window.folders():
                 basename = os.path.basename(folder)
                 if basename == target:
                     root = folder
                     break
+            # Aliases from settings.
             for alias in self.aliases.keys():
                 if alias == target:
                     alias_path = self.aliases.get(alias)
@@ -129,12 +133,10 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     else:
                         root = os.path.expanduser(alias_path)
                     break
+        # If no alias resolved, return target.
+        # Help identify invalid aliases
         if root is None:
-            root = self.root
-            if PLATFORM == "windows":
-                if re.match(r"^[a-zA-Z]$", target):
-                    return os.path.abspath(root)
-            print "AdvancedNewFile[Warning]: No alias found for '" + target + "'"
+            return target
 
         return os.path.abspath(root)
 
@@ -171,13 +173,20 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         if self.show_path:
             if self.view != None:
                 self.view.set_status("AdvancedNewFile", "Creating file at %s " % \
-                    os.path.abspath(os.path.join(base, path)))
+                    self.generate_creation_path(base, path))
             else:
                 sublime.status_message("Unable to fill status bar without view")
 
         PathAutocomplete.set_path(path)
 
+    def generate_creation_path(self, base, path):
+        if PLATFORM == "windows":
+            if not re.match(WIN_ROOT_REGEX, base):
+                return base + ":" + path
+        return os.path.abspath(os.path.join(base, path))
+
     def entered_filename(self, filename):
+        # Check if valid root specified for windows.
         if PLATFORM == "windows":
             if re.match(WIN_ROOT_REGEX, filename):
                 root = filename[0:3]
@@ -185,15 +194,23 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     sublime.error_message(root + " is not a valid root.")
                     self.clear()
                     return
+
         base, path = self.split_path(filename)
         file_path = os.path.join(base, path)
-
-        if DEBUG:
-            print "AdvancedNewFile[Debug]: Creating file at " + file_path
-        if not os.path.exists(file_path):
-            self.create(file_path)
-        if not os.path.isdir(file_path):
-            self.window.open_file(file_path)
+        # Check for invalid alias specified.
+        if self.top_level_split_char in filename and not (PLATFORM == "windows" and re.match(WIN_ROOT_REGEX, base)):
+            if base == "":
+                error_message = "Current file cannot be resolved"
+            else:
+                error_message = base + " is an invalid alias"
+            sublime.error_message(error_message)
+        else:
+            if DEBUG:
+                print "AdvancedNewFile[Debug]: Creating file at " + file_path
+            if not os.path.exists(file_path):
+                self.create(file_path)
+            if not os.path.isdir(file_path):
+                self.window.open_file(file_path)
 
         self.clear()
 
