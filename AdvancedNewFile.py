@@ -79,13 +79,11 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         HOME_REGEX = r"^~[/\\]"
         root = None
         try:
+            # Parse windows root
             if PLATFORM == "windows":
                 if re.match(WIN_ROOT_REGEX, path):
                     root = path[0:3]
-                    if os.path.isdir(root):
-                        path = path[3:]
-                    else:
-                        root = None
+                    path = path[3:]
 
             if self.top_level_split_char in path and root == None:
                 parts = path.split(self.top_level_split_char, 1)
@@ -96,6 +94,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 path = path[2:]
             elif root == None:
                 root = self.root or self.window.folders()[0]
+
         except IndexError:
             root = os.path.expanduser("~")
 
@@ -132,6 +131,9 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     break
         if root is None:
             root = self.root
+            if PLATFORM == "windows":
+                if re.match(r"^[a-zA-Z]$", target):
+                    return os.path.abspath(root)
             print "AdvancedNewFile[Warning]: No alias found for '" + target + "'"
 
         return os.path.abspath(root)
@@ -176,6 +178,13 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         PathAutocomplete.set_path(path)
 
     def entered_filename(self, filename):
+        if PLATFORM == "windows":
+            if re.match(WIN_ROOT_REGEX, filename):
+                root = filename[0:3]
+                if not os.path.isdir(root):
+                    sublime.error_message(root + " is not a valid root.")
+                    self.clear()
+                    return
         base, path = self.split_path(filename)
         file_path = os.path.join(base, path)
 
