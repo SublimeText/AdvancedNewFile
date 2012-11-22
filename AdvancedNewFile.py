@@ -17,6 +17,7 @@ DEBUG = False
 PLATFORM = sublime.platform()
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
+NIX_ROOT_REGEX = r"^/"
 
 
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
@@ -183,6 +184,10 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         if PLATFORM == "windows":
             if not re.match(WIN_ROOT_REGEX, base):
                 return base + ":" + path
+        else:
+            if not re.match(NIX_ROOT_REGEX, base):
+                return base + ":" + path
+
         return os.path.abspath(os.path.join(base, path))
 
     def entered_filename(self, filename):
@@ -198,11 +203,13 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         base, path = self.split_path(filename)
         file_path = os.path.join(base, path)
         # Check for invalid alias specified.
-        if self.top_level_split_char in filename and not (PLATFORM == "windows" and re.match(WIN_ROOT_REGEX, base)):
+        if self.top_level_split_char in filename and \
+            not (PLATFORM == "windows" and re.match(WIN_ROOT_REGEX, base)) and \
+            not (PLATFORM != "windows" and re.match(NIX_ROOT_REGEX, base)):
             if base == "":
-                error_message = "Current file cannot be resolved"
+                error_message = "Current file cannot be resolved."
             else:
-                error_message = base + " is an invalid alias"
+                error_message = "'" + base + "' is an invalid alias."
             sublime.error_message(error_message)
         else:
             if DEBUG:
@@ -295,7 +302,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
             if DEBUG:
                 print "AdvancedNewFile[Debug]: (Prev) Suggestions"
                 print pac.prev_suggestions
-
+#            if len(pac.prev_suggestions > 1):
             return pac.prev_suggestions
 
         suggestions = []
