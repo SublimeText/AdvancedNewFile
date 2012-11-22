@@ -31,7 +31,7 @@ The default directory is specified by the `default_root` setting. By default, it
 If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager.
 
 ### Windows
-There is a known conflict with the popular plugin [ZenCoding](https://github.com/sublimator/ZenCoding). 
+There is a known conflict with the popular plugin [ZenCoding](https://github.com/sublimator/ZenCoding).
 
 `ctrl+alt+n`: General keymap to create new files.
 
@@ -40,12 +40,12 @@ There is a known conflict with the popular plugin [ZenCoding](https://github.com
 ### OS X and Linux
 The super keys for Linux and OS X are the Windows and command key respectively.
 
-`super+alt+n`: General keymap to create new files. 
+`super+alt+n`: General keymap to create new files.
 
 `shift+super+alt+n`: In addition to creating the folders specified, new folders will also contain an `__init__.py` file.
 
 ## Settings
-`alias`: 
+`alias`:
 
 A dictionary that contains a set of aliases tied to a directory. For more information, see [Aliases](https://github.com/skuroda/Sublime-AdvancedNewFile#aliases)
 
@@ -82,7 +82,11 @@ If the current view's directory cannot be resolved, the top level folder in the 
 
 `default_path`:
 
-This path is used as the default if `path` has been specified for the setting `default_root`. 
+This path is used as the default if `path` has been specified for the setting `default_root`.
+
+`ignore_case`:
+
+A boolean specifying if case should be ignored when building auto complete list.
 
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
@@ -123,7 +127,7 @@ Sample aliases:
     }
 
 To use the above alias, when specifying a new file enter `Desktop:testDir/testFile`, which would then create a file at `<home_directory>/Desktop/testDir/testFile`.
-    
+
 ##### Platform Specific Aliases
 You can also create aliases that are platform specific. These follow a similar set of rules as aliases. However, rather than specifying a string path to use, a dictionary is specified. This dictionary may contains the following keys: `windows`, `linux`, and `osx`. The path for this particular alias will be used based on the operating system in use. If the same alias is specified in both `alias` and `os_specific_alias`, the path in `os_specific_alias` will be used.
 
@@ -141,10 +145,10 @@ Sample OS Specific Aliases:
 
 ##### Predefined Aliases
 ###### Top level folders in window
-Top level folders can be specified by typing in the name of the folder followed by a colon. Then specify the path as you would normally. 
+Top level folders can be specified by typing in the name of the folder followed by a colon. Then specify the path as you would normally.
 
 ###### Current Working Directory
-To specify the current working directory, simply type a colon, without any preceding text. 
+To specify the current working directory, simply type a colon, without any preceding text.
 
 ## Notes
 Thanks to Dima Kukushkin ([xobb1t](https://github.com/xobb1t)) for the original work on this plugin. Also, thank you to [facelessuser](https://github.com/facelessuser), and by extension biermeester and matthjes for the idea of platform specific settings.

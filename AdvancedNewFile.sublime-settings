@@ -1,8 +1,8 @@
 {
-    // This setting contains a dictionary of aliases. The keys represent the 
-    // alias names, the values represent the paths. 
-    // NOTE: These should be absolute paths. Also, these paths should 
-    // match your systems convention. For example, Windows machines should 
+    // This setting contains a dictionary of aliases. The keys represent the
+    // alias names, the values represent the paths.
+    // NOTE: These should be absolute paths. Also, these paths should
+    // match your systems convention. For example, Windows machines should
     // have paths similar to "C:\\Users\\username\\Desktop". *nix systems should
     // have paths similar to "/home/username/desktop".
     "alias": {},
@@ -18,8 +18,8 @@
     "default_initial": "",
 
     // A boolean defining if cursor text should be used. Currently, only
-    // text bound by single or double quotes will be read in. 
-    // NOTE: A value read from within quotes will override the default 
+    // text bound by single or double quotes will be read in.
+    // NOTE: A value read from within quotes will override the default
     // initial string.
     "use_cursor_text": false,
 
@@ -27,7 +27,7 @@
     // complete options.
     "show_files": false,
 
-    // A boolean specifying if the file path being created should be displayed in 
+    // A boolean specifying if the file path being created should be displayed in
     // the status bar.
     "show_path": true,
 
@@ -41,7 +41,12 @@
     // will be used.
     "default_root": "top_folder",
 
-    // A string specifying the default root to use. For this to be utilized, 
+    // A string specifying the default root to use. For this to be utilized,
     // "default_root" must be set to "path"
-    "default_path": "~"
+    "default_path": "~",
+
+    // A boolean specifying if case should be ignored when building
+    // auto complete list.
+    "ignore_case": false
+
 }

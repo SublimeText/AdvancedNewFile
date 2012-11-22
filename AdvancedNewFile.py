@@ -11,7 +11,8 @@ SETTINGS = [
     "show_path",
     "default_root",
     "default_path",
-    "os_specific_alias"
+    "os_specific_alias",
+    "ignore_case"
 ]
 DEBUG = False
 PLATFORM = sublime.platform()
@@ -41,6 +42,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         # Set some default values for the auto complete
         PathAutocomplete.set_show_files(settings.get("show_files"))
         PathAutocomplete.set_aliases(self.aliases)
+        PathAutocomplete.set_ignore_case(settings.get("ignore_case"))
 
         # Search for initial string
         path = settings.get("default_initial", "")
@@ -266,6 +268,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
     prev_root = ""
     default_root = True
     show_files = False
+    ignore_case = False
 
     def continue_previous_autocomplete(self):
         pac = PathAutocomplete
@@ -362,7 +365,13 @@ class PathAutocomplete(sublime_plugin.EventListener):
         sugg = []
         sugg_w_spaces = []
         for entry in iterable_var:
-            if entry.find(base) == 0:
+            compare_entry = entry
+            compare_base = base
+            if PathAutocomplete.ignore_case:
+                compare_entry = compare_entry.lower()
+                compare_base = compare_base.lower()
+
+            if compare_entry.find(compare_base) == 0:
                 if " " in base:
                     sugg_w_spaces.append(entry + ":")
                 else:
@@ -375,9 +384,15 @@ class PathAutocomplete(sublime_plugin.EventListener):
         sugg_w_spaces = []
         for filename in os.listdir(path):
             if PathAutocomplete.show_files or os.path.isdir(os.path.join(path, filename)):
-                if filename.find(base) == 0:
+                compare_base = base
+                compare_filename = filename
+                if PathAutocomplete.ignore_case:
+                    compare_base = compare_base.lower()
+                    compare_filename = filename.lower()
+
+                if compare_filename.find(compare_base) == 0:
                     # Need to find a better way to do the auto complete.
-                    if " " in base:
+                    if " " in compare_base:
                         if os.path.isdir(os.path.join(path, filename)):
                             sugg_w_spaces.append(filename + sep)
                         else:
@@ -419,6 +434,10 @@ class PathAutocomplete(sublime_plugin.EventListener):
     @staticmethod
     def set_show_files(show_files):
         PathAutocomplete.show_files = show_files
+
+    @staticmethod
+    def set_ignore_case(ignore_case):
+        PathAutocomplete.ignore_case = ignore_case
 
 
 def get_settings(view):
