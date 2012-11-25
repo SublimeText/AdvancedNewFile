@@ -116,7 +116,7 @@ You can create an alias to quickly navigate to a directory. Simply type in the a
 
 Alias paths may be relative or absolute. If relative, the current view will be used as the base location. If the current view does not exist on disk, the home directory will be used as the base. When specifying absolute paths, be sure to use the system specific style (e.g. Windows `C:\\Users\\username\\Desktop`, OS X and Linix `/home/username/desktop/`). In addition, you may specify an alias from the home directory by using `~/`.
 
-If an invalid alias is specified, the plugin will default to the specified `default_root`. If the default root cannot be resolved, such as no top level folders existing, the home directory will be used as the root.
+If an invalid alias is specified, an error pop up will be displayed when trying to create the file.
 
 Sample aliases:
 

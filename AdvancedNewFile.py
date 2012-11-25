@@ -214,13 +214,22 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 error_message = "'" + base + "' is an invalid alias."
             sublime.error_message(error_message)
         else:
+            attempt_open = True
             if DEBUG:
                 print "AdvancedNewFile[Debug]: Creating file at " + file_path
             if not os.path.exists(file_path):
-                self.create(file_path)
-            if not os.path.isdir(file_path):
-                self.window.open_file(file_path)
+                try:
+                    self.create(file_path)
+                except Exception as e:
+                    attempt_open = False
+                    sublime.error_message("Cannot create " + file_path + ". See console for details")
+                    print "Exception: %s" % e.strerror
 
+            if attempt_open:
+                if os.path.isdir(file_path):
+                    sublime.error_message("Cannot open view for " + file_path + ". It is a directory. ")
+                else:
+                    self.window.open_file(file_path)
         self.clear()
 
     def clear(self):
@@ -305,7 +314,6 @@ class PathAutocomplete(sublime_plugin.EventListener):
             if DEBUG:
                 print "AdvancedNewFile[Debug]: (Prev) Suggestions"
                 print pac.prev_suggestions
-#            if len(pac.prev_suggestions > 1):
             return pac.prev_suggestions
 
         suggestions = []

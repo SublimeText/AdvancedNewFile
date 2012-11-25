@@ -1,0 +1,12 @@
+New Features/Enhancements:
+
+- Add OS Specific Aliases to settings.
+- Display an error when attempting to use an invalid alias.
+- Display an error when attempting to open a directory in a view.
+- Display an error if path creation fails.
+
+Please see the README for more information about the new settings.
+
+Bug Fixes:
+- Status bar update causing errors when no view is present.
+- Specifying absolute paths for Windows produced unexpected behavior.
