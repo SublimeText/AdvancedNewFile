@@ -222,12 +222,12 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     self.create(file_path)
                 except Exception as e:
                     attempt_open = False
-                    sublime.error_message("Cannot create " + file_path + ". See console for details")
+                    sublime.error_message("Cannot create '" + file_path + "'. See console for details")
                     print "Exception: %s" % e.strerror
 
             if attempt_open:
                 if os.path.isdir(file_path):
-                    sublime.error_message("Cannot open view for " + file_path + ". It is a directory. ")
+                    sublime.error_message("Cannot open view for '" + file_path + "'. It is a directory. ")
                 else:
                     self.window.open_file(file_path)
         self.clear()
