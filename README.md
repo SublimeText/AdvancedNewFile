@@ -51,7 +51,7 @@ A dictionary that contains a set of aliases tied to a directory. For more inform
 
 `os_specific_alias`:
 
-A dictionary containing a set of aliases tied to a directory. These aliases will be platform specific. For more information, see [Platform Specific Aliases](https://github.com/skuroda/Sublime-AdvancedNewFile#ilatform-specific-aliases)
+A dictionary containing a set of aliases tied to a directory. These aliases will be platform specific. For more information, see [Platform Specific Aliases](https://github.com/skuroda/Sublime-AdvancedNewFile#platform-specific-aliases)
 
 `default_initial`:
 
@@ -129,7 +129,7 @@ Sample aliases:
 To use the above alias, when specifying a new file enter `Desktop:testDir/testFile`, which would then create a file at `<home_directory>/Desktop/testDir/testFile`.
 
 ##### Platform Specific Aliases
-You can also create aliases that are platform specific. These follow a similar set of rules as aliases. However, rather than specifying a string path to use, a dictionary is specified. This dictionary may contains the following keys: `windows`, `linux`, and `osx`. The path for this particular alias will be used based on the operating system in use. If the same alias is specified in both `alias` and `os_specific_alias`, the path in `os_specific_alias` will be used.
+You can also create aliases that are platform specific. These follow a similar set of rules as aliases. However, rather than specifying a string path to use, a dictionary is specified. This dictionary may contain the following keys: `windows`, `linux`, and `osx`. The path for this particular alias will be used based on the operating system in use. If the same alias is specified in both `alias` and `os_specific_alias`, the path in `os_specific_alias` will be used.
 
 Sample OS Specific Aliases:
 
