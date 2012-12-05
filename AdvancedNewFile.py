@@ -157,6 +157,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         temp = view.settings().get("word_separators")
         temp = temp.replace(".", "")
         view.settings().set("word_separators", temp)
+        view.settings().set("auto_complete_commit_on_tab", True)
         # May be useful to see the popup for debugging
         if DEBUG:
             view.settings().set("auto_complete", True)
