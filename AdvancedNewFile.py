@@ -255,13 +255,18 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             return ""
 
         view = self.view
+
         for region in view.sel():
             syntax = view.syntax_name(region.begin())
             if re.match(".*string.quoted.double", syntax) or re.match(".*string.quoted.single", syntax):
                 path = view.substr(view.extract_scope(region.begin()))
                 path = re.sub('^"|\'', '',  re.sub('"|\'$', '', path.strip()))
+                break
             else:
-                return ""
+                path = ""
+
+        if view.sel()[0].begin() != view.sel()[0].end():
+            path = view.substr(view.sel()[0])
 
         return path
 
