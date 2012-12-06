@@ -252,7 +252,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
     def get_cursor_path(self):
         if self.view == None:
-            return
+            return ""
 
         view = self.view
         for region in view.sel():
@@ -262,6 +262,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 path = re.sub('^"|\'', '',  re.sub('"|\'$', '', path.strip()))
             else:
                 return ""
+
+        return path
 
 
 class PathAutocomplete(sublime_plugin.EventListener):
