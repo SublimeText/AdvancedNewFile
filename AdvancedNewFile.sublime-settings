@@ -17,10 +17,12 @@
     // A default initial value to fill the create new file input path with.
     "default_initial": "",
 
-    // A boolean defining if cursor text should be used. Currently, only
-    // text bound by single or double quotes will be read in.
-    // NOTE: A value read from within quotes will override the default
-    // initial string.
+    // A boolean defining if cursor text should be used. Text bound by single or
+    // double quotes or within a region will be used. If multiple cursors
+    // are used, the earliest selection containing a region or existing 
+    // within quotes will be used.
+    // NOTE: A value read from cursorwill override the default
+    // initial string setting.
     "use_cursor_text": false,
 
     // A boolean value specifying if regular files should be included in the auto

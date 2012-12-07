@@ -59,7 +59,7 @@ A string that will be automatically inserted into the new file creation input.
 
 `use_cursor_text`:
 
-A boolean value determining if text from a buffer, currently bound by single or double quotes, will be auto inserted into the new file generation input field.
+A boolean value determining if text from a buffer, bound by quotes or a selected region, will be auto inserted into the new file generation input field. If multiple cursors are used, the first entry either contained in quotes, are a selected region, will be used.
 
 `show_files`:
 
