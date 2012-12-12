@@ -152,17 +152,17 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         )
 
         view.set_name(VIEW_NAME)
-        view.settings().set("tab_size", 0)
-        view.settings().set("translate_tabs_to_spaces", True)
         temp = view.settings().get("word_separators")
         temp = temp.replace(".", "")
         view.settings().set("word_separators", temp)
         view.settings().set("auto_complete_commit_on_tab", True)
+        view.settings().set("tab_completion", True)
+
         # May be useful to see the popup for debugging
         if DEBUG:
             view.settings().set("auto_complete", True)
             view.settings().set("auto_complete_selector", "text")
-
+        PathAutocomplete.set_view_id(view.id())
         PathAutocomplete.set_root(self.root, True)
 
     def update_filename_input(self, path_in):
@@ -278,6 +278,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
     path = ""
     root = ""
     default_root = True
+    view_id = None
 
     prev_suggestions = []
     prev_base = ""
@@ -286,6 +287,11 @@ class PathAutocomplete(sublime_plugin.EventListener):
     prev_root = ""
     prev_prefix = ""
     prev_locations = []
+
+    def on_query_context(self, view, key, operator, operand, match_all):
+        if key == "advanced_new_file_completion" and PathAutocomplete.view_id != None and view.id() == PathAutocomplete.view_id:
+            return True
+        return None
 
     def continue_previous_autocomplete(self):
         pac = PathAutocomplete
@@ -315,10 +321,10 @@ class PathAutocomplete(sublime_plugin.EventListener):
         return False
 
     def on_query_completions(self, view, prefix, locations):
-        if view.name() != VIEW_NAME:
+        pac = PathAutocomplete
+        if pac.view_id == None or view.id() != pac.view_id:
             return []
 
-        pac = PathAutocomplete
         auto_complete_prefix = ""
         if self.continue_previous_autocomplete() and prefix != "":
             if DEBUG:
@@ -350,7 +356,6 @@ class PathAutocomplete(sublime_plugin.EventListener):
             sugg, sugg_w_spaces = self.generate_relative_auto_complete(path, base, auto_complete_prefix)
             suggestions += sugg
             suggestions_w_spaces += sugg_w_spaces
-
         # If suggestions exist, use complete name
         # else remove base prefix
         if len(suggestions) > 0:
@@ -406,6 +411,13 @@ class PathAutocomplete(sublime_plugin.EventListener):
         sep = os.sep
         sugg = []
         sugg_w_spaces = []
+
+        # Attempt to prevent searching the same path when a path has been specified
+        # Problems occur when using tab to complete entry with single completion
+        # followed by ctrl + space
+        if not path.endswith(auto_complete_prefix[0:-1]):
+            path = os.path.join(path, auto_complete_prefix)
+
         for filename in os.listdir(path):
             if PathAutocomplete.show_files or os.path.isdir(os.path.join(path, filename)):
                 compare_base = base
@@ -452,6 +464,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
         PathAutocomplete.show_files = False
         PathAutocomplete.prev_prefix = ""
         PathAutocomplete.prev_locations = []
+        PathAutocomplete.view_id = None
 
     @staticmethod
     def set_aliases(aliases):
@@ -464,6 +477,10 @@ class PathAutocomplete(sublime_plugin.EventListener):
     @staticmethod
     def set_ignore_case(ignore_case):
         PathAutocomplete.ignore_case = ignore_case
+
+    @staticmethod
+    def set_view_id(view_id):
+        PathAutocomplete.view_id = view_id
 
 
 def get_settings(view):
