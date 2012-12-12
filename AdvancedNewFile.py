@@ -271,18 +271,21 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
 
 class PathAutocomplete(sublime_plugin.EventListener):
+    aliases = {}
+    show_files = False
+    ignore_case = False
+
     path = ""
     root = ""
+    default_root = True
+
     prev_suggestions = []
     prev_base = ""
     prev_directory = ""
-    aliases = {}
     path_empty = True
     prev_root = ""
-    default_root = True
-    show_files = False
-    ignore_case = False
     prev_prefix = ""
+    prev_locations = []
 
     def continue_previous_autocomplete(self):
         pac = PathAutocomplete
@@ -321,12 +324,9 @@ class PathAutocomplete(sublime_plugin.EventListener):
             if DEBUG:
                 print "AdvancedNewFile[Debug]: (Prev) Suggestions"
                 print pac.prev_suggestions
-            # return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
-
             if len(pac.prev_suggestions) > 1:
                 return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
             else:
-                print "1" + pac.path
                 auto_complete_prefix = pac.prev_suggestions[0][1]
 
         suggestions = []
@@ -362,7 +362,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
                 name = name[len(base) - 1:]
                 suggestions.append((" " + temp, name))
 
-        if len(suggestions) == 0:
+        if len(suggestions) == 0 and locations == pac.prev_locations:
             return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
         # Previous used to determine cycling through entries.
         pac.prev_directory = directory
@@ -370,14 +370,10 @@ class PathAutocomplete(sublime_plugin.EventListener):
         pac.prev_suggestions = suggestions
         pac.prev_root = root_path
         pac.prev_prefix = prefix
+        pac.prev_locations = locations
         if DEBUG:
             print "AdvancedNewFile[Debug]: Suggestions:"
             print suggestions
-        # print suggestions
-        # print prefix
-        # print locations
-        print "2" + pac.path
-        # print pac.prev_prefix
         return (suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
     def generate_project_auto_complete(self, base):
@@ -455,6 +451,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
         PathAutocomplete.default_root = True
         PathAutocomplete.show_files = False
         PathAutocomplete.prev_prefix = ""
+        PathAutocomplete.prev_locations = []
 
     @staticmethod
     def set_aliases(aliases):
