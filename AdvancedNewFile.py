@@ -178,6 +178,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     self.generate_creation_path(base, path))
             else:
                 sublime.status_message("Unable to fill status bar without view")
+
         PathAutocomplete.set_path(path)
 
     def generate_creation_path(self, base, path):
@@ -281,6 +282,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
     default_root = True
     show_files = False
     ignore_case = False
+    prev_prefix = ""
 
     def continue_previous_autocomplete(self):
         pac = PathAutocomplete
@@ -296,6 +298,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
         # If base is empty, we may be cycling through directory options
         if base == "":
             return True
+
         # Ensures the correct directory is used if the default root is specified
         # using an alias.
         if base == prev_base and \
@@ -313,11 +316,18 @@ class PathAutocomplete(sublime_plugin.EventListener):
             return []
 
         pac = PathAutocomplete
+        auto_complete_prefix = ""
         if self.continue_previous_autocomplete() and prefix != "":
             if DEBUG:
                 print "AdvancedNewFile[Debug]: (Prev) Suggestions"
                 print pac.prev_suggestions
-            return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+            # return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+
+            if len(pac.prev_suggestions) > 1:
+                return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+            else:
+                print "1" + pac.path
+                auto_complete_prefix = pac.prev_suggestions[0][1]
 
         suggestions = []
         suggestions_w_spaces = []
@@ -337,9 +347,10 @@ class PathAutocomplete(sublime_plugin.EventListener):
         # Directories
         path = os.path.join(root_path, directory)
         if os.path.exists(path):
-            sugg, sugg_w_spaces = self.generate_relative_auto_complete(path, base)
+            sugg, sugg_w_spaces = self.generate_relative_auto_complete(path, base, auto_complete_prefix)
             suggestions += sugg
             suggestions_w_spaces += sugg_w_spaces
+
         # If suggestions exist, use complete name
         # else remove base prefix
         if len(suggestions) > 0:
@@ -351,15 +362,22 @@ class PathAutocomplete(sublime_plugin.EventListener):
                 name = name[len(base) - 1:]
                 suggestions.append((" " + temp, name))
 
+        if len(suggestions) == 0:
+            return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
         # Previous used to determine cycling through entries.
         pac.prev_directory = directory
         pac.prev_base = base
         pac.prev_suggestions = suggestions
         pac.prev_root = root_path
+        pac.prev_prefix = prefix
         if DEBUG:
             print "AdvancedNewFile[Debug]: Suggestions:"
             print suggestions
-
+        # print suggestions
+        # print prefix
+        # print locations
+        print "2" + pac.path
+        # print pac.prev_prefix
         return (suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
     def generate_project_auto_complete(self, base):
@@ -388,7 +406,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
                     sugg.append((entry + ":", entry + ":"))
         return sugg, sugg_w_spaces
 
-    def generate_relative_auto_complete(self, path, base):
+    def generate_relative_auto_complete(self, path, base, auto_complete_prefix):
         sep = os.sep
         sugg = []
         sugg_w_spaces = []
@@ -404,14 +422,14 @@ class PathAutocomplete(sublime_plugin.EventListener):
                     # Need to find a better way to do the auto complete.
                     if " " in compare_base:
                         if os.path.isdir(os.path.join(path, filename)):
-                            sugg_w_spaces.append(filename + sep)
+                            sugg_w_spaces.append(auto_complete_prefix + filename + sep)
                         else:
-                            sugg_w_spaces.append(filename)
+                            sugg_w_spaces.append(auto_complete_prefix + filename)
                     else:
                         if os.path.isdir(os.path.join(path, filename)):
-                            sugg.append((" " + filename + sep, filename + sep))
+                            sugg.append((" " + auto_complete_prefix + filename + sep, auto_complete_prefix + filename + sep))
                         else:
-                            sugg.append((" " + filename, filename))
+                            sugg.append((" " + auto_complete_prefix + filename, auto_complete_prefix + filename))
 
         return sugg, sugg_w_spaces
 
@@ -436,6 +454,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
         PathAutocomplete.prev_root = ""
         PathAutocomplete.default_root = True
         PathAutocomplete.show_files = False
+        PathAutocomplete.prev_prefix = ""
 
     @staticmethod
     def set_aliases(aliases):
