@@ -332,7 +332,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
                 print pac.prev_suggestions
             if len(pac.prev_suggestions) > 1:
                 return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
-            else:
+            elif len(pac.prev_suggestions) == 1:
                 auto_complete_prefix = pac.prev_suggestions[0][1]
 
         suggestions = []
@@ -415,8 +415,13 @@ class PathAutocomplete(sublime_plugin.EventListener):
         # Attempt to prevent searching the same path when a path has been specified
         # Problems occur when using tab to complete entry with single completion
         # followed by ctrl + space
-        if not path.endswith(auto_complete_prefix[0:-1]):
-            path = os.path.join(path, auto_complete_prefix)
+        if ":" in auto_complete_prefix:
+            compare_prefix = auto_complete_prefix.split(":", 1)[1]
+        else:
+            compare_prefix = auto_complete_prefix
+
+        if re.search(r"[/\\]$", auto_complete_prefix) and not path.endswith(compare_prefix[0:-1]):
+            path = os.path.join(path, compare_prefix)
 
         for filename in os.listdir(path):
             if PathAutocomplete.show_files or os.path.isdir(os.path.join(path, filename)):

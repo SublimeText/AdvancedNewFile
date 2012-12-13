@@ -13,19 +13,4 @@
 			{ "key": "auto_complete_visible" , "operator": "equal", "operand": false}
 		]
 	}
-//	,
-//	{ "keys": ["tab"], "command": "replace_completion_with_next_completion", "context":
-//		[
-//			{ "key": "advanced_new_file_completion"},
-//			{ "key": "last_command", "operator": "equal", "operand": "insert_best_completion" },
-//			{ "key": "setting.tab_completion", "operator": "equal", "operand": true }
-//		]
-//	},
-//	{ "keys": ["tab"], "command": "commit_completion", "context":
-//		[
-//			{ "key": "advanced_new_file_completion"},
-//			{ "key": "auto_complete_visible" },
-//			{ "key": "setting.auto_complete_commit_on_tab" }
-//		]
-//	}
 ]
