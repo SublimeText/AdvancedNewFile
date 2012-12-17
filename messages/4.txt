@@ -1,0 +1,12 @@
+New Features/Enhancements:
+
+- Enabling "use_cursor_text" will fill with selected regions. The first cursor/region to match the conditions (region or quoted section) will be used.
+- Autocompleting with tab where there is only a single completion option will continue completion on subsequent directories.
+
+Please see the README for more information about the new settings.
+
+Bug Fixes:
+- Properly display completions when using "ctrl+space" to manually display auto complete options.
+- Prevent error pop up from occuring when explicitly creating a directory structure.
+- Fix bug where using cursor text causes an error.
+- Prevent spaces from being inserted when tab is without a possible completion.
