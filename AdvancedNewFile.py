@@ -19,6 +19,7 @@ PLATFORM = sublime.platform()
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
 NIX_ROOT_REGEX = r"^/"
+HOME_REGEX = r"^~"
 
 
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
@@ -108,7 +109,6 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         return root, path
 
     def translate_alias(self, target):
-        RELATIVE_REGEX = r"^\.{1,2}[/\\]"
         root = None
         # Special alias - current file
         if target == "" and self.view is not None:
@@ -126,14 +126,16 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             for alias in self.aliases.keys():
                 if alias == target:
                     alias_path = self.aliases.get(alias)
-                    if re.search(RELATIVE_REGEX, alias_path) is not None:
-                        if self.view.file_name() is not None:
-                            alias_root = os.path.dirname(self.view.file_name())
+                    if re.search(HOME_REGEX, alias_path) is None:
+                        if PLATFORM == "windows":
+                            if re.search(WIN_ROOT_REGEX, alias_path) is None:
+                                root = os.path.join(self.root, alias_path)
+                                break
                         else:
-                            alias_root = os.path.expanduser("~")
-                        root = os.path.join(alias_root, alias_path)
-                    else:
-                        root = os.path.expanduser(alias_path)
+                            if re.search(NIX_ROOT_REGEX, alias_path) is None:
+                                root = os.path.join(self.root, alias_path)
+                                break
+                    root = os.path.expanduser(alias_path)
                     break
         # If no alias resolved, return target.
         # Help identify invalid aliases
