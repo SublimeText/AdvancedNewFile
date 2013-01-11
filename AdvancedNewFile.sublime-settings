@@ -47,6 +47,15 @@
     // "default_root" must be set to "path"
     "default_path": "~",
 
+    // This value specifies the root that will be used when resolving relative paths
+    // defined in aliases. For more information about valid values, see "default_root".
+    // Note that if "path" is used, "alias_path" must be set appropriately.
+    "alias_root": "current",
+
+    // A string specifying the path to use for the alias root. For this to be
+    // utilized, "alias_root" must be set to "path"
+    "alias_path": "~",
+
     // A boolean specifying if case should be ignored when building
     // auto complete list.
     "ignore_case": false

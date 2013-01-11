@@ -84,6 +84,14 @@ If the current view's directory cannot be resolved, the top level folder in the 
 
 This path is used as the default if `path` has been specified for the setting `default_root`.
 
+`alias_root`:
+
+This entry defines the root that will be used when resolving aliases defined as relative paths. For more information about valid entries, see `default_root`. Note that for path, `alias_path` will be specified.
+
+`alias_path`:
+
+This path is used as the default if `path` has been specified for the setting `alias_root`.
+
 `ignore_case`:
 
 A boolean specifying if case should be ignored when building auto complete list.

@@ -12,7 +12,9 @@ SETTINGS = [
     "default_root",
     "default_path",
     "os_specific_alias",
-    "ignore_case"
+    "ignore_case",
+    "alias_root",
+    "alias_path"
 ]
 DEBUG = False
 PLATFORM = sublime.platform()
@@ -50,6 +52,12 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             tmp = self.get_cursor_path()
             if tmp != "":
                 path = tmp
+
+        alias_root = self.get_default_root(settings.get("alias_root"))
+        if alias_root == "path":
+            self.alias_root = os.path.expanduser(settings.get("alias_path"))
+            alias_root = ""
+        self.alias_root, tmp = self.split_path(alias_root)
 
         # Get user input
         self.show_filename_input(path)
@@ -129,7 +137,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     if re.search(HOME_REGEX, alias_path) is None:
                         if PLATFORM == "windows":
                             if re.search(WIN_ROOT_REGEX, alias_path) is None:
-                                root = os.path.join(self.root, alias_path)
+                                root = os.path.join(self.alias_root, alias_path)
                                 break
                         else:
                             if re.search(NIX_ROOT_REGEX, alias_path) is None:
