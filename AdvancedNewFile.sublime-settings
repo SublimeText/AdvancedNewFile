@@ -21,7 +21,7 @@
     // double quotes or within a region will be used. If multiple cursors
     // are used, the earliest selection containing a region or existing 
     // within quotes will be used.
-    // NOTE: A value read from cursorwill override the default
+    // NOTE: A value read from cursor will override the default
     // initial string setting.
     "use_cursor_text": false,
 

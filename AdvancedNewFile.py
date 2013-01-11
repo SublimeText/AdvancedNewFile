@@ -17,7 +17,7 @@ SETTINGS = [
     "alias_path"
 ]
 DEBUG = False
-PLATFORM = sublime.platform()
+PLATFORM = sublime.platform().lower()
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
 NIX_ROOT_REGEX = r"^/"
@@ -66,8 +66,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         aliases = settings.get("alias")
         all_os_aliases = settings.get("os_specific_alias")
         for key in all_os_aliases:
-            if PLATFORM.lower() in all_os_aliases.get(key):
-                aliases[key] = all_os_aliases.get(key).get(PLATFORM.lower())
+            if PLATFORM in all_os_aliases.get(key):
+                aliases[key] = all_os_aliases.get(key).get(PLATFORM)
 
         return aliases
 
@@ -149,7 +149,6 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         # Help identify invalid aliases
         if root is None:
             return target
-
         return os.path.abspath(root)
 
     def show_filename_input(self, initial=''):
@@ -331,6 +330,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
         return False
 
     def on_query_completions(self, view, prefix, locations):
+        self.suggestion_entries = []
         pac = PathAutocomplete
         if pac.view_id == None or view.id() != pac.view_id:
             return []
@@ -404,6 +404,9 @@ class PathAutocomplete(sublime_plugin.EventListener):
         sugg_w_spaces = []
 
         for entry in iterable_var:
+            if entry in self.suggestion_entries:
+                continue
+            self.suggestion_entries.append(entry)
             compare_entry = entry
             compare_base = base
             if PathAutocomplete.ignore_case:
