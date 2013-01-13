@@ -57,8 +57,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         if alias_root == "path":
             self.alias_root = os.path.expanduser(settings.get("alias_path"))
             alias_root = ""
-        self.alias_root, tmp = self.split_path(alias_root)
-
+        self.alias_root, tmp = self.split_path(alias_root, True)
         # Get user input
         self.show_filename_input(path)
 
@@ -86,7 +85,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             print "Invalid specifier for \"default_root\""
         return root
 
-    def split_path(self, path=""):
+    def split_path(self, path="", is_alias=False):
         HOME_REGEX = r"^~[/\\]"
         root = None
         try:
@@ -107,10 +106,13 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 path = path[2:]
             # Default
             elif root == None:
-                root = self.root or self.window.folders()[0]
+                if is_alias:
+                    root = self.alias_root
+                else:
+                    root = self.root
+                root = root or self.window.folders()[0]
         except IndexError:
             root = os.path.expanduser("~")
-
         if DEBUG:
             print "AdvancedNewFile[Debug]: root is " + root
             print "AdvancedNewFile[Debug]: path is " + path

@@ -31,8 +31,6 @@ The default directory is specified by the `default_root` setting. By default, it
 If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager.
 
 ### Windows
-There is a known conflict with the popular plugin [ZenCoding](https://github.com/sublimator/ZenCoding).
-
 `ctrl+alt+n`: General keymap to create new files.
 
 `ctrl+shift+alt+n`: In addition to creating the folders specified, new folders will also contain an `__init__.py` file.
@@ -82,7 +80,7 @@ If the current view's directory cannot be resolved, the top level folder in the 
 
 `default_path`:
 
-This path is used as the default if `path` has been specified for the setting `default_root`.
+This path is used as the default if `path` has been specified for the setting `default_root`. This path should be absolute. If a relative path is specified, it will be relative to the AdvancedNewFile package directory.
 
 `alias_root`:
 
