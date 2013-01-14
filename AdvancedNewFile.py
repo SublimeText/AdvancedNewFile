@@ -11,10 +11,12 @@ SETTINGS = [
     "show_path",
     "default_root",
     "default_path",
+    "default_folder_index",
     "os_specific_alias",
     "ignore_case",
     "alias_root",
-    "alias_path"
+    "alias_path",
+    "alias_folder_index"
 ]
 DEBUG = False
 PLATFORM = sublime.platform().lower()
@@ -27,6 +29,7 @@ HOME_REGEX = r"^~"
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
     def run(self, is_python=False):
         self.root = None
+        self.alias_root = None
         self.top_level_split_char = ":"
         self.is_python = is_python
         self.view = self.window.active_view()
@@ -35,6 +38,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         settings = get_settings(self.view)
         self.aliases = self.get_aliases(settings)
         self.show_path = settings.get("show_path")
+        self.default_folder_index = settings.get("default_folder_index")
+        self.alias_folder_index = settings.get("alias_folder_index")
         default_root = self.get_default_root(settings.get("default_root"))
         if default_root == "path":
             self.root = os.path.expanduser(settings.get("default_path"))
@@ -53,11 +58,12 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             if tmp != "":
                 path = tmp
 
-        alias_root = self.get_default_root(settings.get("alias_root"))
+        alias_root = self.get_default_root(settings.get("alias_root"), True)
         if alias_root == "path":
             self.alias_root = os.path.expanduser(settings.get("alias_path"))
             alias_root = ""
         self.alias_root, tmp = self.split_path(alias_root, True)
+
         # Get user input
         self.show_filename_input(path)
 
@@ -70,15 +76,28 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
         return aliases
 
-    def get_default_root(self, string):
+    def get_default_root(self, string, is_alias=False):
         root = ""
 
         if string == "home":
             root = "~/"
         elif string == "current":
             root = ":"
+        elif string == "project_folder":
+            if is_alias:
+                folder_index = self.alias_folder_index
+            else:
+                folder_index = self.default_folder_index
+            if len(self.window.folders()) <= folder_index:
+                if is_alias:
+                    self.alias_folder_index = 0
+                else:
+                    self.default_folder_index = 0
         elif string == "top_folder":
-            pass
+            if is_alias:
+                self.alias_folder_index = 0
+            else:
+                self.default_folder_index = 0
         elif string == "path":
             root = "path"
         else:
@@ -108,9 +127,11 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             elif root == None:
                 if is_alias:
                     root = self.alias_root
+                    folder_index = self.alias_folder_index
                 else:
                     root = self.root
-                root = root or self.window.folders()[0]
+                    folder_index = self.default_folder_index
+                root = root or self.window.folders()[folder_index]
         except IndexError:
             root = os.path.expanduser("~")
         if DEBUG:

@@ -71,7 +71,7 @@ A boolean value used to determine if the path of the file to be created should b
 
 This value is used to determine the default root when using AdvancedNewFile. It must be one of the following values:
 
-* `top_folder`- The default path will be the top level folder in the window. Note this is the Default value on a clean install.
+* `folder_index`- The default path will be the folder specified by the 'default_folder_index' setting.
 * `current_view` - The default path will be the directory of the current active view.
 * `home` - The default path will be your home directory.
 * `path` - The default path will be defined by the setting `default_path`
@@ -82,6 +82,10 @@ If the current view's directory cannot be resolved, the top level folder in the 
 
 This path is used as the default if `path` has been specified for the setting `default_root`. This path should be absolute. If a relative path is specified, it will be relative to the AdvancedNewFile package directory.
 
+`default_folder_index`:
+
+An integer value representing a folder index to be used when "folder" is specified for "default_root". If an index outside of the range of existing folders is used, it will default to 0 (the top level folder).
+
 `alias_root`:
 
 This entry defines the root that will be used when resolving aliases defined as relative paths. For more information about valid entries, see `default_root`. Note that for path, `alias_path` will be specified.
@@ -89,6 +93,10 @@ This entry defines the root that will be used when resolving aliases defined as 
 `alias_path`:
 
 This path is used as the default if `path` has been specified for the setting `alias_root`.
+
+`alias_folder_index`:
+
+An integer value representing the folder index to use when "folder" is specified for "alias_root". If an index outside of the range of the existing folders is used, it will default to 0.
 
 `ignore_case`:
 

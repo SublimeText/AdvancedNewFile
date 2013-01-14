@@ -35,29 +35,40 @@
 
     // This value specifies the default directory when using AdvancedNewFile.
     // Note it must be one of these values:
-    //  top_folder - Default will be the top level folder in the window.
+    //  project_folder - Default will be the folder index specified by the "default_folder_index" setting.
     //  current - Default will be the directory of the current view.
     //  home - Default will be the home folder (~/)
     //  path - Default will be defined by the setting "default_path"
     // If the current view or top folder cannot be resolved, the home directory
     // will be used.
-    "default_root": "top_folder",
+    "default_root": "project_folder",
 
     // A string specifying the default root to use. For this to be utilized,
     // "default_root" must be set to "path"
     "default_path": "~",
 
+    // An integer value representing a folder index to be used when "folder" is specified
+    // for "default_root". If an index outside of the range of existing folders is used,
+    // it will default to 0 (the top level folder).
+    "default_folder_index": 0,
+
+
     // This value specifies the root that will be used when resolving relative paths
     // defined in aliases. For more information about valid values, see "default_root".
-    // Note that if "path" is used, "alias_path" must be set appropriately.
+    // Note that if "default_path" or "default_folder_index" is used, 
+    // "alias_path" and "alias_folder_index" must be used for the respective entries.
     "alias_root": "current",
 
     // A string specifying the path to use for the alias root. For this to be
     // utilized, "alias_root" must be set to "path"
     "alias_path": "~",
 
+    // An integer value representing the folder index to use when "folder" is specified
+    // for "alias_root". If an index outside of the range of the existing folders is used,
+    // it will default to 0.
+    "alias_folder_index": 0,
+
     // A boolean specifying if case should be ignored when building
     // auto complete list.
     "ignore_case": false
-
 }
