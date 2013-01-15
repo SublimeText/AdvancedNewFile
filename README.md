@@ -71,8 +71,8 @@ A boolean value used to determine if the path of the file to be created should b
 
 This value is used to determine the default root when using AdvancedNewFile. It must be one of the following values:
 
-* `folder_index`- The default path will be the folder specified by the 'default_folder_index' setting.
-* `current_view` - The default path will be the directory of the current active view.
+* `project_folder`- The default path will be the folder specified by the 'default_folder_index' setting.
+* `current` - The default path will be the directory of the current active view.
 * `home` - The default path will be your home directory.
 * `path` - The default path will be defined by the setting `default_path`
 
