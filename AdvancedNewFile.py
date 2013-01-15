@@ -164,7 +164,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                                 break
                         else:
                             if re.search(NIX_ROOT_REGEX, alias_path) is None:
-                                root = os.path.join(self.root, alias_path)
+                                root = os.path.join(self.alias_root, alias_path)
                                 break
                     root = os.path.expanduser(alias_path)
                     break
