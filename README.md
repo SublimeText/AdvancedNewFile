@@ -1,5 +1,5 @@
 # AdvancedNewFile
-Advanced file creation for Sublime Text 2
+Advanced file creation for Sublime Text 2 and Sublime Text 3.
 
 ## Overview
 
@@ -28,7 +28,7 @@ Simply bring up the AdvancedNewFile input through the appropriate [key binding](
 The default directory is specified by the `default_root` setting. By default, it will be the top directory of the folders listed in the window. If this cannot be resolved, the home directory will be used. See [Settings](https://github.com/skuroda/Sublime-AdvancedNewFile#settings) (`default_root`) for more information.
 
 ## Keymaps
-If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager.
+If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager. Alternatively, set command logging to true by entering `sublime.log_commands(True)` in the Sublime Text console.
 
 ### Windows
 `ctrl+alt+n`: General keymap to create new files.

@@ -2,6 +2,7 @@ import os
 import sublime
 import sublime_plugin
 import re
+import logging
 
 SETTINGS = [
     "alias",
@@ -16,18 +17,22 @@ SETTINGS = [
     "ignore_case",
     "alias_root",
     "alias_path",
-    "alias_folder_index"
+    "alias_folder_index",
+    "debug"
 ]
-DEBUG = False
-PLATFORM = sublime.platform().lower()
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
 NIX_ROOT_REGEX = r"^/"
 HOME_REGEX = r"^~"
 
+# Set up logger
+logging.basicConfig(format='[AdvancedNewFile] %(levelname)s %(message)s')
+logger = logging.getLogger()
+
 
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
     def run(self, is_python=False):
+        self.PLATFORM = sublime.platform().lower()
         self.root = None
         self.alias_root = None
         self.top_level_split_char = ":"
@@ -64,6 +69,11 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             alias_root = ""
         self.alias_root, tmp = self.split_path(alias_root, True)
 
+        debug = settings.get("debug") or False
+        if debug:
+            logger.setLevel(logging.DEBUG)
+        else:
+            logger.setLevel(logging.ERROR)
         # Get user input
         self.show_filename_input(path)
 
@@ -71,8 +81,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         aliases = settings.get("alias")
         all_os_aliases = settings.get("os_specific_alias")
         for key in all_os_aliases:
-            if PLATFORM in all_os_aliases.get(key):
-                aliases[key] = all_os_aliases.get(key).get(PLATFORM)
+            if self.PLATFORM in all_os_aliases.get(key):
+                aliases[key] = all_os_aliases.get(key).get(self.PLATFORM)
 
         return aliases
 
@@ -101,7 +111,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         elif string == "path":
             root = "path"
         else:
-            print "Invalid specifier for \"default_root\""
+            logger.error("Invalid specifier for \"default_root\"")
         return root
 
     def split_path(self, path="", is_alias=False):
@@ -109,7 +119,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         root = None
         try:
             # Parse windows root
-            if PLATFORM == "windows":
+            if self.PLATFORM == "windows":
                 if re.match(WIN_ROOT_REGEX, path):
                     root = path[0:3]
                     path = path[3:]
@@ -134,9 +144,6 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 root = root or self.window.folders()[folder_index]
         except IndexError:
             root = os.path.expanduser("~")
-        if DEBUG:
-            print "AdvancedNewFile[Debug]: root is " + root
-            print "AdvancedNewFile[Debug]: path is " + path
         return root, path
 
     def translate_alias(self, target):
@@ -158,7 +165,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 if alias == target:
                     alias_path = self.aliases.get(alias)
                     if re.search(HOME_REGEX, alias_path) is None:
-                        if PLATFORM == "windows":
+                        if self.PLATFORM == "windows":
                             if re.search(WIN_ROOT_REGEX, alias_path) is None:
                                 root = os.path.join(self.alias_root, alias_path)
                                 break
@@ -190,10 +197,6 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         view.settings().set("auto_complete_commit_on_tab", True)
         view.settings().set("tab_completion", True)
 
-        # May be useful to see the popup for debugging
-        if DEBUG:
-            view.settings().set("auto_complete", True)
-            view.settings().set("auto_complete_selector", "text")
         PathAutocomplete.set_view_id(view.id())
         PathAutocomplete.set_root(self.root, True)
 
@@ -204,17 +207,18 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         else:
             PathAutocomplete.set_root(base, True)
 
+        creation_path = self.generate_creation_path(base, path)
         if self.show_path:
             if self.view != None:
                 self.view.set_status("AdvancedNewFile", "Creating file at %s " % \
-                    self.generate_creation_path(base, path))
+                    creation_path)
             else:
                 sublime.status_message("Unable to fill status bar without view")
-
+        logger.debug("Creation path is '%s'" % creation_path)
         PathAutocomplete.set_path(path)
 
     def generate_creation_path(self, base, path):
-        if PLATFORM == "windows":
+        if self.PLATFORM == "windows":
             if not re.match(WIN_ROOT_REGEX, base):
                 return base + ":" + path
         else:
@@ -225,7 +229,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
     def entered_filename(self, filename):
         # Check if valid root specified for windows.
-        if PLATFORM == "windows":
+        if self.PLATFORM == "windows":
             if re.match(WIN_ROOT_REGEX, filename):
                 root = filename[0:3]
                 if not os.path.isdir(root):
@@ -237,8 +241,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         file_path = os.path.join(base, path)
         # Check for invalid alias specified.
         if self.top_level_split_char in filename and \
-            not (PLATFORM == "windows" and re.match(WIN_ROOT_REGEX, base)) and \
-            not (PLATFORM != "windows" and re.match(NIX_ROOT_REGEX, base)):
+            not (self.PLATFORM == "windows" and re.match(WIN_ROOT_REGEX, base)) and \
+            not (self.PLATFORM != "windows" and re.match(NIX_ROOT_REGEX, base)):
             if base == "":
                 error_message = "Current file cannot be resolved."
             else:
@@ -246,15 +250,14 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             sublime.error_message(error_message)
         else:
             attempt_open = True
-            if DEBUG:
-                print "AdvancedNewFile[Debug]: Creating file at " + file_path
+            logger.debug("Creating file at %s", file_path)
             if not os.path.exists(file_path):
                 try:
                     self.create(file_path)
                 except Exception as e:
                     attempt_open = False
                     sublime.error_message("Cannot create '" + file_path + "'. See console for details")
-                    print "Exception: %s" % e.strerror
+                    logger.error("Exception: %s" % e.strerror)
             if attempt_open:
                 if os.path.isdir(file_path):
                     if not re.search(r"(/|\\)$", file_path):
@@ -360,9 +363,8 @@ class PathAutocomplete(sublime_plugin.EventListener):
 
         auto_complete_prefix = ""
         if self.continue_previous_autocomplete() and prefix != "":
-            if DEBUG:
-                print "AdvancedNewFile[Debug]: (Prev) Suggestions"
-                print pac.prev_suggestions
+            logger.debug("(Prev) Suggestions")
+            logger.debug(pac.prev_suggestions)
             if len(pac.prev_suggestions) > 1:
                 return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
             elif len(pac.prev_suggestions) == 1:
@@ -409,9 +411,8 @@ class PathAutocomplete(sublime_plugin.EventListener):
         pac.prev_root = root_path
         pac.prev_prefix = prefix
         pac.prev_locations = locations
-        if DEBUG:
-            print "AdvancedNewFile[Debug]: Suggestions:"
-            print suggestions
+        logger.debug("Suggestions:")
+        logger.debug(suggestions)
         return (suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
     def generate_project_auto_complete(self, base):
@@ -541,6 +542,6 @@ def get_settings(view):
             else:
                 local_settings[key] = project_settings[key]
         else:
-            print "AdvancedNewFile[Warning]: Invalid key '" + key + "' in project settings."
+            logger.error("AdvancedNewFile[Warning]: Invalid key '%s' in project settings.", key)
 
     return local_settings

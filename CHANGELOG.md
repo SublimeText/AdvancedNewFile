@@ -1,5 +1,6 @@
 # Changelog for AdvancedNewFile
-
+- 2 February 2013
+    - Update to be compatible with Sublime Text 3.
 - 14 January 2013
     - Add `alias_root` setting, used with aliases with relative paths.
     - Add setting to allow user to specify which folder from the project should be used.
