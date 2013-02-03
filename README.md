@@ -13,6 +13,7 @@ Installation through [package control](http://wbond.net/sublime_packages/package
 
 * In the Command Palette, enter `Package Control: Install Package`
 * Search for `AdvancedNewFile`
+* In the Command Palette, enter `Package Control :Enable Package` -> select AdvancedNewFile
 
 ### Manual
 Clone or copy this repository into the packages directory. By default, they are located at:
