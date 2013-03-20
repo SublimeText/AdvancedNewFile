@@ -202,7 +202,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
     def update_filename_input(self, path_in):
         base, path = self.split_path(path_in)
-        if self.top_level_split_char in path_in:
+        if self.top_level_split_char in path_in or re.match(r"^~[/\\]", path_in):
             PathAutocomplete.set_root(base, False)
         else:
             PathAutocomplete.set_root(base, True)
