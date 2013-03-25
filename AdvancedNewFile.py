@@ -378,8 +378,11 @@ class PathAutocomplete(sublime_plugin.EventListener):
         if directory == "" and pac.default_root:
             # Project folders
             sugg, sugg_w_spaces = self.generate_project_auto_complete(base)
-            suggestions += sugg
-            suggestions_w_spaces += sugg_w_spaces
+
+            # Only add folder alias if more than 1 exist.
+            if len(sugg) + len(sugg_w_spaces) > 1:
+                suggestions += sugg
+                suggestions_w_spaces += sugg_w_spaces
             # Aliases
             sugg, sugg_w_spaces = self.generate_alias_auto_complete(base)
             suggestions += sugg
