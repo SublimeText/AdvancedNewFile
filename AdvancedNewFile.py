@@ -3,6 +3,7 @@ import sublime
 import sublime_plugin
 import re
 import logging
+import errno
 
 SETTINGS = [
     "alias",
@@ -274,10 +275,10 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             if not os.path.exists(file_path):
                 try:
                     self.create(file_path)
-                except Exception as e:
+                except OSError as e:
                     attempt_open = False
                     sublime.error_message("Cannot create '" + file_path + "'. See console for details")
-                    logger.error("Exception: %s" % e.strerror)
+                    logger.error("Exception: %s '%s'" % (e.strerror, e.filename))
             if attempt_open:
                 if os.path.isdir(file_path):
                     if not re.search(r"(/|\\)$", file_path):
