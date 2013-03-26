@@ -297,12 +297,12 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         if filename != "":
             open(os.path.join(base, filename), "a").close()
 
-    def create_folder(self, base):
-        if not os.path.exists(base):
-            parent = os.path.split(base)[0]
-            if not os.path.exists(parent):
-                self.create_folder(parent)
-            os.mkdir(base)
+    def create_folder(self, path):
+        try:
+            os.makedirs(path)
+        except OSError as ex:
+            if ex.errno != errno.EEXIST:
+                raise
         if self.is_python:
             open(os.path.join(base, '__init__.py'), 'a').close()
 
@@ -400,7 +400,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
             sugg, sugg_w_spaces = self.generate_project_auto_complete(base)
 
             # Only add folder alias if more than 1 exist.
-            if len(sugg) + len(sugg_w_spaces) > 1:
+            if len(sugg) + len(sugg_w_spaces) > 1 or prefix != "":
                 suggestions += sugg
                 suggestions_w_spaces += sugg_w_spaces
             # Aliases
