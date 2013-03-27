@@ -93,7 +93,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         if string == "home":
             root = "~/"
         elif string == "current":
-            root = ":"
+            root = self.top_level_split_char
         elif string == "project_folder":
             if is_alias:
                 folder_index = self.alias_folder_index
@@ -134,7 +134,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     path_list.append(path)
                 if parts[1] != "":
                     path_list.append(parts[1])
-                path = ":".join(path_list)
+                path = self.top_level_split_char.join(path_list)
             # Parse if tilde used
             elif re.match(HOME_REGEX, path) and root == None:
                 root = os.path.expanduser("~")
@@ -200,7 +200,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         else:
             # Add to index so we re
             join_index += 2
-            return os.path.abspath(root), ":".join(split_path[join_index:])
+            return os.path.abspath(root), self.top_level_split_char.join(split_path[join_index:])
 
     def show_filename_input(self, initial=''):
         caption = 'Enter a path for a new file'
@@ -241,10 +241,10 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
     def generate_creation_path(self, base, path):
         if self.PLATFORM == "windows":
             if not re.match(WIN_ROOT_REGEX, base):
-                return base + ":" + path
+                return base + self.top_level_split_char + path
         else:
             if not re.match(NIX_ROOT_REGEX, base):
-                return base + ":" + path
+                return base + self.top_level_split_char + path
 
         return os.path.abspath(os.path.join(base, path))
 
