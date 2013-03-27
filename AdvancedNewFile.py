@@ -153,6 +153,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             root = os.path.expanduser("~")
         return root, path
 
+
+
     def translate_alias(self, path):
         root = None
         split_path = None
@@ -167,9 +169,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             root_found = False
             while join_index >= 0 and not root_found:
                 # Folder aliases
-                for folder in self.window.folders():
-                    basename = os.path.basename(folder)
-                    if basename == target:
+                for name, folder in get_project_folder_data():
+                    if name == target:
                         root = folder
                         root_found = True
                         break
@@ -440,8 +441,8 @@ class PathAutocomplete(sublime_plugin.EventListener):
         return (suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
     def generate_project_auto_complete(self, base):
-        folders = sublime.active_window().folders()
-        folders = map(lambda f: os.path.basename(f), folders)
+        folder_data = get_project_folder_data()
+        folders = [x[0] for x in folder_data]
         return self.generate_auto_complete(base, folders)
 
     def generate_alias_auto_complete(self, base):
@@ -450,7 +451,6 @@ class PathAutocomplete(sublime_plugin.EventListener):
     def generate_auto_complete(self, base, iterable_var):
         sugg = []
         sugg_w_spaces = []
-
         for entry in iterable_var:
             if entry in self.suggestion_entries:
                 continue
@@ -569,3 +569,15 @@ def get_settings(view):
             logger.error("AdvancedNewFile[Warning]: Invalid key '%s' in project settings.", key)
 
     return local_settings
+
+def get_project_folder_data():
+    project_data = sublime.active_window().project_data()
+    folders = []
+    if project_data is not None and "folders" in project_data:
+        for folder_data in project_data["folders"]:
+            if "name" in folder_data:
+                folders.append((folder_data["name"], folder_data["path"]))
+            else:
+                folders.append((os.path.basename(folder_data["path"]), folder_data["path"]))
+
+    return folders
