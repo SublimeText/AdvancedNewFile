@@ -70,5 +70,11 @@
 
     // A boolean specifying if case should be ignored when building
     // auto complete list.
-    "ignore_case": false
+    "ignore_case": false,
+
+    // A boolean specifying if folders should automatically refresh and update the sidebar.
+    // In some builds, the sidebar does not refresh when contents of project folder are updated.
+    // This setting is required to refresh the sidebar in these circumstances.
+    // false by default
+    "auto_refresh_sidebar": false
 }

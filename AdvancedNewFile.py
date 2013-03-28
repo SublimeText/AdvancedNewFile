@@ -19,7 +19,8 @@ SETTINGS = [
     "alias_root",
     "alias_path",
     "alias_folder_index",
-    "debug"
+    "debug",
+    "auto_refresh_sidebar"
 ]
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
@@ -44,6 +45,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         settings = get_settings(self.view)
         self.aliases = self.get_aliases(settings)
         self.show_path = settings.get("show_path")
+        self.auto_refresh_sidebar = settings.get("auto_refresh_sidebar")
         self.default_folder_index = settings.get("default_folder_index")
         self.alias_folder_index = settings.get("alias_folder_index")
         default_root = self.get_default_root(settings.get("default_root"))
@@ -287,6 +289,15 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 else:
                     self.window.open_file(file_path)
         self.clear()
+        self.refresh_sidebar()
+
+    def refresh_sidebar(self):
+        if self.auto_refresh_sidebar:
+            try:
+                self.window.run_command("refresh_folder_list")
+            except:
+                pass
+
 
     def clear(self):
         if self.view != None:
