@@ -26,6 +26,7 @@ VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
 NIX_ROOT_REGEX = r"^/"
 HOME_REGEX = r"^~"
+PLATFORM = sublime.platform().lower()
 
 # Set up logger
 logging.basicConfig(format='[AdvancedNewFile] %(levelname)s %(message)s')
@@ -34,7 +35,7 @@ logger = logging.getLogger()
 
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
     def run(self, is_python=False):
-        self.PLATFORM = sublime.platform().lower()
+        PLATFORM = sublime.platform().lower()
         self.root = None
         self.alias_root = None
         self.top_level_split_char = ":"
@@ -84,8 +85,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         aliases = settings.get("alias")
         all_os_aliases = settings.get("os_specific_alias")
         for key in all_os_aliases:
-            if self.PLATFORM in all_os_aliases.get(key):
-                aliases[key] = all_os_aliases.get(key).get(self.PLATFORM)
+            if PLATFORM in all_os_aliases.get(key):
+                aliases[key] = all_os_aliases.get(key).get(PLATFORM)
 
         return aliases
 
@@ -122,7 +123,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         root = None
         try:
             # Parse windows root
-            if self.PLATFORM == "windows":
+            if PLATFORM == "windows":
                 if re.match(WIN_ROOT_REGEX, path):
                     root = path[0:3]
                     path = path[3:]
@@ -181,7 +182,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     if alias == target:
                         alias_path = self.aliases.get(alias)
                         if re.search(HOME_REGEX, alias_path) is None:
-                            if self.PLATFORM == "windows":
+                            if PLATFORM == "windows":
                                 if re.search(WIN_ROOT_REGEX, alias_path) is None:
                                     root = os.path.join(self.alias_root, alias_path)
                                     break
@@ -242,7 +243,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         PathAutocomplete.set_path(path)
 
     def generate_creation_path(self, base, path):
-        if self.PLATFORM == "windows":
+        if PLATFORM == "windows":
             if not re.match(WIN_ROOT_REGEX, base):
                 return base + self.top_level_split_char + path
         else:
@@ -253,7 +254,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
     def entered_filename(self, filename):
         # Check if valid root specified for windows.
-        if self.PLATFORM == "windows":
+        if PLATFORM == "windows":
             if re.match(WIN_ROOT_REGEX, filename):
                 root = filename[0:3]
                 if not os.path.isdir(root):
@@ -265,8 +266,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         file_path = os.path.join(base, path)
         # Check for invalid alias specified.
         if self.top_level_split_char in filename and \
-            not (self.PLATFORM == "windows" and re.match(WIN_ROOT_REGEX, base)) and \
-            not (self.PLATFORM != "windows" and re.match(NIX_ROOT_REGEX, base)):
+            not (PLATFORM == "windows" and re.match(WIN_ROOT_REGEX, base)) and \
+            not (PLATFORM != "windows" and re.match(NIX_ROOT_REGEX, base)):
             if base == "":
                 error_message = "Current file cannot be resolved."
             else:
@@ -583,12 +584,25 @@ def get_settings(view):
 
 def get_project_folder_data():
     project_data = sublime.active_window().project_data()
+    project_directory = os.path.dirname(sublime.active_window().project_file_name())
     folders = []
     if project_data is not None and "folders" in project_data:
         for folder_data in project_data["folders"]:
-            if "name" in folder_data:
-                folders.append((folder_data["name"], folder_data["path"]))
+            folder_path = folder_data["path"]
+            if PLATFORM == "windows":
+                if re.match(NIX_ROOT_REGEX, folder_path):
+                    folder_path = re.sub(r"/([A-Za-z])/(.+)", r"\1:/\2", folder_path)
+                    folder_path = re.sub(r"/", r"\\", folder_path)
+
+                if not re.match(WIN_ROOT_REGEX, folder_path):
+                    folder_path = os.path.join(project_directory, folder_path)
             else:
-                folders.append((os.path.basename(folder_data["path"]), folder_data["path"]))
+                if not re.match(NIX_ROOT_REGEX, folder_path):
+                    folder_path = os.path.join(project_directory, folder_path)
+
+            if "name" in folder_data:
+                folders.append((folder_data["name"], folder_path))
+            else:
+                folders.append((os.path.basename(folder_path), folder_path))
 
     return folders
