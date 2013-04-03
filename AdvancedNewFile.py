@@ -238,7 +238,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 self.view.set_status("AdvancedNewFile", "Creating file at %s " % \
                     creation_path)
             else:
-                sublime.status_message("Unable to fill status bar without view")
+                sublime.status_message("Creating file at %s" % creation_path)
         logger.debug("Creation path is '%s'" % creation_path)
         PathAutocomplete.set_path(path)
 
@@ -412,11 +412,8 @@ class PathAutocomplete(sublime_plugin.EventListener):
         if directory == "" and pac.default_root:
             # Project folders
             sugg, sugg_w_spaces = self.generate_project_auto_complete(base)
-
-            # Only add folder alias if more than 1 exist.
-            if len(sugg) + len(sugg_w_spaces) > 1 or prefix != "":
-                suggestions += sugg
-                suggestions_w_spaces += sugg_w_spaces
+            suggestions += sugg
+            suggestions_w_spaces += sugg_w_spaces
             # Aliases
             sugg, sugg_w_spaces = self.generate_alias_auto_complete(base)
             suggestions += sugg
@@ -454,8 +451,10 @@ class PathAutocomplete(sublime_plugin.EventListener):
 
     def generate_project_auto_complete(self, base):
         folder_data = get_project_folder_data()
-        folders = [x[0] for x in folder_data]
-        return self.generate_auto_complete(base, folders)
+        if len(folder_data) > 1:
+            folders = [x[0] for x in folder_data]
+            return self.generate_auto_complete(base, folders)
+        return [], []
 
     def generate_alias_auto_complete(self, base):
         return self.generate_auto_complete(base, PathAutocomplete.aliases)
