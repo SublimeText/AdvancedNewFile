@@ -221,7 +221,6 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         view.settings().set("word_separators", temp)
         view.settings().set("auto_complete_commit_on_tab", True)
         view.settings().set("tab_completion", True)
-
         PathAutocomplete.set_view_id(view.id())
         PathAutocomplete.set_root(self.root, True)
 
@@ -394,7 +393,6 @@ class PathAutocomplete(sublime_plugin.EventListener):
         pac = PathAutocomplete
         if pac.view_id == None or view.id() != pac.view_id:
             return []
-
         auto_complete_prefix = ""
         if self.continue_previous_autocomplete() and prefix != "":
             logger.debug("(Prev) Suggestions")
@@ -425,6 +423,7 @@ class PathAutocomplete(sublime_plugin.EventListener):
             sugg, sugg_w_spaces = self.generate_relative_auto_complete(path, base, auto_complete_prefix)
             suggestions += sugg
             suggestions_w_spaces += sugg_w_spaces
+
         # If suggestions exist, use complete name
         # else remove base prefix
         if len(suggestions) > 0:
@@ -582,26 +581,21 @@ def get_settings(view):
     return local_settings
 
 def get_project_folder_data():
-    project_data = sublime.active_window().project_data()
-    project_directory = os.path.dirname(sublime.active_window().project_file_name())
+    window = sublime.active_window()
+    project_data = window.project_data()
+    project_folders = window.folders()
     folders = []
-    if project_data is not None and "folders" in project_data:
-        for folder_data in project_data["folders"]:
-            folder_path = folder_data["path"]
-            if PLATFORM == "windows":
-                if re.match(NIX_ROOT_REGEX, folder_path):
-                    folder_path = re.sub(r"/([A-Za-z])/(.+)", r"\1:/\2", folder_path)
-                    folder_path = re.sub(r"/", r"\\", folder_path)
+    folder_entries = []
 
-                if not re.match(WIN_ROOT_REGEX, folder_path):
-                    folder_path = os.path.join(project_directory, folder_path)
-            else:
-                if not re.match(NIX_ROOT_REGEX, folder_path):
-                    folder_path = os.path.join(project_directory, folder_path)
+    if project_data is not None:
+        folder_entries = project_data.get("folders", [])
 
-            if "name" in folder_data:
-                folders.append((folder_data["name"], folder_path))
-            else:
-                folders.append((os.path.basename(folder_path), folder_path))
+    for index in range(len(folder_entries)):
+        folder_path = project_folders[index]
+        folder_entry = folder_entries[index]
+        if "name" in folder_entry:
+            folders.append((folder_entry["name"], folder_path))
+        else:
+            folders.append((os.path.basename(folder_path), folder_path))
 
     return folders
