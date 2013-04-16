@@ -326,7 +326,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         view = self.view
         path = ""
         for region in view.sel():
-            syntax = view.syntax_name(region.begin())
+            syntax = view.scope_name(region.begin())
             if region.begin() != region.end():
                 path = view.substr(region)
                 break
