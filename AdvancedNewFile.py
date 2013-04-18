@@ -34,7 +34,7 @@ logger = logging.getLogger()
 
 
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
-    def run(self, is_python=False):
+    def run(self, is_python=False, initial_path=None):
         PLATFORM = sublime.platform().lower()
         self.root = None
         self.alias_root = None
@@ -61,11 +61,14 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         PathAutocomplete.set_ignore_case(settings.get("ignore_case"))
 
         # Search for initial string
-        path = settings.get("default_initial", "")
-        if settings.get("use_cursor_text", False):
-            tmp = self.get_cursor_path()
-            if tmp != "":
-                path = tmp
+        if initial_path is not None:
+            path = initial_path
+        else:
+            path = settings.get("default_initial", "")
+            if settings.get("use_cursor_text", False):
+                tmp = self.get_cursor_path()
+                if tmp != "":
+                    path = tmp
 
         alias_root = self.get_default_root(settings.get("alias_root"), True)
         if alias_root == "path":
@@ -317,7 +320,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             if ex.errno != errno.EEXIST:
                 raise
         if self.is_python:
-            open(os.path.join(base, '__init__.py'), 'a').close()
+            open(os.path.join(path, '__init__.py'), 'a').close()
 
     def get_cursor_path(self):
         if self.view == None:
