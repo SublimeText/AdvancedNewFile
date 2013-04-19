@@ -107,6 +107,10 @@ A boolean specifying if case should be ignored when building auto complete list.
 
 A boolean specifying if folders should automatically refresh and update the sidebar. In some builds, the sidebar does not refresh when contents of project folder are updated. This setting is required to refresh the sidebar in these circumstances. False by default.
 
+`show_sidebar_menu`:
+
+A boolean specifying if an AdvancedNewFile option should be shown in the sidebar context menu.
+
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
 

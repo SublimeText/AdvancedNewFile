@@ -562,6 +562,19 @@ class PathAutocomplete(sublime_plugin.EventListener):
         PathAutocomplete.view_id = view_id
 
 
+class AdvancedNewFileAtCommand(sublime_plugin.WindowCommand):
+    def run(self, dirs):
+        if len(dirs) != 1:
+            return
+        path = dirs[0]
+        self.window.run_command("advanced_new_file", {"initial_path": path + os.sep})
+
+
+    def is_visible(self, dirs):
+        settings = sublime.load_settings("AdvancedNewFile.sublime-settings")
+        return settings.get("show_sidebar_menu", False) and len(dirs) == 1
+
+
 def get_settings(view):
     settings = sublime.load_settings("AdvancedNewFile.sublime-settings")
     project_settings = {}
