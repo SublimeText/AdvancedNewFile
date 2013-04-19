@@ -1,0 +1,3 @@
+[
+    { "caption": "Advanced New File", "command": "advanced_new_file_at", "args": {"dirs": []} }
+]

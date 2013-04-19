@@ -19,7 +19,7 @@
 
     // A boolean defining if cursor text should be used. Text bound by single or
     // double quotes or within a region will be used. If multiple cursors
-    // are used, the earliest selection containing a region or existing 
+    // are used, the earliest selection containing a region or existing
     // within quotes will be used.
     // NOTE: A value read from cursor will override the default
     // initial string setting.
@@ -55,7 +55,7 @@
 
     // This value specifies the root that will be used when resolving relative paths
     // defined in aliases. For more information about valid values, see "default_root".
-    // Note that if "default_path" or "default_folder_index" is used, 
+    // Note that if "default_path" or "default_folder_index" is used,
     // "alias_path" and "alias_folder_index" must be used for the respective entries.
     "alias_root": "current",
 
@@ -76,5 +76,9 @@
     // In some builds, the sidebar does not refresh when contents of project folder are updated.
     // This setting is required to refresh the sidebar in these circumstances.
     // false by default
-    "auto_refresh_sidebar": false
+    "auto_refresh_sidebar": false,
+
+    // A boolean specifying if an AdvancedNewFile option should be shown in the
+    // sidebar context menu.
+    "show_sidebar_menu": false
 }
