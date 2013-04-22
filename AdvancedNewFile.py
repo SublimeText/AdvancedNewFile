@@ -314,13 +314,20 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             open(os.path.join(base, filename), "a").close()
 
     def create_folder(self, path):
+        init_list = []
+        if self.is_python:
+            temp_path = path
+            while not os.path.exists(temp_path):
+                init_list.append(temp_path)
+                temp_path = os.path.dirname(temp_path)
         try:
             os.makedirs(path)
         except OSError as ex:
             if ex.errno != errno.EEXIST:
                 raise
-        if self.is_python:
-            open(os.path.join(path, '__init__.py'), 'a').close()
+
+        for entry in init_list:
+            open(os.path.join(entry, '__init__.py'), 'a').close()
 
     def get_cursor_path(self):
         if self.view == None:
