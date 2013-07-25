@@ -1,6 +1,20 @@
 # Changelog for AdvancedNewFile
+- 27 July 2013
+    - Rewrite autocomplete functionality.
+    - Bug Fixes
+        - Snippets no longer appear when entering completions.
+
+- 22 April 2013
+    - Add option to refresh sidebar after creating a file.
+    - Add side bar context menu.
+    - Bug Fixes
+        - Multiple autocomplete issues.
+        - Creation of __init__.py files.
+        - Filling text with cursor values.
+
 - 2 February 2013
     - Update to be compatible with Sublime Text 3.
+
 - 14 January 2013
     - Add `alias_root` setting, used with aliases with relative paths.
     - Add setting to allow user to specify which folder from the project should be used.

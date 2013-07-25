@@ -80,5 +80,9 @@
 
     // A boolean specifying if an AdvancedNewFile option should be shown in the
     // sidebar context menu.
-    "show_sidebar_menu": false
+    "show_sidebar_menu": false,
+
+    // A string specifying the type of auto completion to use. Valid values are
+    // "windows" or "nix"
+    "completion_type": "windows"
 }

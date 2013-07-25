@@ -20,7 +20,8 @@ SETTINGS = [
     "alias_path",
     "alias_folder_index",
     "debug",
-    "auto_refresh_sidebar"
+    "auto_refresh_sidebar",
+    "completion_type"
 ]
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
@@ -44,6 +45,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
         # Settings will be based on the view
         settings = get_settings(self.view)
+        self.settings = settings
         self.aliases = self.get_aliases(settings)
         self.show_path = settings.get("show_path")
         self.auto_refresh_sidebar = settings.get("auto_refresh_sidebar")
@@ -56,9 +58,9 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         self.root, path = self.split_path(default_root)
 
         # Set some default values for the auto complete
-        PathAutocomplete.set_show_files(settings.get("show_files"))
-        PathAutocomplete.set_aliases(self.aliases)
-        PathAutocomplete.set_ignore_case(settings.get("ignore_case"))
+        # PathAutocomplete.set_show_files(settings.get("show_files"))
+        # PathAutocomplete.set_aliases(self.aliases)
+        # PathAutocomplete.set_ignore_case(settings.get("ignore_case"))
 
         # Search for initial string
         if initial_path is not None:
@@ -159,8 +161,6 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             root = os.path.expanduser("~")
         return root, path
 
-
-
     def translate_alias(self, path):
         root = None
         split_path = None
@@ -213,26 +213,39 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         caption = 'Enter a path for a new file'
         if self.is_python:
             caption = '%s (creates __init__.py in new dirs)' % caption
-        view = self.window.show_input_panel(
+        self.input_panel_view = self.window.show_input_panel(
             caption, initial,
             self.entered_filename, self.update_filename_input, self.clear
         )
 
-        view.set_name(VIEW_NAME)
-        temp = view.settings().get("word_separators")
-        temp = temp.replace(".", "")
-        view.settings().set("word_separators", temp)
-        view.settings().set("auto_complete_commit_on_tab", True)
-        view.settings().set("tab_completion", True)
-        PathAutocomplete.set_view_id(view.id())
-        PathAutocomplete.set_root(self.root, True)
+        self.input_panel_view.set_name(VIEW_NAME)
+        # temp = self.input_panel_view.settings().get("word_separators")
+        # temp = temp.replace(".", "")
+        # self.input_panel_view.settings().set("word_separators", temp)
+        print(self.input_panel_view.settings().get("syntax"))
+        # self.input_panel_view.set_syntax_file("Packages/AdvancedNewFile/AdvancedNewFile.hidden-tmLanguage")
+        self.input_panel_view.settings().set("auto_complete_commit_on_tab", False)
+        self.input_panel_view.settings().set("tab_completion", False)
+        self.input_panel_view.settings().set("translate_tabs_to_spaces", False)
+        self.input_panel_view.settings().set("anf_panel", True)
+        # PathAutocomplete.set_view_id(self.input_panel_view.id())
+        # PathAutocomplete.set_root(self.root, True)
 
     def update_filename_input(self, path_in):
+        if path_in.endswith("\t"):
+            self.view.erase_status("AdvancedNewFile2")
+            path_in = path_in.replace("\t", "")
+            if self.settings.get("completion_type") == "windows":
+                path_in = self.windows_completion(path_in)
+            elif self.settings.get("completion_type") == "nix":
+                path_in = self.nix_completion(path_in)
+
+            
         base, path = self.split_path(path_in)
-        if self.top_level_split_char in path_in or re.match(r"^~[/\\]", path_in):
-            PathAutocomplete.set_root(base, False)
-        else:
-            PathAutocomplete.set_root(base, True)
+        # if self.top_level_split_char in path_in or re.match(r"^~[/\\]", path_in):
+            # PathAutocomplete.set_root(base, False)
+        # else:
+            # PathAutocomplete.set_root(base, True)
 
         creation_path = self.generate_creation_path(base, path)
         if self.show_path:
@@ -242,7 +255,143 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             else:
                 sublime.status_message("Creating file at %s" % creation_path)
         logger.debug("Creation path is '%s'" % creation_path)
-        PathAutocomplete.set_path(path)
+        # PathAutocomplete.set_path(path)
+
+    def generate_completion_list(self, path_in, each_list=False):
+        alias_list = []
+        dir_list = []
+        file_list = []
+        self.suggestion_entries = []
+        if self.top_level_split_char in path_in or re.match(r"^~[/\\]", path_in):
+            pass
+        else:
+            directory, filename = os.path.split(path_in)
+            if len(directory) == 0:
+                alias_list += self.generate_alias_auto_complete(filename)
+                alias_list += self.generate_project_auto_complete(filename)
+        base, path = self.split_path(path_in)
+        directory, filename = os.path.split(path)
+        
+        directory = os.path.join(base, directory)
+        if os.path.isdir(directory):
+            for d in os.listdir(directory):
+                full_path = os.path.join(directory, d)
+                if os.path.isdir(full_path):
+                    is_file = False
+                elif self.settings.get("show_files"):
+                    is_file = True
+                else:
+                    continue
+                
+                if self.compare_entries(d, filename):
+                    if is_file:
+                        file_list.append(d)
+                    else:
+                        dir_list.append(d)
+
+        completion_list = alias_list + dir_list + file_list
+
+        return sorted(completion_list), alias_list, dir_list, file_list
+
+    def windows_completion(self, path_in):
+        pattern = r"(.*[/\\:])(.*)"
+        if "prev_text" in dir(self) and self.prev_text == path_in:
+            self.offset = (self.offset + 1) % len(self.completion_list)
+        else:
+            
+            # Generate new completion list
+            temp_completion_list, self.alias_list, self.dir_list, self.file_list= self.generate_completion_list(path_in)
+            if len(temp_completion_list) > 0:
+                self.offset = 1
+                match = re.match(pattern, path_in)
+                if match:
+                    self.completion_list = [match.group(2)] + temp_completion_list
+                else:
+                    self.completion_list = [path_in] + temp_completion_list
+            else:
+                self.offset = 0
+                match = re.match(pattern, path_in)
+                if match:
+                    self.completion_list = [match.group(2)]
+                else:
+                    self.completion_list = [path_in]
+        match = re.match(pattern, path_in)
+        if match :   
+            new_content = re.sub(pattern, r"\1" + self.completion_list[self.offset], path_in)
+        else:
+            new_content = self.completion_list[self.offset]
+
+        if self.completion_list[self.offset] in self.alias_list:
+            self.view.set_status("AdvancedNewFile2", "Alias Completion")
+        elif self.completion_list[self.offset] in self.dir_list:
+            self.view.set_status("AdvancedNewFile2", "Directory Completion")
+        self.prev_text = new_content
+        self.input_panel_view.run_command("anf_replace", {"content": new_content})
+        return new_content
+
+    def nix_completion(self, path_in):
+        pattern = r"(.*[/\\:])(.*)"
+
+        completion_list, alias_list, dir_list, file_list = self.generate_completion_list(path_in)
+        print(completion_list)
+        print(alias_list)
+        print(dir_list)
+        print(file_list)
+        new_content = path_in
+        if len(completion_list) > 0:
+            common = os.path.commonprefix(completion_list)
+            match = re.match(pattern, path_in)
+            if match :   
+                new_content = re.sub(pattern, r"\1" + common, path_in)
+            else:
+                new_content = common
+            if len(completion_list) > 1:
+                dir_list = map(lambda s: s + "/", dir_list)
+                alias_list = map(lambda s: s + ":", alias_list)
+                status_message_list = sorted(list(dir_list) + list(alias_list) + file_list)
+                sublime.status_message(", ".join(status_message_list))
+            else:
+                if completion_list[0] in alias_list:
+                    new_content += ":"
+                elif completion_list[0] in dir_list:
+                    new_content += "/"
+        self.input_panel_view.run_command("anf_replace", {"content": new_content})
+        return new_content
+
+    def generate_project_auto_complete(self, base):
+        folder_data = get_project_folder_data()
+        if len(folder_data) > 1:
+            folders = [x[0] for x in folder_data]
+            return self.generate_auto_complete(base, folders)
+        return []
+
+    def generate_alias_auto_complete(self, base):
+        return self.generate_auto_complete(base, self.aliases)
+
+    def generate_auto_complete(self, base, iterable_var):
+        sugg = []
+        for entry in iterable_var:
+            if entry in self.suggestion_entries:
+                continue
+            self.suggestion_entries.append(entry)
+            compare_entry = entry
+            compare_base = base
+            if self.settings.get("ignore_case"):
+                compare_entry = compare_entry.lower()
+                compare_base = compare_base.lower()
+
+            if self.compare_entries(compare_entry, compare_base):
+                sugg.append(entry)
+
+        return sugg
+
+    def compare_entries(self, compare_entry, compare_base):
+        if self.settings.get("ignore_case"):
+            compare_entry = compare_entry.lower()
+            compare_base = compare_base.lower()
+
+        return compare_entry.startswith(compare_base)
+        
 
     def generate_creation_path(self, base, path):
         if PLATFORM == "windows":
@@ -301,11 +450,11 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             except:
                 pass
 
-
     def clear(self):
         if self.view != None:
             self.view.erase_status("AdvancedNewFile")
-        PathAutocomplete.clear()
+            self.view.erase_status("AdvancedNewFile2")
+        # PathAutocomplete.clear()
 
     def create(self, filename):
         base, filename = os.path.split(filename)
@@ -348,225 +497,230 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         return path
 
 
-class PathAutocomplete(sublime_plugin.EventListener):
-    aliases = {}
-    show_files = False
-    ignore_case = False
+class AnfReplaceCommand(sublime_plugin.TextCommand):
+    def run(self, edit, content):
+        self.view.replace(edit, sublime.Region(0, self.view.size()), content)
+       
+# class PathAutocomplete(sublime_plugin.EventListener):
+#     aliases = {}
+#     show_files = False
+#     ignore_case = False
 
-    path = ""
-    root = ""
-    default_root = True
-    view_id = None
+#     path = ""
+#     root = ""
+#     default_root = True
+#     view_id = None
 
-    prev_suggestions = []
-    prev_base = ""
-    prev_directory = ""
-    path_empty = True
-    prev_root = ""
-    prev_prefix = ""
-    prev_locations = []
+#     prev_suggestions = []
+#     prev_base = ""
+#     prev_directory = ""
+#     path_empty = True
+#     prev_root = ""
+#     prev_prefix = ""
+#     prev_locations = []
 
-    def on_query_context(self, view, key, operator, operand, match_all):
-        if key == "advanced_new_file_completion" and PathAutocomplete.view_id != None and view.id() == PathAutocomplete.view_id:
-            return True
-        return None
+#     def on_query_context(self, view, key, operator, operand, match_all):
+#         if key == "advanced_new_file_completion" and PathAutocomplete.view_id != None and view.id() == PathAutocomplete.view_id:
+#             return True
+#         return None
 
-    def continue_previous_autocomplete(self):
-        pac = PathAutocomplete
-        sep = os.sep
-        root_path = pac.root + sep
-        prev_base = pac.prev_base
-        prev_directory = pac.prev_directory
-        prev_root = pac.prev_root
+#     def continue_previous_autocomplete(self):
+#         pac = PathAutocomplete
+#         sep = os.sep
+#         root_path = pac.root + sep
+#         prev_base = pac.prev_base
+#         prev_directory = pac.prev_directory
+#         prev_root = pac.prev_root
 
-        base = os.path.basename(pac.path)
-        directory = os.path.dirname(pac.path)
+#         base = os.path.basename(pac.path)
+#         directory = os.path.dirname(pac.path)
 
-        # If base is empty, we may be cycling through directory options
-        if base == "":
-            return True
+#         # If base is empty, we may be cycling through directory options
+#         if base == "":
+#             return True
 
-        # Ensures the correct directory is used if the default root is specified
-        # using an alias.
-        if base == prev_base and \
-        directory == prev_directory and \
-        prev_root == root_path and \
-        pac.default_root:
-            return True
-        # Continue completions if file names are completed.
-        if os.path.isfile(os.path.join(root_path, pac.path)):
-            return True
-        return False
+#         # Ensures the correct directory is used if the default root is specified
+#         # using an alias.
+#         if base == prev_base and \
+#         directory == prev_directory and \
+#         prev_root == root_path and \
+#         pac.default_root:
+#             return True
+#         # Continue completions if file names are completed.
+#         if os.path.isfile(os.path.join(root_path, pac.path)):
+#             return True
+#         return False
 
-    def on_query_completions(self, view, prefix, locations):
-        self.suggestion_entries = []
-        pac = PathAutocomplete
-        if pac.view_id == None or view.id() != pac.view_id:
-            return []
-        auto_complete_prefix = ""
-        if self.continue_previous_autocomplete() and prefix != "":
-            logger.debug("(Prev) Suggestions")
-            logger.debug(pac.prev_suggestions)
-            if len(pac.prev_suggestions) > 1:
-                return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
-            elif len(pac.prev_suggestions) == 1:
-                auto_complete_prefix = pac.prev_suggestions[0][1]
+#     def on_query_completions(self, view, prefix, locations):
+#         return
+#         self.suggestion_entries = []
+#         pac = PathAutocomplete
+#         if pac.view_id == None or view.id() != pac.view_id:
+#             return []
+#         auto_complete_prefix = ""
+#         if self.continue_previous_autocomplete() and prefix != "":
+#             logger.debug("(Prev) Suggestions")
+#             logger.debug(pac.prev_suggestions)
+#             if len(pac.prev_suggestions) > 1:
+#                 return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+#             elif len(pac.prev_suggestions) == 1:
+#                 auto_complete_prefix = pac.prev_suggestions[0][1]
 
-        suggestions = []
-        suggestions_w_spaces = []
-        root_path = pac.root + os.sep
-        directory, base = os.path.split(pac.path)
+#         suggestions = []
+#         suggestions_w_spaces = []
+#         root_path = pac.root + os.sep
+#         directory, base = os.path.split(pac.path)
 
-        if directory == "" and pac.default_root:
-            # Project folders
-            sugg, sugg_w_spaces = self.generate_project_auto_complete(base)
-            suggestions += sugg
-            suggestions_w_spaces += sugg_w_spaces
-            # Aliases
-            sugg, sugg_w_spaces = self.generate_alias_auto_complete(base)
-            suggestions += sugg
-            suggestions_w_spaces += sugg_w_spaces
+#         if directory == "" and pac.default_root:
+#             # Project folders
+#             sugg, sugg_w_spaces = self.generate_project_auto_complete(base)
+#             suggestions += sugg
+#             suggestions_w_spaces += sugg_w_spaces
+#             # Aliases
+#             sugg, sugg_w_spaces = self.generate_alias_auto_complete(base)
+#             suggestions += sugg
+#             suggestions_w_spaces += sugg_w_spaces
 
-        # Directories
-        path = os.path.join(root_path, directory)
-        if os.path.exists(path):
-            sugg, sugg_w_spaces = self.generate_relative_auto_complete(path, base, auto_complete_prefix)
-            suggestions += sugg
-            suggestions_w_spaces += sugg_w_spaces
+#         # Directories
+#         path = os.path.join(root_path, directory)
+#         if os.path.exists(path):
+#             sugg, sugg_w_spaces = self.generate_relative_auto_complete(path, base, auto_complete_prefix)
+#             suggestions += sugg
+#             suggestions_w_spaces += sugg_w_spaces
 
-        # If suggestions exist, use complete name
-        # else remove base prefix
-        if len(suggestions) > 0:
-            for name in suggestions_w_spaces:
-                suggestions.append((" " + name, name))
-        else:
-            for name in suggestions_w_spaces:
-                temp = name
-                name = name[len(base) - 1:]
-                suggestions.append((" " + temp, name))
+#         # If suggestions exist, use complete name
+#         # else remove base prefix
+#         if len(suggestions) > 0:
+#             for name in suggestions_w_spaces:
+#                 suggestions.append((" " + name, name))
+#         else:
+#             for name in suggestions_w_spaces:
+#                 temp = name
+#                 name = name[len(base) - 1:]
+#                 suggestions.append((" " + temp, name))
 
-        if len(suggestions) == 0 and locations == pac.prev_locations:
-            return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
-        # Previous used to determine cycling through entries.
-        pac.prev_directory = directory
-        pac.prev_base = base
-        pac.prev_suggestions = suggestions
-        pac.prev_root = root_path
-        pac.prev_prefix = prefix
-        pac.prev_locations = locations
-        logger.debug("Suggestions:")
-        logger.debug(suggestions)
-        return (suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+#         if len(suggestions) == 0 and locations == pac.prev_locations:
+#             return (pac.prev_suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+#         # Previous used to determine cycling through entries.
+#         pac.prev_directory = directory
+#         pac.prev_base = base
+#         pac.prev_suggestions = suggestions
+#         pac.prev_root = root_path
+#         pac.prev_prefix = prefix
+#         pac.prev_locations = locations
+#         logger.debug("Suggestions:")
+#         logger.debug(suggestions)
+#         return (suggestions, sublime.INHIBIT_WORD_COMPLETIONS | sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
-    def generate_project_auto_complete(self, base):
-        folder_data = get_project_folder_data()
-        if len(folder_data) > 1:
-            folders = [x[0] for x in folder_data]
-            return self.generate_auto_complete(base, folders)
-        return [], []
+#     def generate_project_auto_complete(self, base):
+#         folder_data = get_project_folder_data()
+#         if len(folder_data) > 1:
+#             folders = [x[0] for x in folder_data]
+#             return self.generate_auto_complete(base, folders)
+#         return [], []
 
-    def generate_alias_auto_complete(self, base):
-        return self.generate_auto_complete(base, PathAutocomplete.aliases)
+#     def generate_alias_auto_complete(self, base):
+#         return self.generate_auto_complete(base, PathAutocomplete.aliases)
 
-    def generate_auto_complete(self, base, iterable_var):
-        sugg = []
-        sugg_w_spaces = []
-        for entry in iterable_var:
-            if entry in self.suggestion_entries:
-                continue
-            self.suggestion_entries.append(entry)
-            compare_entry = entry
-            compare_base = base
-            if PathAutocomplete.ignore_case:
-                compare_entry = compare_entry.lower()
-                compare_base = compare_base.lower()
+#     def generate_auto_complete(self, base, iterable_var):
+#         sugg = []
+#         sugg_w_spaces = []
+#         for entry in iterable_var:
+#             if entry in self.suggestion_entries:
+#                 continue
+#             self.suggestion_entries.append(entry)
+#             compare_entry = entry
+#             compare_base = base
+#             if PathAutocomplete.ignore_case:
+#                 compare_entry = compare_entry.lower()
+#                 compare_base = compare_base.lower()
 
-            if compare_entry.find(compare_base) == 0:
-                if " " in base:
-                    sugg_w_spaces.append(entry + ":")
-                else:
-                    sugg.append((entry + ":", entry + ":"))
-        return sugg, sugg_w_spaces
+#             if compare_entry.find(compare_base) == 0:
+#                 if " " in base:
+#                     sugg_w_spaces.append(entry + ":")
+#                 else:
+#                     sugg.append((entry + ":", entry + ":"))
+#         return sugg, sugg_w_spaces
 
-    def generate_relative_auto_complete(self, path, base, auto_complete_prefix):
-        sep = os.sep
-        sugg = []
-        sugg_w_spaces = []
+#     def generate_relative_auto_complete(self, path, base, auto_complete_prefix):
+#         sep = os.sep
+#         sugg = []
+#         sugg_w_spaces = []
 
-        # Attempt to prevent searching the same path when a path has been specified
-        # Problems occur when using tab to complete entry with single completion
-        # followed by ctrl + space
-        if ":" in auto_complete_prefix:
-            compare_prefix = auto_complete_prefix.split(":", 1)[1]
-        else:
-            compare_prefix = auto_complete_prefix
+#         # Attempt to prevent searching the same path when a path has been specified
+#         # Problems occur when using tab to complete entry with single completion
+#         # followed by ctrl + space
+#         if ":" in auto_complete_prefix:
+#             compare_prefix = auto_complete_prefix.split(":", 1)[1]
+#         else:
+#             compare_prefix = auto_complete_prefix
 
-        if re.search(r"[/\\]$", auto_complete_prefix) and not path.endswith(compare_prefix[0:-1]):
-            path = os.path.join(path, compare_prefix)
+#         if re.search(r"[/\\]$", auto_complete_prefix) and not path.endswith(compare_prefix[0:-1]):
+#             path = os.path.join(path, compare_prefix)
 
-        for filename in os.listdir(path):
-            if PathAutocomplete.show_files or os.path.isdir(os.path.join(path, filename)):
-                compare_base = base
-                compare_filename = filename
-                if PathAutocomplete.ignore_case:
-                    compare_base = compare_base.lower()
-                    compare_filename = filename.lower()
+#         for filename in os.listdir(path):
+#             if PathAutocomplete.show_files or os.path.isdir(os.path.join(path, filename)):
+#                 compare_base = base
+#                 compare_filename = filename
+#                 if PathAutocomplete.ignore_case:
+#                     compare_base = compare_base.lower()
+#                     compare_filename = filename.lower()
 
-                if compare_filename.find(compare_base) == 0:
-                    # Need to find a better way to do the auto complete.
-                    if " " in compare_base:
-                        if os.path.isdir(os.path.join(path, filename)):
-                            sugg_w_spaces.append(auto_complete_prefix + filename + sep)
-                        else:
-                            sugg_w_spaces.append(auto_complete_prefix + filename)
-                    else:
-                        if os.path.isdir(os.path.join(path, filename)):
-                            sugg.append((" " + auto_complete_prefix + filename + sep, auto_complete_prefix + filename + sep))
-                        else:
-                            sugg.append((" " + auto_complete_prefix + filename, auto_complete_prefix + filename))
+#                 if compare_filename.find(compare_base) == 0:
+#                     # Need to find a better way to do the auto complete.
+#                     if " " in compare_base:
+#                         if os.path.isdir(os.path.join(path, filename)):
+#                             sugg_w_spaces.append(auto_complete_prefix + filename + sep)
+#                         else:
+#                             sugg_w_spaces.append(auto_complete_prefix + filename)
+#                     else:
+#                         if os.path.isdir(os.path.join(path, filename)):
+#                             sugg.append((" " + auto_complete_prefix + filename + sep, auto_complete_prefix + filename + sep))
+#                         else:
+#                             sugg.append((" " + auto_complete_prefix + filename, auto_complete_prefix + filename))
 
-        return sugg, sugg_w_spaces
+#         return sugg, sugg_w_spaces
 
-    @staticmethod
-    def set_path(path_input):
-        PathAutocomplete.path = path_input
+#     @staticmethod
+#     def set_path(path_input):
+#         PathAutocomplete.path = path_input
 
-    @staticmethod
-    def set_root(root_input, default_root):
-        PathAutocomplete.root = root_input
-        PathAutocomplete.default_root = default_root
+#     @staticmethod
+#     def set_root(root_input, default_root):
+#         PathAutocomplete.root = root_input
+#         PathAutocomplete.default_root = default_root
 
-    @staticmethod
-    def clear():
-        PathAutocomplete.path = ""
-        PathAutocomplete.root = ""
-        PathAutocomplete.prev_suggestions = []
-        PathAutocomplete.prev_base = ""
-        PathAutocomplete.prev_directory = ""
-        PathAutocomplete.aliases = {}
-        PathAutocomplete.path_empty = True
-        PathAutocomplete.prev_root = ""
-        PathAutocomplete.default_root = True
-        PathAutocomplete.show_files = False
-        PathAutocomplete.prev_prefix = ""
-        PathAutocomplete.prev_locations = []
-        PathAutocomplete.view_id = None
+#     @staticmethod
+#     def clear():
+#         PathAutocomplete.path = ""
+#         PathAutocomplete.root = ""
+#         PathAutocomplete.prev_suggestions = []
+#         PathAutocomplete.prev_base = ""
+#         PathAutocomplete.prev_directory = ""
+#         PathAutocomplete.aliases = {}
+#         PathAutocomplete.path_empty = True
+#         PathAutocomplete.prev_root = ""
+#         PathAutocomplete.default_root = True
+#         PathAutocomplete.show_files = False
+#         PathAutocomplete.prev_prefix = ""
+#         PathAutocomplete.prev_locations = []
+#         PathAutocomplete.view_id = None
 
-    @staticmethod
-    def set_aliases(aliases):
-        PathAutocomplete.aliases = aliases
+#     @staticmethod
+#     def set_aliases(aliases):
+#         PathAutocomplete.aliases = aliases
 
-    @staticmethod
-    def set_show_files(show_files):
-        PathAutocomplete.show_files = show_files
+#     @staticmethod
+#     def set_show_files(show_files):
+#         PathAutocomplete.show_files = show_files
 
-    @staticmethod
-    def set_ignore_case(ignore_case):
-        PathAutocomplete.ignore_case = ignore_case
+#     @staticmethod
+#     def set_ignore_case(ignore_case):
+#         PathAutocomplete.ignore_case = ignore_case
 
-    @staticmethod
-    def set_view_id(view_id):
-        PathAutocomplete.view_id = view_id
+#     @staticmethod
+#     def set_view_id(view_id):
+#         PathAutocomplete.view_id = view_id
 
 class AdvancedNewFileAtCommand(sublime_plugin.WindowCommand):
     def run(self, dirs):
