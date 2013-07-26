@@ -84,5 +84,7 @@
 
     // A string specifying the type of auto completion to use. Valid values are
     // "windows" or "nix"
-    "completion_type": "windows"
+    "completion_type": "windows",
+
+    "complete_single_entry": true
 }

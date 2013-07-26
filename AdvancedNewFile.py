@@ -21,7 +21,8 @@ SETTINGS = [
     "alias_folder_index",
     "debug",
     "auto_refresh_sidebar",
-    "completion_type"
+    "completion_type",
+    "complete_single_entry"
 ]
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
@@ -44,16 +45,15 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         self.view = self.window.active_view()
 
         # Settings will be based on the view
-        settings = get_settings(self.view)
-        self.settings = settings
-        self.aliases = self.get_aliases(settings)
-        self.show_path = settings.get("show_path")
-        self.auto_refresh_sidebar = settings.get("auto_refresh_sidebar")
-        self.default_folder_index = settings.get("default_folder_index")
-        self.alias_folder_index = settings.get("alias_folder_index")
-        default_root = self.get_default_root(settings.get("default_root"))
+        self.settings = get_settings(self.view)
+        self.aliases = self.get_aliases()
+        self.show_path = self.settings.get("show_path")
+        self.auto_refresh_sidebar = self.settings.get("auto_refresh_sidebar")
+        self.default_folder_index = self.settings.get("default_folder_index")
+        self.alias_folder_index = self.settings.get("alias_folder_index")
+        default_root = self.get_default_root(self.settings.get("default_root"))
         if default_root == "path":
-            self.root = os.path.expanduser(settings.get("default_path"))
+            self.root = os.path.expanduser(self.settings.get("default_path"))
             default_root = ""
         self.root, path = self.split_path(default_root)
 
@@ -61,19 +61,19 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         if initial_path is not None:
             path = initial_path
         else:
-            path = settings.get("default_initial", "")
-            if settings.get("use_cursor_text", False):
+            path = self.settings.get("default_initial", "")
+            if self.settings.get("use_cursor_text", False):
                 tmp = self.get_cursor_path()
                 if tmp != "":
                     path = tmp
 
-        alias_root = self.get_default_root(settings.get("alias_root"), True)
+        alias_root = self.get_default_root(self.settings.get("alias_root"), True)
         if alias_root == "path":
-            self.alias_root = os.path.expanduser(settings.get("alias_path"))
+            self.alias_root = os.path.expanduser(self.settings.get("alias_path"))
             alias_root = ""
         self.alias_root, tmp = self.split_path(alias_root, True)
 
-        debug = settings.get("debug") or False
+        debug = self.settings.get("debug") or False
         if debug:
             logger.setLevel(logging.DEBUG)
         else:
@@ -81,9 +81,9 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         # Get user input
         self.show_filename_input(path)
 
-    def get_aliases(self, settings):
-        aliases = settings.get("alias")
-        all_os_aliases = settings.get("os_specific_alias")
+    def get_aliases(self):
+        aliases = self.settings.get("alias")
+        all_os_aliases = self.settings.get("os_specific_alias")
         for key in all_os_aliases:
             if PLATFORM in all_os_aliases.get(key):
                 aliases[key] = all_os_aliases.get(key).get(PLATFORM)
@@ -228,7 +228,6 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             elif self.settings.get("completion_type") == "nix":
                 path_in = self.nix_completion(path_in)
 
-            
         base, path = self.split_path(path_in)
 
         creation_path = self.generate_creation_path(base, path)
@@ -254,7 +253,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 alias_list += self.generate_project_auto_complete(filename)
         base, path = self.split_path(path_in)
         directory, filename = os.path.split(path)
-        
+
         directory = os.path.join(base, directory)
         if os.path.isdir(directory):
             for d in os.listdir(directory):
@@ -265,7 +264,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     is_file = True
                 else:
                     continue
-                
+
                 if self.compare_entries(d, filename):
                     if is_file:
                         file_list.append(d)
@@ -278,37 +277,47 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
     def windows_completion(self, path_in):
         pattern = r"(.*[/\\:])(.*)"
+        match = re.match(pattern, path_in)
         if "prev_text" in dir(self) and self.prev_text == path_in:
             self.offset = (self.offset + 1) % len(self.completion_list)
         else:
-            
             # Generate new completion list
-            temp_completion_list, self.alias_list, self.dir_list, self.file_list= self.generate_completion_list(path_in)
-            if len(temp_completion_list) > 0:
-                self.offset = 1
-                match = re.match(pattern, path_in)
-                if match:
-                    self.completion_list = [match.group(2)] + temp_completion_list
-                else:
-                    self.completion_list = [path_in] + temp_completion_list
-            else:
-                self.offset = 0
-                match = re.match(pattern, path_in)
+            self.completion_list, self.alias_list, self.dir_list, self.file_list = self.generate_completion_list(path_in)
+            self.offset = 0
+
+            if len(self.completion_list) == 0:
                 if match:
                     self.completion_list = [match.group(2)]
                 else:
                     self.completion_list = [path_in]
         match = re.match(pattern, path_in)
-        if match :   
-            new_content = re.sub(pattern, r"\1" + self.completion_list[self.offset], path_in)
+        if match :
+            completion = self.completion_list[self.offset]
+            if self.settings.get("complete_single_entry"):
+                if len(self.completion_list) == 1:
+                    if completion in self.alias_list:
+                        completion += ":"
+                    elif completion in self.dir_list:
+                        completion += "/"
+            new_content = re.sub(pattern, r"\1" + completion, path_in)
         else:
-            new_content = self.completion_list[self.offset]
+            completion = self.completion_list[self.offset]
+            if self.settings.get("complete_single_entry"):
+                if len(self.completion_list) == 1:
+                    if completion in self.alias_list:
+                        completion += ":"
+                    elif completion in self.dir_list:
+                        completion += "/"
+            new_content = completion
 
-        if self.completion_list[self.offset] in self.alias_list:
-            self.view.set_status("AdvancedNewFile2", "Alias Completion")
-        elif self.completion_list[self.offset] in self.dir_list:
-            self.view.set_status("AdvancedNewFile2", "Directory Completion")
-        self.prev_text = new_content
+        if len(self.completion_list) > 1:
+            if self.completion_list[self.offset] in self.alias_list:
+                self.view.set_status("AdvancedNewFile2", "Alias Completion")
+            elif self.completion_list[self.offset] in self.dir_list:
+                self.view.set_status("AdvancedNewFile2", "Directory Completion")
+            self.prev_text = new_content
+        else:
+            self.prev_text = ""
         self.input_panel_view.run_command("anf_replace", {"content": new_content})
         return new_content
 
@@ -320,7 +329,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         if len(completion_list) > 0:
             common = os.path.commonprefix(completion_list)
             match = re.match(pattern, path_in)
-            if match :   
+            if match :
                 new_content = re.sub(pattern, r"\1" + common, path_in)
             else:
                 new_content = common
@@ -370,7 +379,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             compare_base = compare_base.lower()
 
         return compare_entry.startswith(compare_base)
-        
+
 
     def generate_creation_path(self, base, path):
         if PLATFORM == "windows":
