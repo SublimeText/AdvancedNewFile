@@ -1,0 +1,4 @@
+- Rewrite autocomplete functionality to support *nix or windows style completions. Please see the README for details about new settings.
+
+Bug Fixes:
+- Snippets no longer appear when entering completions.
