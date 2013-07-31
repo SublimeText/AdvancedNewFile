@@ -50,7 +50,6 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         self.settings = get_settings(self.view)
         self.aliases = self.get_aliases()
         self.show_path = self.settings.get("show_path")
-        self.auto_refresh_sidebar = self.settings.get("auto_refresh_sidebar")
         self.default_folder_index = self.settings.get("default_folder_index")
         self.alias_folder_index = self.settings.get("alias_folder_index")
         default_root = self.get_default_root(self.settings.get("default_root"))
@@ -172,7 +171,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             root_found = False
             while join_index >= 0 and not root_found:
                 # Folder aliases
-                for name, folder in get_project_folder_data():
+                for name, folder in get_project_folder_data(self.settings.get("use_folder_name")):
                     if name == target:
                         root = folder
                         root_found = True
@@ -222,8 +221,10 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         self.input_panel_view.settings().set("anf_panel", True)
 
     def update_filename_input(self, path_in):
+        if self.settings.get("completion_type") == "windows":
+            if "prev_text" in dir(self) and self.prev_text != path_in:
+                self.view.erase_status("AdvancedNewFile2")
         if path_in.endswith("\t"):
-            self.view.erase_status("AdvancedNewFile2")
             path_in = path_in.replace("\t", "")
             if self.settings.get("completion_type") == "windows":
                 path_in = self.windows_completion(path_in)
@@ -319,7 +320,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 self.view.set_status("AdvancedNewFile2", "Directory Completion")
             self.prev_text = new_content
         else:
-            self.prev_text = ""
+            self.prev_text = None
         self.input_panel_view.run_command("anf_replace", {"content": new_content})
         return new_content
 
@@ -349,7 +350,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         return new_content
 
     def generate_project_auto_complete(self, base):
-        folder_data = get_project_folder_data()
+        folder_data = get_project_folder_data(self.settings.get("use_folder_name"))
         if len(folder_data) > 1:
             folders = [x[0] for x in folder_data]
             return self.generate_auto_complete(base, folders)
@@ -434,7 +435,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         self.refresh_sidebar()
 
     def refresh_sidebar(self):
-        if self.auto_refresh_sidebar:
+        if self.settings.get("auto_refresh_sidebar"):
             try:
                 self.window.run_command("refresh_folder_list")
             except:
@@ -525,7 +526,7 @@ def get_settings(view):
 
     return local_settings
 
-def get_project_folder_data():
+def get_project_folder_data(use_folder_name):
     folders = []
     folder_entries = []
     window = sublime.active_window()
@@ -535,7 +536,11 @@ def get_project_folder_data():
         project_data = window.project_data()
 
         if project_data is not None:
-            folder_entries = project_data.get("folders", [])
+            if use_folder_name:
+                for folder in project_data.get("folders", []):
+                    folder_entries.append({})
+            else:
+                folder_entries = project_data.get("folders", [])
     else:
         for folder in project_folders:
             folder_entries.append({})
