@@ -80,5 +80,17 @@
 
     // A boolean specifying if an AdvancedNewFile option should be shown in the
     // sidebar context menu.
-    "show_sidebar_menu": false
+    "show_sidebar_menu": false,
+
+    // A string specifying the type of auto completion to use. Valid values are
+    // "windows" or "nix"
+    "completion_type": "windows",
+
+    // A boolean setting specifying if a separator should be inserted when
+    // there is only one completion and completion type is "windows"
+    "complete_single_entry": true,
+
+    // A boolean setting specifying if the folder name should be used 
+    // or the name specified in the project. This setting only applies to ST3.
+    "use_folder_name": false
 }

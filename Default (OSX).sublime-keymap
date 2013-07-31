@@ -3,13 +3,10 @@
 	{ "keys": ["shift+super+alt+n"], "command": "advanced_new_file", "args": {"is_python": true}},
 	{
 		"keys": ["tab"],
-		"command": "insert_best_completion", 
-		"args": {"default": "", "exact": false}, 
-		"context": [
-			{ "key": "advanced_new_file_completion"},
-			{ "key": "setting.tab_completion", "operator": "equal", "operand": true },
-			{ "key": "last_command", "operator": "not_equal", "operand": "insert_best_completion" },
-			{ "key": "auto_complete_visible" , "operator": "equal", "operand": false}
-		]
+		"command": "insert",
+		"args": {"characters": "\t"},
+		"context": [{
+			"key": "setting.anf_panel"
+		}]
 	}
 ]

@@ -2,7 +2,7 @@ Thank you for installing the AdvancedNewFile plugin.
 
 For more information please visit https://github.com/skuroda/Sublime-AdvancedNewFile.
 
-Note you may need to restart Sublime Text 2 after installing this plugin.
+Note you may need to restart Sublime Text after installing this plugin.
 
 If you have any questions, comments, or run into issues, please let me know! Hope you enjoy the plugin.
 
