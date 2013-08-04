@@ -303,6 +303,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     elif completion in self.dir_list:
                         completion += "/"
             new_content = re.sub(pattern, r"\1" + completion, path_in)
+            first_token = False
         else:
             completion = self.completion_list[self.offset]
             if self.settings.get("complete_single_entry"):
@@ -312,12 +313,14 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     elif completion in self.dir_list:
                         completion += "/"
             new_content = completion
+            first_token = True
 
         if len(self.completion_list) > 1:
-            if self.completion_list[self.offset] in self.alias_list:
-                self.view.set_status("AdvancedNewFile2", "Alias Completion")
-            elif self.completion_list[self.offset] in self.dir_list:
-                self.view.set_status("AdvancedNewFile2", "Directory Completion")
+            if first_token:
+                if self.completion_list[self.offset] in self.alias_list:
+                    self.view.set_status("AdvancedNewFile2", "Alias Completion")
+                elif self.completion_list[self.offset] in self.dir_list:
+                    self.view.set_status("AdvancedNewFile2", "Directory Completion")
             self.prev_text = new_content
         else:
             self.prev_text = None
@@ -532,7 +535,7 @@ def get_project_folder_data(use_folder_name):
     window = sublime.active_window()
     project_folders = window.folders()
 
-    if IS_ST3: 
+    if IS_ST3:
         project_data = window.project_data()
 
         if project_data is not None:
