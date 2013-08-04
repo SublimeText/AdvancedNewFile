@@ -22,7 +22,7 @@ Clone or copy this repository into the packages directory. By default, they are 
 * Windows: %APPDATA%/Roaming/Sublime Text 2/Packages/
 * Linux: ~/.config/sublime-text-2/Packages/
 
-or 
+or
 
 * OS X: ~/Library/Application Support/Sublime Text 3/Packages/
 * Windows: %APPDATA%/Roaming/Sublime Text 3/Packages/
@@ -132,10 +132,8 @@ A boolean setting specifying if the folder name should be used or the name speci
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
 
-    "settings":
-    {
-        "AdvancedNewFile":
-        {
+    "settings": {
+        "AdvancedNewFile": {
             "default_initial": "/project/specific/path"
         }
     }
