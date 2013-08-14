@@ -223,7 +223,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
     def update_filename_input(self, path_in):
         if self.settings.get("completion_type") == "windows":
             if "prev_text" in dir(self) and self.prev_text != path_in:
-                self.view.erase_status("AdvancedNewFile2")
+                if self.view is not None:
+                    self.view.erase_status("AdvancedNewFile2")
         if path_in.endswith("\t"):
             path_in = path_in.replace("\t", "")
             if self.settings.get("completion_type") == "windows":
@@ -318,10 +319,11 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
         if len(self.completion_list) > 1:
             if first_token:
-                if self.completion_list[self.offset] in self.alias_list:
-                    self.view.set_status("AdvancedNewFile2", "Alias Completion")
-                elif self.completion_list[self.offset] in self.dir_list:
-                    self.view.set_status("AdvancedNewFile2", "Directory Completion")
+                if self.view is not None:
+                    if self.completion_list[self.offset] in self.alias_list:
+                        self.view.set_status("AdvancedNewFile2", "Alias Completion")
+                    elif self.completion_list[self.offset] in self.dir_list:
+                        self.view.set_status("AdvancedNewFile2", "Directory Completion")
             self.prev_text = new_content
         else:
             self.prev_text = None
