@@ -302,7 +302,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                         completion += ":"
                     elif completion in self.dir_list:
                         completion += "/"
-            new_content = re.sub(pattern, r"\1" + completion, path_in)
+            new_content = re.sub(pattern, r"\1" , path_in)
+            new_content += completion
             first_token = False
         else:
             completion = self.completion_list[self.offset]
@@ -336,7 +337,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             common = os.path.commonprefix(completion_list)
             match = re.match(pattern, path_in)
             if match :
-                new_content = re.sub(pattern, r"\1" + common, path_in)
+                new_content = re.sub(pattern, r"\1", path_in)
+                new_content += common
             else:
                 new_content = common
             if len(completion_list) > 1:
