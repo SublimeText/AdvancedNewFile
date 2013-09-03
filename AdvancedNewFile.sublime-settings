@@ -90,7 +90,11 @@
     // there is only one completion and completion type is "windows"
     "complete_single_entry": true,
 
-    // A boolean setting specifying if the folder name should be used 
+    // A boolean setting specifying if the folder name should be used
     // or the name specified in the project. This setting only applies to ST3.
-    "use_folder_name": false
+    "use_folder_name": false,
+
+    // Boolean setting specifying if relative paths should be based on the
+    // current working directory.
+    "relative_from_current": true
 }

@@ -23,7 +23,8 @@ SETTINGS = [
     "auto_refresh_sidebar",
     "completion_type",
     "complete_single_entry",
-    "use_folder_name"
+    "use_folder_name",
+    "relative_from_current"
 ]
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
@@ -143,6 +144,13 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             elif re.match(HOME_REGEX, path) and root == None:
                 root = os.path.expanduser("~")
                 path = path[2:]
+            elif re.match(r"^\.{1,2}[/\\]", path) and self.settings.get("relative_from_current", False):
+                path_index = 2
+                root = os.path.dirname(self.view.file_name())
+                if re.match(r"^\.{2}[/\\]", path):
+                    root = os.path.dirname(root)
+                    path_index = 3
+                path = path[path_index:]
 
             # Default
             if root == None:

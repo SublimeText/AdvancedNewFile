@@ -1,0 +1,6 @@
+Enhancements:
+- Setting to allow relative paths to be based on the current working directory. Enabled by default.
+
+Bug Fixes:
+- Various fixes for auto completion
+- Prompt completion type when using Windows Completion
