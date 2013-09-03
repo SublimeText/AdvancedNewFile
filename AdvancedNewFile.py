@@ -140,6 +140,12 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 if parts[1] != "":
                     path_list.append(parts[1])
                 path = self.top_level_split_char.join(path_list)
+            elif re.match(r"^/", path):
+                if PLATFORM == "windows":
+                    root = os.path.splitdrive(self.view.file_name())
+                else:
+                    root = "/"
+                path = path[1:]
             # Parse if tilde used
             elif re.match(HOME_REGEX, path) and root == None:
                 root = os.path.expanduser("~")
@@ -163,6 +169,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 root = root or self.window.folders()[folder_index]
         except IndexError:
             root = os.path.expanduser("~")
+
         return root, path
 
     def translate_alias(self, path):
@@ -407,7 +414,11 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             if not re.match(NIX_ROOT_REGEX, base):
                 return base + self.top_level_split_char + path
 
-        return os.path.abspath(os.path.join(base, path))
+        tokens = re.split(r"[/\\]", base) + re.split(r"[/\\]", path)
+        if tokens[0] == "":
+            tokens[0] = "/"
+
+        return os.path.abspath(os.path.join(*tokens))
 
     def entered_filename(self, filename):
         # Check if valid root specified for windows.
