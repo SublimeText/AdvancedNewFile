@@ -141,11 +141,18 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     path_list.append(parts[1])
                 path = self.top_level_split_char.join(path_list)
             elif re.match(r"^/", path):
+                path_offset = 1
                 if PLATFORM == "windows":
-                    root = os.path.splitdrive(self.view.file_name())
+                    match = re.match(r"^/([a-zA-Z])/", path)
+                    if match:
+                        root = "%s:\\" % match.group(1)
+                        path_offset = 3
+                    else:
+                        root, _ = os.path.splitdrive(self.view.file_name())
+                        root += "\\"
                 else:
                     root = "/"
-                path = path[1:]
+                path = path[path_offset:]
             # Parse if tilde used
             elif re.match(HOME_REGEX, path) and root == None:
                 root = os.path.expanduser("~")
@@ -417,7 +424,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         tokens = re.split(r"[/\\]", base) + re.split(r"[/\\]", path)
         if tokens[0] == "":
             tokens[0] = "/"
-
+        if PLATFORM == "windows":
+            tokens[0] = base[0:3]
         return os.path.abspath(os.path.join(*tokens))
 
     def entered_filename(self, filename):
