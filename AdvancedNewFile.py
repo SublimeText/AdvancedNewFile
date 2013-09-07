@@ -278,9 +278,10 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 alias_list += self.generate_alias_auto_complete(filename)
                 alias_list += self.generate_project_auto_complete(filename)
         base, path = self.split_path(path_in)
-        directory, filename = os.path.split(path)
+        full_path = self.generate_creation_path(base, path)
 
-        directory = os.path.join(base, directory)
+        directory, filename = os.path.split(full_path)
+
         if os.path.isdir(directory):
             for d in os.listdir(directory):
                 full_path = os.path.join(directory, d)
@@ -426,7 +427,11 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             tokens[0] = "/"
         if PLATFORM == "windows":
             tokens[0] = base[0:3]
-        return os.path.abspath(os.path.join(*tokens))
+
+        full_path = os.path.abspath(os.path.join(*tokens))
+        if re.search(r"[/\\]$", path):
+           full_path += os.path.sep
+        return full_path
 
     def entered_filename(self, filename):
         # Check if valid root specified for windows.
@@ -439,7 +444,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     return
 
         base, path = self.split_path(filename)
-        file_path = os.path.join(base, path)
+        file_path = self.generate_creation_path(base, path)
         # Check for invalid alias specified.
         if self.top_level_split_char in filename and \
             not (PLATFORM == "windows" and re.match(WIN_ROOT_REGEX, base)) and \
