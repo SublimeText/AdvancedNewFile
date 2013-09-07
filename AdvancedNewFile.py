@@ -499,7 +499,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 init_list.append(temp_path)
                 temp_path = os.path.dirname(temp_path)
         try:
-            os.makedirs(path)
+            if not os.path.exists(path):
+                os.makedirs(path)
         except OSError as ex:
             if ex.errno != errno.EEXIST:
                 raise
