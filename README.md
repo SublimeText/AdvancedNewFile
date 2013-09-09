@@ -133,6 +133,9 @@ A boolean setting specifying if the folder name should be used or the name speci
 
 Boolean setting specifying if relative paths should be based on the current working directory.
 
+`default_extension`:
+
+String containing the default file extension. Note the extension is only applied if the specified path does not contain a dot (.) character.
 
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.

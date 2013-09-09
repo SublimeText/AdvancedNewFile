@@ -96,5 +96,9 @@
 
     // Boolean setting specifying if relative paths should be based on the
     // current working directory.
-    "relative_from_current": true
+    "relative_from_current": true,
+
+    // String containing the default file extension. Note the extension is only applied
+    // if the specified path does not contain a dot (.) character.
+    "default_extension": ""
 }

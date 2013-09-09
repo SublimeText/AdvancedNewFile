@@ -24,7 +24,8 @@ SETTINGS = [
     "completion_type",
     "complete_single_entry",
     "use_folder_name",
-    "relative_from_current"
+    "relative_from_current",
+    "default_extension"
 ]
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
@@ -177,6 +178,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         except IndexError:
             root = os.path.expanduser("~")
 
+
         return root, path
 
     def translate_alias(self, path):
@@ -256,7 +258,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
         base, path = self.split_path(path_in)
 
-        creation_path = self.generate_creation_path(base, path)
+        creation_path = self.generate_creation_path(base, path, True)
         if self.show_path:
             if self.view != None:
                 self.view.set_status("AdvancedNewFile", "Creating file at %s " % \
@@ -414,7 +416,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         return compare_entry.startswith(compare_base)
 
 
-    def generate_creation_path(self, base, path):
+    def generate_creation_path(self, base, path, append_extension=False):
         if PLATFORM == "windows":
             if not re.match(WIN_ROOT_REGEX, base):
                 return base + self.top_level_split_char + path
@@ -429,8 +431,15 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             tokens[0] = base[0:3]
 
         full_path = os.path.abspath(os.path.join(*tokens))
-        if re.search(r"[/\\]$", path):
-           full_path += os.path.sep
+        if re.search(r"[/\\]$", path) or len(path) == 0:
+            full_path += os.path.sep
+        elif re.search(r"\.", tokens[-1]):
+            if re.search(r"\.$", tokens[-1]):
+                full_path += "."
+        elif append_extension:
+            filename = os.path.basename(full_path)
+            if not os.path.exists(full_path):
+                full_path += self.settings.get("default_extension", "")
         return full_path
 
     def entered_filename(self, filename):
@@ -444,7 +453,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                     return
 
         base, path = self.split_path(filename)
-        file_path = self.generate_creation_path(base, path)
+        file_path = self.generate_creation_path(base, path, True)
         # Check for invalid alias specified.
         if self.top_level_split_char in filename and \
             not (PLATFORM == "windows" and re.match(WIN_ROOT_REGEX, base)) and \
