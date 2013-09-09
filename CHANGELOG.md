@@ -1,4 +1,9 @@
 # Changelog for AdvancedNewFile
+- 9 September 2013
+    - Bug fix for folder creation.
+    - Bug fix for permission issue.
+    - Add default extension setting.
+
 - 2 September 2013
     - Add setting to begin all relative paths from current working directory if available.
 
