@@ -37,7 +37,7 @@ The default directory is specified by the `default_root` setting. By default, it
 ### Commands with no Default Bindings
 The following commands are supported, but have no forward facing bindings. You may choose to create key bindings, command palette entries, or context menu entries for them yourself.
 
-#### Moving files.
+#### Rename File
 To execute the command to rename the current active view, use the command `advanced_new_file` with the argument parameter `{"rename": true}`. An example keybinding for this is
 
     [
