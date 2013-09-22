@@ -34,6 +34,17 @@ Simply bring up the AdvancedNewFile input through the appropriate [key binding](
 **Default directory:**
 The default directory is specified by the `default_root` setting. By default, it will be the top directory of the folders listed in the window. If this cannot be resolved, the home directory will be used. See [Settings](https://github.com/skuroda/Sublime-AdvancedNewFile#settings) (`default_root`) for more information.
 
+### Commands with no Default Bindings
+The following commands are supported, but have no forward facing bindings. You may choose to create key bindings, command palette entries, or context menu entries for them yourself.
+
+#### Moving files.
+To execute the command to rename the current active view, use the command `advanced_new_file` with the argument parameter `{"rename": true}`. An example keybinding for this is
+
+    [
+        {"keys": ["alt+shift+n"] "command": "advanced_new_file", "args": {"rename": true}}
+    ]
+
+
 ## Keymaps
 If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager. Alternatively, set command logging to true by entering `sublime.log_commands(True)` in the Sublime Text console.
 

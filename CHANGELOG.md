@@ -1,4 +1,7 @@
 # Changelog for AdvancedNewFile
+- 23 September 2013
+    - Support renaming current file.
+
 - 9 September 2013
     - Bug fix for folder creation.
     - Bug fix for permission issue.
