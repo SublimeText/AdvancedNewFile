@@ -100,5 +100,13 @@
 
     // String containing the default file extension. Note the extension is only applied
     // if the specified path does not contain a dot (.) character.
-    "default_extension": ""
+    "default_extension": "",
+
+    // String representing permissions to be applied to newly created directories.
+    // e.g. "777" -> RWX for user, group, and other.
+    "folder_permissions": "",
+
+    // String representing permissions to be applied to newly created files.
+    // e.g. "777" -> RWX for user, group, and other.
+    "file_permissions": ""
 }

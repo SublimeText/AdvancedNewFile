@@ -26,7 +26,9 @@ SETTINGS = [
     "complete_single_entry",
     "use_folder_name",
     "relative_from_current",
-    "default_extension"
+    "default_extension",
+    "file_permissions",
+    "folder_permissions"
 ]
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
@@ -542,6 +544,9 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         self.create_folder(base)
         if filename != "":
             open(os.path.join(base, filename), "a").close()
+            if self.settings().get("file_permissions", "") != "":
+                file_permissions = self.settings().get("file_permissions", "")
+                os.chmod(creation_path, oct(int(file_permissions)))
 
     def create_folder(self, path):
         init_list = []
@@ -557,8 +562,17 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             if ex.errno != errno.EEXIST:
                 raise
 
+        file_permissions = self.settings().get("file_permissions", "")
+        folder_permissions = self.settings.get("folder_permissions", "")
         for entry in init_list:
-            open(os.path.join(entry, '__init__.py'), 'a').close()
+            if self.is_python:
+                creation_path = os.path.join(entry, '__init__.py')
+                open(creation_path, 'a').close()
+                if  file_permissions != "":
+                    os.chmod(creation_path, oct(int(file_permissions)))
+            if  folder_permissions != "":
+                os.chmod(entry, folder_permissions)
+
 
     def get_cursor_path(self):
         if self.view == None:

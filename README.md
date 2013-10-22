@@ -148,6 +148,15 @@ Boolean setting specifying if relative paths should be based on the current work
 
 String containing the default file extension. Note the extension is only applied if the specified path does not contain a dot (.) character.
 
+`folder_permissions`:
+
+String representing permissions to be applied to newly created folders. E.g. "777" -> RWX for user, group, and other.
+
+`file_permissions`:
+
+String representing permissions to be applied to newly created files. E.g. "777" -> RWX for user, group, and other.
+
+
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
 
