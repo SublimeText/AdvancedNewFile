@@ -44,6 +44,12 @@ To execute the command to rename the current active view, use the command `advan
         {"keys": ["alt+shift+n"] "command": "advanced_new_file", "args": {"rename": true}}
     ]
 
+#### Rename File - Side Bar Context Menu
+To create a sidebar menu entry, you need to create a file named `Side Bar.sublime-menu`. It is recommended you place this in your `User` directory. Like the key binding files, this menu is a list of command entries. Each entry contains 3 items. The first is the `caption`. This is the string that appears in the menu. Next is the `command`. For this, you will use `advanced_new_file_rename_at`. Finally, are the `args`. You will need to specify `{"files": []}`. An example entry can be seen below.
+
+    [
+        { "caption": "ANF: Rename", "command": "advanced_new_file_rename_at", "args": {"files": []}}
+    ]
 
 ## Keymaps
 If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager. Alternatively, set command logging to true by entering `sublime.log_commands(True)` in the Sublime Text console.

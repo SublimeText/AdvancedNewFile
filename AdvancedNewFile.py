@@ -43,7 +43,7 @@ logger = logging.getLogger()
 
 
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
-    def run(self, is_python=False, initial_path=None, rename=False):
+    def run(self, is_python=False, initial_path=None, rename=False, rename_file=None):
         PLATFORM = sublime.platform().lower()
         self.root = None
         self.alias_root = None
@@ -51,6 +51,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         self.is_python = is_python
         self.rename = rename
         self.view = self.window.active_view()
+        self.rename_filename = rename_file
 
         # Settings will be based on the view
         self.settings = get_settings(self.view)
@@ -507,7 +508,10 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             if not re.search(r"(/|\\)$", file_path):
                 sublime.error_message("Cannot open view for '" + file_path + "'. It is a directory. ")
         else:
-            if self.view:
+            if self.rename_filename:
+                shutil.move(self.rename_filename, file_path)
+                self.open_file(file_path)
+            elif self.view:
                 window = self.view.window()
                 if self.view.file_name():
                     self.view.run_command("save")
@@ -544,7 +548,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         self.create_folder(base)
         if filename != "":
             open(os.path.join(base, filename), "a").close()
-            if self.settings().get("file_permissions", "") != "":
+            if self.settings.get("file_permissions", "") != "":
                 file_permissions = self.settings().get("file_permissions", "")
                 os.chmod(creation_path, oct(int(file_permissions)))
 
@@ -562,7 +566,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             if ex.errno != errno.EEXIST:
                 raise
 
-        file_permissions = self.settings().get("file_permissions", "")
+        file_permissions = self.settings.get("file_permissions", "")
         folder_permissions = self.settings.get("folder_permissions", "")
         for entry in init_list:
             if self.is_python:
@@ -610,6 +614,12 @@ class AdvancedNewFileAtCommand(sublime_plugin.WindowCommand):
         settings = sublime.load_settings("AdvancedNewFile.sublime-settings")
         return settings.get("show_sidebar_menu", False) and len(dirs) == 1
 
+class AdvancedNewFileRenameAtCommand(sublime_plugin.WindowCommand):
+    def run(self, files):
+        self.window.run_command("advanced_new_file", {"rename": True, "rename_file": files[0]})
+
+    def is_visible(self, files):
+        return len(files) == 1
 
 def get_settings(view):
     settings = sublime.load_settings("AdvancedNewFile.sublime-settings")
