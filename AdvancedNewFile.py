@@ -547,18 +547,18 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         base, filename = os.path.split(filename)
         self.create_folder(base)
         if filename != "":
-            open(os.path.join(base, filename), "a").close()
+            creation_path = os.path.join(base, filename)
+            open(creation_path, "a").close()
             if self.settings.get("file_permissions", "") != "":
-                file_permissions = self.settings().get("file_permissions", "")
-                os.chmod(creation_path, oct(int(file_permissions)))
+                file_permissions = self.settings.get("file_permissions", "")
+                os.chmod(creation_path, int(file_permissions, 8))
 
     def create_folder(self, path):
         init_list = []
-        if self.is_python:
-            temp_path = path
-            while not os.path.exists(temp_path):
-                init_list.append(temp_path)
-                temp_path = os.path.dirname(temp_path)
+        temp_path = path
+        while not os.path.exists(temp_path):
+            init_list.append(temp_path)
+            temp_path = os.path.dirname(temp_path)
         try:
             if not os.path.exists(path):
                 os.makedirs(path)
@@ -573,9 +573,9 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 creation_path = os.path.join(entry, '__init__.py')
                 open(creation_path, 'a').close()
                 if  file_permissions != "":
-                    os.chmod(creation_path, oct(int(file_permissions)))
+                    os.chmod(creation_path, int(file_permissions, 8))
             if  folder_permissions != "":
-                os.chmod(entry, folder_permissions)
+                os.chmod(entry, int(folder_permissions, 8))
 
 
     def get_cursor_path(self):
