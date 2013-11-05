@@ -28,7 +28,8 @@ SETTINGS = [
     "relative_from_current",
     "default_extension",
     "file_permissions",
-    "folder_permissions"
+    "folder_permissions",
+    "rename_default"
 ]
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
@@ -66,10 +67,17 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         self.root, path = self.split_path(default_root)
 
         # Search for initial string
+
         if initial_path is not None:
             path = initial_path
         else:
-            path = self.settings.get("default_initial", "")
+            if rename:
+                path = self.settings.get("rename_default", "")
+                current_file = self.view.file_name()
+                current_file_name = os.path.basename(self.view.file_name()) if current_file else ""
+                path = path.replace("<current>", current_file_name)
+            if path == "":
+                path = self.settings.get("default_initial", "")
             if self.settings.get("use_cursor_text", False):
                 tmp = self.get_cursor_path()
                 if tmp != "":
