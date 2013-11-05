@@ -1,0 +1,5 @@
+Enhancements:
+- Add functionality to rename. Have to manually set up a key binding.
+- Add functionality to rename via sidebar context menu. Have to manually set up context menu entry.
+- Add default extension setting.
+- Allow folder and file permissions to be specified.

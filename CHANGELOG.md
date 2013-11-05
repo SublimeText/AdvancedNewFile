@@ -1,4 +1,8 @@
 # Changelog for AdvancedNewFile
+- 4 October 2013
+    - Rename file using side bar context menu.
+    - Set folder and file permissions for created folders and files.
+
 - 23 September 2013
     - Support renaming current file.
 
