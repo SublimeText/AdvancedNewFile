@@ -41,7 +41,7 @@ The following commands are supported, but have no forward facing bindings. You m
 To execute the command to rename the current active view, use the command `advanced_new_file` with the argument parameter `{"rename": true}`. An example keybinding for this is
 
     [
-        {"keys": ["alt+shift+n"] "command": "advanced_new_file", "args": {"rename": true}}
+        {"keys": ["alt+shift+n"], "command": "advanced_new_file", "args": {"rename": true}}
     ]
 
 #### Rename File - Side Bar Context Menu
