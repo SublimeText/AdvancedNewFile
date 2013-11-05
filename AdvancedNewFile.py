@@ -508,11 +508,16 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             if not re.search(r"(/|\\)$", file_path):
                 sublime.error_message("Cannot open view for '" + file_path + "'. It is a directory. ")
         else:
+            window = self.window
             if self.rename_filename:
                 shutil.move(self.rename_filename, file_path)
-                self.open_file(file_path)
+                file_view = self.find_open_file(self.rename_filename)
+                if file_view is not None:
+                    window.focus_view(file_view)
+                    window.run_command("close")
+                    self.open_file(file_path)
+
             elif self.view:
-                window = self.view.window()
                 if self.view.file_name():
                     self.view.run_command("save")
                     window.focus_view(self.view)
@@ -530,6 +535,16 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             else:
                 sublime.error_message("Unable to move file. No file to move.")
 
+    def find_open_file(self, file_name):
+        window = self.window
+        if IS_ST3:
+            return window.find_open_file(file_name)
+        else:
+            for view in window.views():
+                view_name = view.file_name()
+                if view_name != "" and view_name == file_name:
+                    return view
+        return None
 
     def refresh_sidebar(self):
         if self.settings.get("auto_refresh_sidebar"):
