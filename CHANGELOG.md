@@ -1,4 +1,8 @@
 # Changelog for AdvancedNewFile
+- 9 November 2013
+    - Rename default with special token for current file.
+    - README updates.
+
 - 4 October 2013
     - Rename file using side bar context menu.
     - Set folder and file permissions for created folders and files.
