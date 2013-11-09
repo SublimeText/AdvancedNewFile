@@ -41,14 +41,20 @@ The following commands are supported, but have no forward facing bindings. You m
 To execute the command to rename the current active view, use the command `advanced_new_file` with the argument parameter `{"rename": true}`. An example keybinding for this is
 
     [
-        {"keys": ["alt+shift+n"] "command": "advanced_new_file", "args": {"rename": true}}
+        {"keys": ["alt+shift+n"], "command": "advanced_new_file", "args": {"rename": true}}
     ]
 
-#### Rename File - Side Bar Context Menu
+#### Rename File - Context Menu
 To create a sidebar menu entry, you need to create a file named `Side Bar.sublime-menu`. It is recommended you place this in your `User` directory. Like the key binding files, this menu is a list of command entries. Each entry contains 3 items. The first is the `caption`. This is the string that appears in the menu. Next is the `command`. For this, you will use `advanced_new_file_rename_at`. Finally, are the `args`. You will need to specify `{"files": []}`. An example entry can be seen below.
 
     [
         { "caption": "ANF: Rename", "command": "advanced_new_file_rename_at", "args": {"files": []}}
+    ]
+
+To create a context menu entry for the view, create a file named `Context.sublime-menu`. A sample entry can be seen below.
+
+    [
+        {"caption": "ANF: Rename", "command": "advanced_new_file", "args": {"rename": true}}
     ]
 
 ## Keymaps
@@ -67,6 +73,8 @@ The super keys for Linux and OS X are the Windows and command key respectively.
 `shift+super+alt+n`: In addition to creating the folders specified, new folders will also contain an `__init__.py` file.
 
 ## Settings
+Default settings can be seen by navigating to `Preferences -> Packages Settings -> AdvancedNewFile - Default`. To modify the default settings, navigate to `Preferences -> Packages Settings -> AdvancedNewFile -> User`.
+
 `alias`:
 
 A dictionary that contains a set of aliases tied to a directory. For more information, see [Aliases](https://github.com/skuroda/Sublime-AdvancedNewFile#aliases)
@@ -164,7 +172,7 @@ String representing permissions to be applied to newly created files. E.g. "777"
 
 `rename_default`:
 
-Default input for renaming a file. Special value `<rename>` will be replaced with the current file name.
+Default input for renaming a file. Special value `<current>` will be replaced with the current file name.
 
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
