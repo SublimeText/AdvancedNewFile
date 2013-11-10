@@ -110,7 +110,7 @@
     // e.g. "777" -> RWX for user, group, and other.
     "file_permissions": "",
 
-    // Default input for renaming a file. Special value <rename> will be replaced
+    // Default input for renaming a file. Special value <current> will be replaced
     // with the current file name.
     "rename_default": ""
 }
