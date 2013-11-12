@@ -231,8 +231,12 @@ Sample OS Specific Aliases:
 ###### Top level folders in window
 Top level folders can be specified by typing in the name of the folder followed by a colon. Then specify the path as you would normally.
 
+**Note**
+
+In Sublime Text 2, the name of the folder will be the actual name of the folder, not an arbitrary name specified in the project. However, due to an API update, folder names in Sublime Text 3 will match the Side Bar names. To achieve a similar behavior in Sublime Text 2, you can create `Project Specific Settings` for `alias`.
+
 ###### Current Working Directory
-To specify the current working directory, simply type a colon, without any preceding text.
+To specify the current working directory, simply type a colon, without any preceding text. Alternatively, set `relative_from_current` to `true` in your settings. Paths specified as relative paths will then begin from the current working directory.
 
 ## Notes
 Thanks to Dima Kukushkin ([xobb1t](https://github.com/xobb1t)) for the original work on this plugin. Also, thank you to [facelessuser](https://github.com/facelessuser), and by extension biermeester and matthjes for the idea of platform specific settings.
