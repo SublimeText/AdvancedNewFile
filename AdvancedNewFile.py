@@ -245,6 +245,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
     def show_filename_input(self, initial=''):
         if self.rename:
             caption = 'Enter a new path for current file'
+            self.original_name = self.window.active_view().file_name().rsplit(os.sep, 1)[1]
         else:
             caption = 'Enter a path for a new file'
         if self.is_python:
@@ -278,6 +279,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         if self.show_path:
             if self.view != None:
                 if self.rename:
+                    if os.path.isdir(creation_path):
+                        creation_path = os.path.join(creation_path, self.original_name)
                     self.view.set_status("AdvancedNewFile", "Moving file to %s " % \
                         creation_path)
                 else:
@@ -516,35 +519,35 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
     def rename_file(self, file_path):
         if os.path.isdir(file_path):
-            if not re.search(r"(/|\\)$", file_path):
-                sublime.error_message("Cannot open view for '" + file_path + "'. It is a directory. ")
-        else:
-            window = self.window
-            if self.rename_filename:
-                shutil.move(self.rename_filename, file_path)
-                file_view = self.find_open_file(self.rename_filename)
-                if file_view is not None:
-                    window.focus_view(file_view)
-                    window.run_command("close")
-                    self.open_file(file_path)
+            # use original name if a directory path has been passed in.
+            file_path = os.path.join(file_path, self.original_name)
 
-            elif self.view:
-                if self.view.file_name():
-                    self.view.run_command("save")
-                    window.focus_view(self.view)
-                    window.run_command("close")
-                    shutil.move(self.view.file_name(), file_path)
-                else:
-                    content = self.view.substr(sublime.Region(0, self.view.size()))
-                    self.view.set_scratch(True)
-                    self.view.run_command("close")
-                    window.focus_view(self.view)
-                    window.run_command("close")
-                    with open(file_path, "w") as file_obj:
-                        file_obj.write(content)
+        window = self.window
+        if self.rename_filename:
+            shutil.move(self.rename_filename, file_path)
+            file_view = self.find_open_file(self.rename_filename)
+            if file_view is not None:
+                window.focus_view(file_view)
+                window.run_command("close")
                 self.open_file(file_path)
+
+        elif self.view:
+            if self.view.file_name():
+                self.view.run_command("save")
+                window.focus_view(self.view)
+                window.run_command("close")
+                shutil.move(self.view.file_name(), file_path)
             else:
-                sublime.error_message("Unable to move file. No file to move.")
+                content = self.view.substr(sublime.Region(0, self.view.size()))
+                self.view.set_scratch(True)
+                self.view.run_command("close")
+                window.focus_view(self.view)
+                window.run_command("close")
+                with open(file_path, "w") as file_obj:
+                    file_obj.write(content)
+            self.open_file(file_path)
+        else:
+            sublime.error_message("Unable to move file. No file to move.")
 
     def find_open_file(self, file_name):
         window = self.window
