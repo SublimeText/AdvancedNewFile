@@ -243,7 +243,10 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             return os.path.abspath(root), self.top_level_split_char.join(split_path[join_index:])
 
     def show_filename_input(self, initial=''):
-        caption = 'Enter a path for a new file'
+        if self.rename:
+            caption = 'Enter a new path for current file'
+        else:
+            caption = 'Enter a path for a new file'
         if self.is_python:
             caption = '%s (creates __init__.py in new dirs)' % caption
         self.input_panel_view = self.window.show_input_panel(
