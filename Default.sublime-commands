@@ -1,0 +1,5 @@
+[
+  { "caption": "AFN: Open File", "command": "advanced_new_file" },
+  { "caption": "AFN: Rename File", "command": "advanced_new_file", "args": { "rename": true} },
+  { "caption": "AFN: Delete File", "command": "advanced_new_file", "args": { "delete": true} }
+]

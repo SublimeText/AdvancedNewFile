@@ -1,5 +1,16 @@
 [
     {
+        "mnemonic": "f",
+        "id": "file",
+        "children":
+        [
+            { "caption": "-" },
+            { "caption": "New File With Name", "mnemonic": "n", "command": "advanced_new_file" },
+            { "caption": "Rename Current File", "mnemonic": "r", "command": "advanced_new_file", "args": { "rename": true } },
+            { "caption": "Delete Current File","mnemonic": "d",  "command": "advanced_new_file", "args": { "delete": true } },
+        ]
+    },
+    {
         "caption": "Preferences",
         "mnemonic": "n",
         "id": "preferences",
