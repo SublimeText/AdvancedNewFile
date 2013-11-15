@@ -30,8 +30,7 @@ SETTINGS = [
     "default_extension",
     "file_permissions",
     "folder_permissions",
-    "rename_default",
-    "version_control"
+    "rename_default"
 ]
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
@@ -528,7 +527,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         window = self.window
         if self.rename_filename:
             if tracked_by_git:
-                subprocess.call(['git', 'mv', self.view.file_name(), file_path])
+                self.git_mv(self.view.file_name(), file_path)
             else:
                 shutil.move(self.rename_filename, file_path)
             file_view = self.find_open_file(self.rename_filename)
@@ -543,7 +542,7 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 window.focus_view(self.view)
                 window.run_command("close")
                 if tracked_by_git:
-                    subprocess.call(['git', 'mv', self.view.file_name(), file_path])
+                    self.git_mv(self.view.file_name(), file_path)
                 else:
                     shutil.move(self.view.file_name(), file_path)
             else:
@@ -636,15 +635,15 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
 
     def file_tracked_by_git(self, filepath):
-        if self.version_control == 'git':
+        git_available = (subprocess.call(['which', 'git']) == 0)
+        if git_available:
             return subprocess.call(['git', 'ls-files', filepath, '--error-unmatch']) == 0
         else:
             return False
 
 
-    @property
-    def version_control(self):
-        return self.settings.get("version_control")
+    def git_mv(self, from_filepath, to_filepath):
+        subprocess.call(['git', 'mv', from_filepath, to_filepath])
 
 
 class AnfReplaceCommand(sublime_plugin.TextCommand):
