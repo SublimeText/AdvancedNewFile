@@ -172,6 +172,9 @@ String representing permissions to be applied to newly created files. E.g. "777"
 
 `rename_default`:
 
+String representing the version control system. Valid values are '', 'git'. If set to 'git', file renaming will use git mv instead of mv.
+`version_control`:
+
 Default input for renaming a file. Special value `<current>` will be replaced with the current file name.
 
 ### Project Specific Settings

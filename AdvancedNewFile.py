@@ -5,6 +5,7 @@ import re
 import logging
 import errno
 import shutil
+import subprocess
 
 SETTINGS = [
     "alias",
@@ -29,7 +30,8 @@ SETTINGS = [
     "default_extension",
     "file_permissions",
     "folder_permissions",
-    "rename_default"
+    "rename_default",
+    "version_control"
 ]
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
@@ -522,9 +524,13 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             # use original name if a directory path has been passed in.
             file_path = os.path.join(file_path, self.original_name)
 
+        tracked_by_git = self.file_tracked_by_git(self.view.file_name())
         window = self.window
         if self.rename_filename:
-            shutil.move(self.rename_filename, file_path)
+            if tracked_by_git:
+                subprocess.call(['git', 'mv', self.view.file_name(), file_path])
+            else:
+                shutil.move(self.rename_filename, file_path)
             file_view = self.find_open_file(self.rename_filename)
             if file_view is not None:
                 window.focus_view(file_view)
@@ -536,7 +542,10 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 self.view.run_command("save")
                 window.focus_view(self.view)
                 window.run_command("close")
-                shutil.move(self.view.file_name(), file_path)
+                if tracked_by_git:
+                    subprocess.call(['git', 'mv', self.view.file_name(), file_path])
+                else:
+                    shutil.move(self.view.file_name(), file_path)
             else:
                 content = self.view.substr(sublime.Region(0, self.view.size()))
                 self.view.set_scratch(True)
@@ -624,6 +633,18 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 break
 
         return path
+
+
+    def file_tracked_by_git(self, filepath):
+        if self.version_control == 'git':
+            return subprocess.call(['git', 'ls-files', filepath, '--error-unmatch']) == 0
+        else:
+            return False
+
+
+    @property
+    def version_control(self):
+        return self.settings.get("version_control")
 
 
 class AnfReplaceCommand(sublime_plugin.TextCommand):
