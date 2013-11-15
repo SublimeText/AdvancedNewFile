@@ -45,7 +45,11 @@ logger = logging.getLogger()
 
 
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
-    def run(self, is_python=False, initial_path=None, rename=False, rename_file=None):
+    def run(self, is_python=False, initial_path=None, rename=False, delete=False, rename_file=None):
+        if delete:
+            self.delete_current_file()
+            return
+
         PLATFORM = sublime.platform().lower()
         self.root = None
         self.alias_root = None
@@ -634,6 +638,23 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         return path
 
 
+    def delete_current_file(self):
+        filepath = self.window.active_view().file_name()
+        if not filepath or not os.path.isfile(filepath):
+            return
+
+        if not sublime.ok_cancel_dialog("Delete this file?\n%s" % os.path.basename(filepath)):
+            return
+
+        self.window.run_command("close")
+        if self.file_tracked_by_git(filepath):
+            self.git_rm(filepath)
+        else:
+            os.remove(filepath)
+
+        self.refresh_sidebar()
+
+
     def file_tracked_by_git(self, filepath):
         git_available = (subprocess.call(['which', 'git']) == 0)
         if git_available:
@@ -644,6 +665,10 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
     def git_mv(self, from_filepath, to_filepath):
         subprocess.call(['git', 'mv', from_filepath, to_filepath])
+
+
+    def git_rm(self, filepath):
+        subprocess.call(['git', 'rm', filepath])
 
 
 class AnfReplaceCommand(sublime_plugin.TextCommand):
