@@ -30,7 +30,8 @@ SETTINGS = [
     "default_extension",
     "file_permissions",
     "folder_permissions",
-    "rename_default"
+    "rename_default",
+    "vcs_management"
 ]
 VIEW_NAME = "AdvancedNewFileCreation"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
@@ -646,30 +647,38 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         if not sublime.ok_cancel_dialog("Delete this file?\n%s" % os.path.basename(filepath)):
             return
 
-        self.window.run_command("close")
         if self.file_tracked_by_git(filepath):
             self.git_rm(filepath)
         else:
-            os.remove(filepath)
+            self.window.run_command("delete_file", {"files": [filepath]})
 
         self.refresh_sidebar()
 
 
     def file_tracked_by_git(self, filepath):
-        git_available = (subprocess.call(['which', 'git']) == 0)
-        if git_available:
-            return subprocess.call(['git', 'ls-files', filepath, '--error-unmatch']) == 0
+        if PLATFORM == "windows":
+            git_available = (subprocess.call(['where', 'git'], shell=True) == 0)
+        else:
+            git_available = (subprocess.call(['which', 'git']) == 0)
+
+        if git_available and self.settings.get("vcs_management", False):
+            path, file_name = os.path.split(filepath)
+            return subprocess.call(['git', 'ls-files', file_name, '--error-unmatch'], cwd=path) == 0
         else:
             return False
 
-
     def git_mv(self, from_filepath, to_filepath):
-        subprocess.call(['git', 'mv', from_filepath, to_filepath])
+        path, filename = os.path.split(from_filepath)
+        result =  subprocess.call(['git', 'mv', filename, to_filepath], cwd=path)
+        if result != 0:
+            sublime.error_message("Git move of %s to %s failed" % (from_filepath, to_filepath))
 
 
     def git_rm(self, filepath):
-        subprocess.call(['git', 'rm', filepath])
-
+        path, filename = os.path.split(filepath)
+        result = subprocess.call(['git', 'rm', filename], cwd=path)
+        if result != 0:
+            sublime.error_message("Git remove of %s failed." % (filepath))
 
 class AnfReplaceCommand(sublime_plugin.TextCommand):
     def run(self, edit, content):
