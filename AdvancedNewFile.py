@@ -47,6 +47,8 @@ logger = logging.getLogger()
 
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
     def run(self, is_python=False, initial_path=None, rename=False, delete=False, rename_file=None):
+        self.view = self.window.active_view()
+        self.settings = get_settings(self.view)
         if delete:
             self.delete_current_file()
             return
@@ -57,11 +59,9 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         self.top_level_split_char = ":"
         self.is_python = is_python
         self.rename = rename
-        self.view = self.window.active_view()
         self.rename_filename = rename_file
 
         # Settings will be based on the view
-        self.settings = get_settings(self.view)
         self.aliases = self.get_aliases()
         self.show_path = self.settings.get("show_path")
         self.default_folder_index = self.settings.get("default_folder_index")
@@ -498,13 +498,23 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         else:
             attempt_open = True
             logger.debug("Creating file at %s", file_path)
-            if not os.path.exists(file_path):
-                try:
-                    self.create(file_path)
-                except OSError as e:
-                    attempt_open = False
-                    sublime.error_message("Cannot create '" + file_path + "'. See console for details")
-                    logger.error("Exception: %s '%s'" % (e.strerror, e.filename))
+            if self.rename:
+                path = os.path.dirname(file_path)
+                if not os.path.exists(path):
+                    try:
+                        self.create_folder(path)
+                    except OSError as e:
+                        attempt_open = False
+                        sublime.error_message("Cannot create '" + file_path + "'. See console for details")
+                        logger.error("Exception: %s '%s'" % (e.strerror, e.filename))
+            else:
+                if not os.path.exists(file_path):
+                    try:
+                        self.create(file_path)
+                    except OSError as e:
+                        attempt_open = False
+                        sublime.error_message("Cannot create '" + file_path + "'. See console for details")
+                        logger.error("Exception: %s '%s'" % (e.strerror, e.filename))
             if attempt_open:
                 if self.rename:
                     self.rename_file(file_path)
@@ -524,15 +534,15 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
         return new_view
 
     def rename_file(self, file_path):
-        if os.path.isdir(file_path):
+        if os.path.isdir(file_path) or re.search(r"(/|\\)$", file_path):
             # use original name if a directory path has been passed in.
             file_path = os.path.join(file_path, self.original_name)
 
-        tracked_by_git = self.file_tracked_by_git(self.view.file_name())
         window = self.window
         if self.rename_filename:
+            tracked_by_git = self.file_tracked_by_git(self.rename_filename)
             if tracked_by_git:
-                self.git_mv(self.view.file_name(), file_path)
+                self.git_mv(self.rename_filename, file_path)
             else:
                 shutil.move(self.rename_filename, file_path)
             file_view = self.find_open_file(self.rename_filename)
@@ -541,15 +551,17 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
                 window.run_command("close")
                 self.open_file(file_path)
 
-        elif self.view:
-            if self.view.file_name():
+        elif self.view is not None and self.view.file_name() is not None:
+            filename = self.view.file_name()
+            tracked_by_git = self.file_tracked_by_git(filename)
+            if filename:
                 self.view.run_command("save")
                 window.focus_view(self.view)
                 window.run_command("close")
                 if tracked_by_git:
-                    self.git_mv(self.view.file_name(), file_path)
+                    self.git_mv(filename, file_path)
                 else:
-                    shutil.move(self.view.file_name(), file_path)
+                    shutil.move(filename, file_path)
             else:
                 content = self.view.substr(sublime.Region(0, self.view.size()))
                 self.view.set_scratch(True)
@@ -669,7 +681,8 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
 
     def git_mv(self, from_filepath, to_filepath):
         path, filename = os.path.split(from_filepath)
-        result =  subprocess.call(['git', 'mv', filename, to_filepath], cwd=path)
+        args = ["git", "mv", filename, to_filepath]
+        result =  subprocess.call(args, cwd=path)
         if result != 0:
             sublime.error_message("Git move of %s to %s failed" % (from_filepath, to_filepath))
 
