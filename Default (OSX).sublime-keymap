@@ -1,6 +1,6 @@
 [
-	{ "keys": ["super+alt+n"], "command": "advanced_new_file"},
-	{ "keys": ["shift+super+alt+n"], "command": "advanced_new_file", "args": {"is_python": true}},
+	{ "keys": ["super+alt+n"], "command": "advanced_new_file_new"},
+	{ "keys": ["shift+super+alt+n"], "command": "advanced_new_file_new", "args": {"is_python": true}},
 	{
 		"keys": ["tab"],
 		"command": "insert",

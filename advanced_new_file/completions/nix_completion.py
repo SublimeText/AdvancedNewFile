@@ -1,18 +1,13 @@
+import os
+import re
+import sublime
+
 from .completion_base import GenerateCompletionListBase
-NIX_ROOT_REGEX = r"^/"
-
-class NixPlatform():
-    def split(self, path):
-        return None, path
-
-    def parse_nix_path(self, root, path):
-        return "/", 1
-
-
+from ..anf_util import *
 
 class NixCompletion(GenerateCompletionListBase):
-    def __init__(self, settings):
-        super(NixCompletion, self).__init__(settings)
+    def __init__(self, command):
+        super(NixCompletion, self).__init__(command)
 
     def completion(self, path_in):
         pattern = r"(.*[/\\:])(.*)"

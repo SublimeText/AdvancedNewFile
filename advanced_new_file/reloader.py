@@ -22,11 +22,24 @@ else:
 
 mods_load_order = [
     '.anf_util',
-    '.anf_base',
     '.completion_base',
-    '.nix_platform',
-    '.anf_windows_platform',
-    '.anf_new'
+
+    ".completions",
+    '.completions.nix_completion',
+    '.completions.windows_completion',
+
+    ".platform",
+    ".platform.windows_platform",
+    ".platform.nix_platform",
+
+    ".commands",
+    ".commands.command_base",
+    ".commands.git",
+    ".commands.git.git_command_base",
+    ".commands.helper_commands",
+    '.commands.new_file_command',
+    ".commands.move_file_command",
+    ".commands.delete_file_command"
 ]
 
 for suffix in mods_load_order:

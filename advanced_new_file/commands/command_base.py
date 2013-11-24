@@ -1,65 +1,49 @@
-import os
-import sublime
-import sublime_plugin
-import re
-import logging
 import errno
-import shutil
-import subprocess
+import os
+import re
+import sublime
 
-import AdvancedNewFile.advanced_new_file.anf_util as anf_util
-from .nix_platform import NixPlatform, NixCompletion
-from .anf_windows_platform import WindowsPlatform, WindowsCompletion
+from ..anf_util import *
+from ..platform.windows_platform import WindowsPlatform
+from ..platform.nix_platform import NixPlatform
+from ..completions.nix_completion import NixCompletion
+from ..completions.windows_completion import WindowsCompletion
 
 VIEW_NAME = "AdvancedNewFileCreation"
-WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
-NIX_ROOT_REGEX = r"^/"
-HOME_REGEX = r"^~"
-PLATFORM = sublime.platform().lower()
-IS_ST3 = int(sublime.version()) > 3000
 
-# Set up logger
-logging.basicConfig(format='[AdvancedNewFile] %(levelname)s %(message)s')
-logger = logging.getLogger()
 
 class AdvancedNewFileBase(object):
 
     def __init__(self, window):
-        print("FASFD")
         super(AdvancedNewFileBase, self).__init__(window)
 
-        self.top_level_split_char = ":"
         if PLATFORM == "windows":
-            self.platform = WindowsPlatform()
+            self.platform = WindowsPlatform(window.active_view())
         else:
             self.platform = NixPlatform()
 
 
     def __generate_default_root(self):
-        default_root = self.__get_default_root(self.settings.get(anf_util.DEFAULT_ROOT_SETTING))
+        default_root = self.__get_default_root(self.settings.get(DEFAULT_ROOT_SETTING))
         if default_root == "path":
-            self.root = os.path.expanduser(self.settings.get(anf_util.DEFAULT_PATH_SETTING))
+            self.root = os.path.expanduser(self.settings.get(DEFAULT_PATH_SETTING))
             default_root = ""
-        return self.__split_path(default_root)
+        return self.split_path(default_root)
 
     def __generate_alias_root(self):
-        alias_root = self.__get_default_root(self.settings.get(anf_util.ALIAS_ROOT_SETTING), True)
+        alias_root = self.__get_default_root(self.settings.get(ALIAS_ROOT_SETTING), True)
         if alias_root == "path":
-            self.alias_root = os.path.expanduser(self.settings.get(anf_util.ALIAS_PATH_SETTING))
+            self.alias_root = os.path.expanduser(self.settings.get(ALIAS_PATH_SETTING))
             alias_root = ""
-        return self.__split_path(alias_root, True)
+        return self.split_path(alias_root, True)
 
-    def generate_initial_path(self):
-        _, path = self.__generate_default_root()
-
+    def generate_initial_path(self, initial_path):
         # Search for initial string
-
         if initial_path is not None:
             path = initial_path
         else:
-            if path == "":
-                path = self.settings.get(anf_util.DEFAULT_ROOT_SETTING)
-            if self.settings.get(anf_util.USE_CURSOR_TEXT_SETTING, False):
+            _, path = self.__generate_default_root()
+            if self.settings.get(USE_CURSOR_TEXT_SETTING, False):
                 cursor_text = self.get_cursor_path()
                 if cursor_text != "":
                     path = cursor_text
@@ -68,7 +52,7 @@ class AdvancedNewFileBase(object):
 
     def run_setup(self):
         self.view = self.window.active_view()
-        self.settings = anf_util.get_settings(self.view)
+        self.settings = get_settings(self.view)
         self.root = None
         self.alias_root = None
         self.aliases = self.__get_aliases()
@@ -77,22 +61,17 @@ class AdvancedNewFileBase(object):
         self.alias_root, _ = self.__generate_alias_root()
 
         # Need to fix this
-        debug = self.settings.get("debug") or False
-        if debug:
-            logger.setLevel(logging.DEBUG)
-        else:
-            logger.setLevel(logging.ERROR)
+        debug = self.settings.get(DEBUG_SETTING) or False
 
-        print(self.settings.get(anf_util.COMPLETION_TYPE_SETTING))
-        completion_type = self.settings.get(anf_util.COMPLETION_TYPE_SETTING)
+        completion_type = self.settings.get(COMPLETION_TYPE_SETTING)
         if completion_type == "windows":
-            self.completion = WindowsCompletion(self.settings, self.view)
+            self.completion = WindowsCompletion(self)
         else:
-            self.completion = NixCompletion(self.settings)
+            self.completion = NixCompletion(self)
 
     def __get_aliases(self):
-        aliases = self.settings.get("alias")
-        all_os_aliases = self.settings.get("os_specific_alias")
+        aliases = self.settings.get(ALIAS_SETTING)
+        all_os_aliases = self.settings.get(OS_SPECIFIC_ALIAS_SETTING)
         for key in all_os_aliases:
             if PLATFORM in all_os_aliases.get(key):
                 aliases[key] = all_os_aliases.get(key).get(PLATFORM)
@@ -101,18 +80,19 @@ class AdvancedNewFileBase(object):
 
     def __get_default_root(self, string, is_alias=False):
         root = ""
+        self.alias_folder_index = self.settings.get(ALIAS_FOLDER_INDEX_SETTING)
+        self.default_folder_index = self.settings.get(DEFAULT_FOLDER_INDEX_SETTING)
         if string == "home":
             root = "~/"
         elif string == "current":
-            root = self.top_level_split_char
+            root = TOP_LEVEL_SPLIT_CHAR
         elif string == "project_folder":
             num_folders = len(self.window.folders())
             if is_alias:
-                folder_index = self.settings.get("alias_folder_index")
-                self.alias_folder_index = 0 if num_folders <= folder_index else folder_index
-            else:
-                folder_index = self.settings.get("default_folder_index")
-                self.default_folder_index = 0 if num_folders <= folder_index else folder_index
+                if num_folders <= self.alias_folder_index:
+                    self.alias_folder_index = 0
+            elif num_folders <= self.default_folder_index:
+                self.default_folder_index = 0
         elif string == "top_folder":
             if is_alias:
                 self.alias_folder_index = 0
@@ -121,24 +101,24 @@ class AdvancedNewFileBase(object):
         elif string == "path":
             root = "path"
         else:
-            logger.error("Invalid specifier for \"default_root\"")
+            print("Invalid specifier for \"default_root\"")
         return root
 
-    def __split_path(self, path="", is_alias=False):
+    def split_path(self, path="", is_alias=False):
         HOME_REGEX = r"^~[/\\]"
         root = None
         try:
             root, path = self.platform.split(path)
             # Parse if alias
-            if self.top_level_split_char in path and root == None:
-                parts = path.rsplit(self.top_level_split_char, 1)
+            if TOP_LEVEL_SPLIT_CHAR in path and root == None:
+                parts = path.rsplit(TOP_LEVEL_SPLIT_CHAR, 1)
                 root, path = self.__translate_alias(parts[0])
                 path_list = []
                 if path != "":
                     path_list.append(path)
                 if parts[1] != "":
                     path_list.append(parts[1])
-                path = self.top_level_split_char.join(path_list)
+                path = TOP_LEVEL_SPLIT_CHAR.join(path_list)
             elif re.match(r"^/", path):
                 root, path_offset = self.platform.parse_nix_path(root, path)
                 path = path[path_offset:]
@@ -146,7 +126,7 @@ class AdvancedNewFileBase(object):
             elif re.match(HOME_REGEX, path) and root == None:
                 root = os.path.expanduser("~")
                 path = path[2:]
-            elif re.match(r"^\.{1,2}[/\\]", path) and self.settings.get("relative_from_current", False):
+            elif re.match(r"^\.{1,2}[/\\]", path) and self.settings.get(RELATIVE_FROM_CURRENT_SETTING, False):
                 path_index = 2
                 root = os.path.dirname(self.view.file_name())
                 if re.match(r"^\.{2}[/\\]", path):
@@ -176,13 +156,13 @@ class AdvancedNewFileBase(object):
             if filename is not None:
                 root = os.path.dirname(filename)
         else:
-            split_path = path.split(self.top_level_split_char)
+            split_path = path.split(TOP_LEVEL_SPLIT_CHAR)
             join_index = len(split_path) - 1
             target = path
             root_found = False
             while join_index >= 0 and not root_found:
                 # Folder aliases
-                for name, folder in get_project_folder_data(self.settings.get("use_folder_name")):
+                for name, folder in get_project_folder_data(self.settings.get(USE_FOLDER_NAME_SETTING)):
                     if name == target:
                         root = folder
                         root_found = True
@@ -209,15 +189,15 @@ class AdvancedNewFileBase(object):
         else:
             # Add to index so we re
             join_index += 2
-            return os.path.abspath(root), self.top_level_split_char.join(split_path[join_index:])
+            return os.path.abspath(root), TOP_LEVEL_SPLIT_CHAR.join(split_path[join_index:])
 
     def input_panel_caption(self):
         return ""
 
-    def show_filename_input(self, caption="", initial=''):
+    def show_filename_input(self, initial):
         self.input_panel_view = self.window.show_input_panel(
             self.input_panel_caption(), initial,
-            self.entered_filename, self.__update_filename_input, self.clear
+            self.on_done, self.__update_filename_input, self.clear
         )
 
         self.input_panel_view.set_name(VIEW_NAME)
@@ -226,41 +206,35 @@ class AdvancedNewFileBase(object):
         self.input_panel_view.settings().set("translate_tabs_to_spaces", False)
         self.input_panel_view.settings().set("anf_panel", True)
 
-    # Auto complete and path resolution common to all commands
     def __update_filename_input(self, path_in):
-        if self.settings.get("completion_type") == "windows":
+        new_content = path_in
+        if self.settings.get(COMPLETION_TYPE_SETTING) == "windows":
             if "prev_text" in dir(self) and self.prev_text != path_in:
                 if self.view is not None:
                     self.view.erase_status("AdvancedNewFile2")
         if path_in.endswith("\t"):
-            path_in = path_in.replace("\t", "")
-            if self.settings.get("completion_type") == "windows":
-                path_in = self.__windows_completion(path_in)
-            elif self.settings.get("completion_type") == "nix":
-                path_in = self.__nix_completion(path_in)
-        self.input_panel_view.run_command("anf_replace", {"content": path_in})
-        base, path = self.__split_path(path_in)
+            new_content = self.completion.completion(path_in.replace("\t", ""))
+        if new_content != path_in:
+            self.input_panel_view.run_command("anf_replace", {"content": new_content})
+        else:
+            base, path = self.split_path(path_in)
 
-        creation_path = self.__generate_creation_path(base, path, True)
-        if self.settings.get(and_util.SHOW_PATH_SETTING, False):
-            if self.view != None:
-                if self.rename:
-                    if os.path.isdir(creation_path):
-                        creation_path = os.path.join(creation_path, self.original_name)
-                    self.view.set_status("AdvancedNewFile", "Moving file to %s " % \
-                        creation_path)
-                else:
-                    self.view.set_status("AdvancedNewFile", "Creating file at %s " % \
-                        creation_path)
-            else:
-                if self.rename:
-                    sublime.status_message("Moving file to %s" % creation_path)
-                else:
-                    sublime.status_message("Creating file at %s" % creation_path)
-        logger.debug("Creation path is '%s'" % creation_path)
+            creation_path = generate_creation_path(self.settings, base, path, True)
+            if self.settings.get(SHOW_PATH_SETTING, False):
+                self.update_status_message(creation_path)
+
+    def update_status_message(self, creation_path):
+        pass
 
     def entered_file_action(self, path):
         pass
+
+    def on_done(self, input_string):
+        if len(input_string) != 0:
+            self.entered_filename(input_string)
+
+        self.clear()
+        self.refresh_sidebar()
 
     def entered_filename(self, filename):
         # Check if valid root specified for windows.
@@ -272,10 +246,10 @@ class AdvancedNewFileBase(object):
                     self.clear()
                     return
 
-        base, path = self.__split_path(filename)
-        file_path = self.__generate_creation_path(base, path, True)
+        base, path = self.split_path(filename)
+        file_path = generate_creation_path(self.settings, base, path, True)
         # Check for invalid alias specified.
-        if self.top_level_split_char in filename and \
+        if TOP_LEVEL_SPLIT_CHAR in filename and \
             not (PLATFORM == "windows" and re.match(WIN_ROOT_REGEX, base)) and \
             not (PLATFORM != "windows" and re.match(NIX_ROOT_REGEX, base)):
             if base == "":
@@ -286,8 +260,7 @@ class AdvancedNewFileBase(object):
 
         self.entered_file_action(file_path)
 
-        self.clear()
-        self.refresh_sidebar()
+
 
     def open_file(self, file_path):
         new_view = None
@@ -299,7 +272,7 @@ class AdvancedNewFileBase(object):
         return new_view
 
     def refresh_sidebar(self):
-        if self.settings.get("auto_refresh_sidebar"):
+        if self.settings.get(AUTO_REFRESH_SIDEBAR_SETTING):
             try:
                 self.window.run_command("refresh_folder_list")
             except:
@@ -319,8 +292,8 @@ class AdvancedNewFileBase(object):
 
     def create_file(self, name):
         open(name, "a").close()
-        if self.settings.get("file_permissions", "") != "":
-            file_permissions = self.settings.get("file_permissions", "")
+        if self.settings.get(FILE_PERMISSIONS_SETTING, "") != "":
+            file_permissions = self.settings.get(FILE_PERMISSIONS_SETTING, "")
             os.chmod(name, int(file_permissions, 8))
 
     def create_folder(self, path):

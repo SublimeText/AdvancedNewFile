@@ -1,4 +1,6 @@
 import sublime
+import re
+import os
 
 ALIAS_SETTING = "alias"
 DEFAULT_INITIAL_SETTING = "default_initial"
@@ -54,14 +56,18 @@ SETTINGS = [
 
 NIX_ROOT_REGEX = r"^/"
 WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
+HOME_REGEX = r"^~"
+PLATFORM = sublime.platform()
+TOP_LEVEL_SPLIT_CHAR = ":"
+IS_ST3 = int(sublime.version()) > 3000
 
-def generate_creation_path(settings, top_level_split_char, base, path, append_extension=False):
+def generate_creation_path(settings, base, path, append_extension=False):
         if PLATFORM == "windows":
             if not re.match(WIN_ROOT_REGEX, base):
-                return base + top_level_split_char + path
+                return base + TOP_LEVEL_SPLIT_CHAR + path
         else:
             if not re.match(NIX_ROOT_REGEX, base):
-                return base + top_level_split_char + path
+                return base + TOP_LEVEL_SPLIT_CHAR + path
 
         tokens = re.split(r"[/\\]", base) + re.split(r"[/\\]", path)
         if tokens[0] == "":
@@ -78,7 +84,7 @@ def generate_creation_path(settings, top_level_split_char, base, path, append_ex
         elif append_extension:
             filename = os.path.basename(full_path)
             if not os.path.exists(full_path):
-                full_path += settings.get(anf_util.DEFAULT_EXTENSION_SETTING)
+                full_path += settings.get(DEFAULT_EXTENSION_SETTING)
         return full_path
 
 def get_settings(view):
@@ -98,7 +104,7 @@ def get_settings(view):
             else:
                 local_settings[key] = project_settings[key]
         else:
-            logger.error("AdvancedNewFile[Warning]: Invalid key '%s' in project settings.", key)
+            print("AdvancedNewFile[Warning]: Invalid key '%s' in project settings.", key)
 
     return local_settings
 
