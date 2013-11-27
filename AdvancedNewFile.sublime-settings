@@ -78,10 +78,6 @@
     // false by default
     "auto_refresh_sidebar": false,
 
-    // A boolean specifying if an AdvancedNewFile option should be shown in the
-    // sidebar context menu.
-    "show_sidebar_menu": false,
-
     // A string specifying the type of auto completion to use. Valid values are
     // "windows" or "nix"
     "completion_type": "windows",
@@ -112,5 +108,8 @@
 
     // Default input for renaming a file. Special value <current> will be replaced
     // with the current file name.
-    "rename_default": ""
+    "rename_default": "",
+
+    // Setting to control if VCS management is used when moving and removing files.
+    "vcs_management": false
 }

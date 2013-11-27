@@ -1,0 +1,6 @@
+[
+  { "caption": "ANF: New File", "command": "advanced_new_file_new" },
+  { "caption": "ANF: Rename File", "command": "advanced_new_file_move"},
+  { "caption": "ANF: Delete File", "command": "advanced_new_file_delete"},
+  { "caption": "ANF: Delete Current File", "command": "advanced_new_file_delete", "args": {"current": true}}
+]
