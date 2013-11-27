@@ -37,7 +37,7 @@ class AdvancedNewFileBase(object):
             alias_root = ""
         return self.split_path(alias_root, True)
 
-    def generate_initial_path(self, initial_path):
+    def generate_initial_path(self, initial_path = None):
         # Search for initial string
         if initial_path is not None:
             path = initial_path
