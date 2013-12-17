@@ -260,8 +260,6 @@ class AdvancedNewFileBase(object):
 
         self.entered_file_action(file_path)
 
-
-
     def open_file(self, file_path):
         new_view = None
         if os.path.isdir(file_path):
@@ -340,4 +338,13 @@ class AdvancedNewFileBase(object):
         return path
 
 
-
+    def _find_open_file(self, file_name):
+        window = self.window
+        if IS_ST3:
+            return window.find_open_file(file_name)
+        else:
+            for view in window.views():
+                view_name = view.file_name()
+                if view_name != "" and view_name == file_name:
+                    return view
+        return None

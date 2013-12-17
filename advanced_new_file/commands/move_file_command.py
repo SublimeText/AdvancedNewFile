@@ -7,6 +7,7 @@ from .git.git_command_base import GitCommandBase
 from .command_base import AdvancedNewFileBase
 from ..anf_util import *
 
+
 class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand, GitCommandBase):
     def __init__(self, window):
         super(AdvancedNewFileMove, self).__init__(window)
@@ -83,7 +84,6 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand, Git
             else:
                 content = self.view.substr(sublime.Region(0, self.view.size()))
                 self.view.set_scratch(True)
-                self.view.run_command("close")
                 window.focus_view(self.view)
                 window.run_command("close")
                 with open(file_path, "w") as file_obj:
@@ -99,17 +99,6 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand, Git
         else:
             shutil.move(from_file, to_file)
 
-    def _find_open_file(self, file_name):
-        window = self.window
-        if IS_ST3:
-            return window.find_open_file(file_name)
-        else:
-            for view in window.views():
-                view_name = view.file_name()
-                if view_name != "" and view_name == file_name:
-                    return view
-        return None
-
     def update_status_message(self, creation_path):
         if self.view != None:
             if os.path.isdir(creation_path) or os.path.basename(creation_path) == "" :
@@ -118,6 +107,7 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand, Git
                 creation_path)
         else:
             sublime.status_message("Moving file to %s" % creation_path)
+
 
 class AdvancedNewFileMoveAtCommand(sublime_plugin.WindowCommand):
     def run(self, files):
