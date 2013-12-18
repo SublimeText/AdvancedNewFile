@@ -100,7 +100,10 @@ def get_settings(view):
     for key in project_settings:
         if key in SETTINGS:
             if key == "alias":
-                local_settings[key] = dict(local_settings[key].items() + project_settings.get(key).items())
+                if IS_ST3:
+                    local_settings[key] = dict(local_settings[key].items() | project_settings.get(key).items())
+                else:
+                    local_settings[key] = dict(local_settings[key].items() + project_settings.get(key).items())
             else:
                 local_settings[key] = project_settings[key]
         else:
