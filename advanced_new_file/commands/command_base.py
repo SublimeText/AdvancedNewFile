@@ -172,7 +172,7 @@ class AdvancedNewFileBase(object):
                     if alias == target:
                         alias_path = self.aliases.get(alias)
                         if re.search(HOME_REGEX, alias_path) is None:
-                            root = self.platform.get_alias_absolute_path(alias_path)
+                            root = self.platform.get_alias_absolute_path(self.alias_root, alias_path)
                             if root is not None:
                                 break
                         root = os.path.expanduser(alias_path)

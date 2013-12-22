@@ -26,3 +26,8 @@ class WindowsPlatform(object):
             root += "\\"
 
         return root, path_offset
+
+    def get_alias_absolute_path(self, root, path):
+        if re.search(WIN_ROOT_REGEX, path):
+            return os.path.join(root, path)
+        return None
