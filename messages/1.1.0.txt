@@ -6,6 +6,7 @@ Changes:
 - Miscellaneous bug fixes.
 
 Enhancements:
+- Add delete command.
 - Add rename key `<filepath>` to display absolute path to the current file.
 - Add basic support for git when moving or deleting files. Thank you @btsai
 - When moving a file, specifying a directory will move the file to that location with the same name.
