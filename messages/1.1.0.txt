@@ -1,0 +1,12 @@
+This version contains a major refactor of the code. If any issues arise, please create an issue on the github (https://github.com/skuroda/Sublime-AdvancedNewFile) page. Thank you for using AdvancedNewFile.
+
+Changes:
+- Rename key `<current>` has been replaced with `<filename>`
+- Remove setting to display context menu in side bar. Instructions on how to add menu entries have been added to the github wiki.
+- Miscellaneous bug fixes.
+
+Enhancements:
+- Add rename key `<filepath>` to display absolute path to the current file.
+- Add basic support for git when moving or deleting files. Thank you @btsai
+- When moving a file, specifying a directory will move the file to that location with the same name.
+
