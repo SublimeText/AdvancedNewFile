@@ -35,27 +35,10 @@ Simply bring up the AdvancedNewFile input through the appropriate [key binding](
 The default directory is specified by the `default_root` setting. By default, it will be the top directory of the folders listed in the window. If this cannot be resolved, the home directory will be used. See [Settings](https://github.com/skuroda/Sublime-AdvancedNewFile#settings) (`default_root`) for more information.
 
 ### Commands with no Default Bindings
-The following commands are supported, but have no forward facing bindings. You may choose to create key bindings, command palette entries, or context menu entries for them yourself.
+The plugin supports renaming and deleting files. However, these are not, by default bound to any key binding. For more information on the available commands, see the GitHub [wiki](https://github.com/skuroda/Sublime-AdvancedNewFile/wiki/Commands) page.
 
-#### Rename File
-To execute the command to rename the current active view, use the command `advanced_new_file` with the argument parameter `{"rename": true}`. An example keybinding for this is
-
-    [
-        {"keys": ["alt+shift+n"], "command": "advanced_new_file", "args": {"rename": true}}
-    ]
-
-#### Rename File - Context Menu
-To create a sidebar menu entry, you need to create a file named `Side Bar.sublime-menu`. It is recommended you place this in your `User` directory. Like the key binding files, this menu is a list of command entries. Each entry contains 3 items. The first is the `caption`. This is the string that appears in the menu. Next is the `command`. For this, you will use `advanced_new_file_rename_at`. Finally, are the `args`. You will need to specify `{"files": []}`. An example entry can be seen below.
-
-    [
-        { "caption": "ANF: Rename", "command": "advanced_new_file_rename_at", "args": {"files": []}}
-    ]
-
-To create a context menu entry for the view, create a file named `Context.sublime-menu`. A sample entry can be seen below.
-
-    [
-        {"caption": "ANF: Rename", "command": "advanced_new_file", "args": {"rename": true}}
-    ]
+### Adding Commands to Menu
+The plugin does not contain any menu commands by default. To add them yourself, please see the GitHub[wiki](https://github.com/skuroda/Sublime-AdvancedNewFile/wiki/Menu-Entries)
 
 ## Keymaps
 If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager. Alternatively, set command logging to true by entering `sublime.log_commands(True)` in the Sublime Text console.
