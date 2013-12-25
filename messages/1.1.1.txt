@@ -1,0 +1,1 @@
+* Fix issue with update message. If you did not see the 1.1.0 update message, please visit https://github.com/skuroda/Sublime-AdvancedNewFile/blob/master/messages/1.1.0.txt
