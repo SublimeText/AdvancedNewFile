@@ -56,7 +56,7 @@ class AdvancedNewFileDelete(AdvancedNewFileBase, sublime_plugin.WindowCommand, G
         else:
             self.window.run_command("delete_file", {"files": [filepath]})
 
-        file_view = self._find_open_file(self.rename_filename)
+        file_view = self._find_open_file(filepath)
         if file_view is not None:
             file_view.set_scratch(True)
             window.focus_view(file_view)
