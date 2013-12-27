@@ -8,7 +8,8 @@ from .command_base import AdvancedNewFileBase
 from ..anf_util import *
 
 
-class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand, GitCommandBase):
+class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand,
+                          GitCommandBase):
     def __init__(self, window):
         super(AdvancedNewFileMove, self).__init__(window)
 
@@ -19,18 +20,28 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand, Git
 
         path = self.settings.get(RENAME_DEFAULT_SETTING)
         current_file = self.view.file_name()
-        current_file_name = os.path.basename(self.view.file_name()) if current_file else ""
+        if current_file:
+            current_file_name = os.path.basename(self.view.file_name())
+        else:
+            current_file_name = ""
+
         path = path.replace("<filepath>", current_file)
         path = path.replace("<filename>", current_file_name)
-        self.show_filename_input(path if len(path) > 0 else self.generate_initial_path())
+        self.show_filename_input(
+            path if len(path) > 0 else self.generate_initial_path())
 
     def input_panel_caption(self):
         caption = 'Enter a new path for current file'
         view = self.window.active_view()
+        self.original_name = None
         if view is not None:
-            self.original_name = os.path.basename(view.file_name()) if view.file_name is not None else ""
-        else:
+            view_file_name = view.file_name()
+            if view_file_name:
+                self.original_name = os.path.basename(view_file_name)
+
+        if self.original_name is None:
             self.original_name = ""
+
         if self.is_python:
             caption = '%s (creates __init__.py in new dirs)' % caption
         return caption
@@ -40,7 +51,8 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand, Git
         args = ["mv", filename, to_filepath]
         result = self.run_command(args, path)
         if result != 0:
-            sublime.error_message("Git move of %s to %s failed" % (from_filepath, to_filepath))
+            sublime.error_message("Git move of %s to %s failed" %
+                                 (from_filepath, to_filepath))
 
     def entered_file_action(self, path):
         attempt_open = True
@@ -50,7 +62,8 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand, Git
                 self.create_folder(directory)
             except OSError as e:
                 attempt_open = False
-                sublime.error_message("Cannot create '" + path + "'. See console for details")
+                sublime.error_message("Cannot create '" + path + "'." +
+                                      " See console for details")
                 print("Exception: %s '%s'" % (e.strerror, e.filename))
 
         if attempt_open:
@@ -100,11 +113,12 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand, Git
             shutil.move(from_file, to_file)
 
     def update_status_message(self, creation_path):
-        if self.view != None:
-            if os.path.isdir(creation_path) or os.path.basename(creation_path) == "" :
+        if self.view is not None:
+            if (os.path.isdir(creation_path) or
+               os.path.basename(creation_path) == ""):
                 creation_path = os.path.join(creation_path, self.original_name)
-            self.view.set_status("AdvancedNewFile", "Moving file to %s " % \
-                creation_path)
+            self.view.set_status("AdvancedNewFile", "Moving file to %s " %
+                                 creation_path)
         else:
             sublime.status_message("Moving file to %s" % creation_path)
 
@@ -113,7 +127,8 @@ class AdvancedNewFileMoveAtCommand(sublime_plugin.WindowCommand):
     def run(self, files):
         if len(files) != 1:
             return
-        self.window.run_command("advanced_new_file_move", {"rename_file": files[0]})
+        self.window.run_command("advanced_new_file_move",
+                                {"rename_file": files[0]})
 
     def is_visible(self, files):
         return len(files) == 1

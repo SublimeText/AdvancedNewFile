@@ -3,6 +3,7 @@ import os
 from .command_base import AdvancedNewFileBase
 from ..anf_util import *
 
+
 class AdvancedNewFileNew(AdvancedNewFileBase, sublime_plugin.WindowCommand):
     def __init__(self, window):
         super(AdvancedNewFileNew, self).__init__(window)
@@ -25,24 +26,27 @@ class AdvancedNewFileNew(AdvancedNewFileBase, sublime_plugin.WindowCommand):
                 self.create(path)
             except OSError as e:
                 attempt_open = False
-                sublime.error_message("Cannot create '" + path + "'. See console for details")
+                sublime.error_message("Cannot create '" + path +
+                                      "'. See console for details")
                 print("Exception: %s '%s'" % (e.strerror, e.filename))
         if attempt_open:
             self.open_file(path)
 
     def update_status_message(self, creation_path):
-        if self.view != None:
-            self.view.set_status("AdvancedNewFile", "Creating file at %s " % \
-                creation_path)
+        if self.view is not None:
+            self.view.set_status("AdvancedNewFile", "Creating file at %s " %
+                                 creation_path)
         else:
             sublime.status_message("Creating file at %s" % creation_path)
+
 
 class AdvancedNewFileNewAtCommand(sublime_plugin.WindowCommand):
     def run(self, dirs):
         if len(dirs) != 1:
             return
         path = dirs[0] + os.sep
-        self.window.run_command("advanced_new_file_new", {"initial_path": path})
+        self.window.run_command("advanced_new_file_new",
+                                {"initial_path": path})
 
     def is_visible(self, dirs):
         return len(dirs) == 1

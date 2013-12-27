@@ -22,18 +22,21 @@ class AdvancedNewFileBase(object):
         else:
             self.platform = NixPlatform()
 
-
     def __generate_default_root(self):
-        default_root = self.__get_default_root(self.settings.get(DEFAULT_ROOT_SETTING))
+        default_root = self.__get_default_root(
+            self.settings.get(DEFAULT_ROOT_SETTING))
         if default_root == "path":
-            self.root = os.path.expanduser(self.settings.get(DEFAULT_PATH_SETTING))
+            self.root = os.path.expanduser(
+                self.settings.get(DEFAULT_PATH_SETTING))
             default_root = ""
         return self.split_path(default_root)
 
     def __generate_alias_root(self):
-        alias_root = self.__get_default_root(self.settings.get(ALIAS_ROOT_SETTING), True)
+        alias_root = self.__get_default_root(
+            self.settings.get(ALIAS_ROOT_SETTING), True)
         if alias_root == "path":
-            self.alias_root = os.path.expanduser(self.settings.get(ALIAS_PATH_SETTING))
+            self.alias_root = os.path.expanduser(
+                self.settings.get(ALIAS_PATH_SETTING))
             alias_root = ""
         return self.split_path(alias_root, True)
 
@@ -81,7 +84,8 @@ class AdvancedNewFileBase(object):
     def __get_default_root(self, string, is_alias=False):
         root = ""
         self.alias_folder_index = self.settings.get(ALIAS_FOLDER_INDEX_SETTING)
-        self.default_folder_index = self.settings.get(DEFAULT_FOLDER_INDEX_SETTING)
+        self.default_folder_index = self.settings.get(
+            DEFAULT_FOLDER_INDEX_SETTING)
         if string == "home":
             root = "~/"
         elif string == "current":
@@ -110,7 +114,7 @@ class AdvancedNewFileBase(object):
         try:
             root, path = self.platform.split(path)
             # Parse if alias
-            if TOP_LEVEL_SPLIT_CHAR in path and root == None:
+            if TOP_LEVEL_SPLIT_CHAR in path and root is None:
                 parts = path.rsplit(TOP_LEVEL_SPLIT_CHAR, 1)
                 root, path = self.__translate_alias(parts[0])
                 path_list = []
@@ -123,10 +127,11 @@ class AdvancedNewFileBase(object):
                 root, path_offset = self.platform.parse_nix_path(root, path)
                 path = path[path_offset:]
             # Parse if tilde used
-            elif re.match(HOME_REGEX, path) and root == None:
+            elif re.match(HOME_REGEX, path) and root is None:
                 root = os.path.expanduser("~")
                 path = path[2:]
-            elif re.match(r"^\.{1,2}[/\\]", path) and self.settings.get(RELATIVE_FROM_CURRENT_SETTING, False):
+            elif (re.match(r"^\.{1,2}[/\\]", path) and
+                  self.settings.get(RELATIVE_FROM_CURRENT_SETTING, False)):
                 path_index = 2
                 root = os.path.dirname(self.view.file_name())
                 if re.match(r"^\.{2}[/\\]", path):
@@ -135,7 +140,7 @@ class AdvancedNewFileBase(object):
                 path = path[path_index:]
 
             # Default
-            if root == None:
+            if root is None:
                 if is_alias:
                     root = self.alias_root
                     folder_index = self.alias_folder_index
@@ -160,9 +165,10 @@ class AdvancedNewFileBase(object):
             join_index = len(split_path) - 1
             target = path
             root_found = False
+            use_folder_name = self.settings.get(USE_FOLDER_NAME_SETTING)
             while join_index >= 0 and not root_found:
                 # Folder aliases
-                for name, folder in get_project_folder_data(self.settings.get(USE_FOLDER_NAME_SETTING)):
+                for name, folder in get_project_folder_data(use_folder_name):
                     if name == target:
                         root = folder
                         root_found = True
@@ -172,7 +178,8 @@ class AdvancedNewFileBase(object):
                     if alias == target:
                         alias_path = self.aliases.get(alias)
                         if re.search(HOME_REGEX, alias_path) is None:
-                            root = self.platform.get_alias_absolute_path(self.alias_root, alias_path)
+                            root = self.platform.get_alias_absolute_path(
+                                self.alias_root, alias_path)
                             if root is not None:
                                 break
                         root = os.path.expanduser(alias_path)
@@ -189,7 +196,8 @@ class AdvancedNewFileBase(object):
         else:
             # Add to index so we re
             join_index += 2
-            return os.path.abspath(root), TOP_LEVEL_SPLIT_CHAR.join(split_path[join_index:])
+            return (os.path.abspath(root),
+                    TOP_LEVEL_SPLIT_CHAR.join(split_path[join_index:]))
 
     def input_panel_caption(self):
         return ""
@@ -201,7 +209,8 @@ class AdvancedNewFileBase(object):
         )
 
         self.input_panel_view.set_name(VIEW_NAME)
-        self.input_panel_view.settings().set("auto_complete_commit_on_tab", False)
+        self.input_panel_view.settings().set("auto_complete_commit_on_tab",
+                                             False)
         self.input_panel_view.settings().set("tab_completion", False)
         self.input_panel_view.settings().set("translate_tabs_to_spaces", False)
         self.input_panel_view.settings().set("anf_panel", True)
@@ -215,11 +224,13 @@ class AdvancedNewFileBase(object):
         if path_in.endswith("\t"):
             new_content = self.completion.completion(path_in.replace("\t", ""))
         if new_content != path_in:
-            self.input_panel_view.run_command("anf_replace", {"content": new_content})
+            self.input_panel_view.run_command("anf_replace",
+                                              {"content": new_content})
         else:
             base, path = self.split_path(path_in)
 
-            creation_path = generate_creation_path(self.settings, base, path, True)
+            creation_path = generate_creation_path(self.settings, base, path,
+                                                   True)
             if self.settings.get(SHOW_PATH_SETTING, False):
                 self.update_status_message(creation_path)
 
@@ -249,9 +260,9 @@ class AdvancedNewFileBase(object):
         base, path = self.split_path(filename)
         file_path = generate_creation_path(self.settings, base, path, True)
         # Check for invalid alias specified.
-        if TOP_LEVEL_SPLIT_CHAR in filename and \
-            not (PLATFORM == "windows" and re.match(WIN_ROOT_REGEX, base)) and \
-            not (PLATFORM != "windows" and re.match(NIX_ROOT_REGEX, base)):
+        is_valid = (TOP_LEVEL_SPLIT_CHAR in filename and
+                    self.platform.is_absolute_path(base))
+        if is_valid:
             if base == "":
                 error_message = "Current file cannot be resolved."
             else:
@@ -264,7 +275,8 @@ class AdvancedNewFileBase(object):
         new_view = None
         if os.path.isdir(file_path):
             if not re.search(r"(/|\\)$", file_path):
-                sublime.error_message("Cannot open view for '" + file_path + "'. It is a directory. ")
+                sublime.error_message("Cannot open view for '" + file_path +
+                                      "'. It is a directory. ")
         else:
             new_view = self.window.open_file(file_path)
         return new_view
@@ -277,7 +289,7 @@ class AdvancedNewFileBase(object):
                 pass
 
     def clear(self):
-        if self.view != None:
+        if self.view is not None:
             self.view.erase_status("AdvancedNewFile")
             self.view.erase_status("AdvancedNewFile2")
 
@@ -313,14 +325,13 @@ class AdvancedNewFileBase(object):
             if self.is_python:
                 creation_path = os.path.join(entry, '__init__.py')
                 open(creation_path, 'a').close()
-                if  file_permissions != "":
+                if file_permissions != "":
                     os.chmod(creation_path, int(file_permissions, 8))
-            if  folder_permissions != "":
+            if folder_permissions != "":
                 os.chmod(entry, int(folder_permissions, 8))
 
-
     def get_cursor_path(self):
-        if self.view == None:
+        if self.view is None:
             return ""
 
         view = self.view
@@ -336,7 +347,6 @@ class AdvancedNewFileBase(object):
                 break
 
         return path
-
 
     def _find_open_file(self, file_name):
         window = self.window

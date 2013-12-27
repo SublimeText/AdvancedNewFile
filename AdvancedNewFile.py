@@ -20,5 +20,3 @@ if VERSION > 3000:
 else:
     from advanced_new_file import reloader
     from advanced_new_file.commands import *
-
-

@@ -61,6 +61,7 @@ PLATFORM = sublime.platform()
 TOP_LEVEL_SPLIT_CHAR = ":"
 IS_ST3 = int(sublime.version()) > 3000
 
+
 def generate_creation_path(settings, base, path, append_extension=False):
         if PLATFORM == "windows":
             if not re.match(WIN_ROOT_REGEX, base):
@@ -87,11 +88,12 @@ def generate_creation_path(settings, base, path, append_extension=False):
                 full_path += settings.get(DEFAULT_EXTENSION_SETTING)
         return full_path
 
+
 def get_settings(view):
     settings = sublime.load_settings("AdvancedNewFile.sublime-settings")
     project_settings = {}
     local_settings = {}
-    if view != None:
+    if view is not None:
         project_settings = view.settings().get('AdvancedNewFile', {})
 
     for setting in SETTINGS:
@@ -101,15 +103,23 @@ def get_settings(view):
         if key in SETTINGS:
             if key == "alias":
                 if IS_ST3:
-                    local_settings[key] = dict(local_settings[key].items() | project_settings.get(key).items())
+                    local_settings[key] = dict(
+                        local_settings[key].items() |
+                        project_settings.get(key).items()
+                    )
                 else:
-                    local_settings[key] = dict(local_settings[key].items() + project_settings.get(key).items())
+                    local_settings[key] = dict(
+                        local_settings[key].items() +
+                        project_settings.get(key).items()
+                    )
             else:
                 local_settings[key] = project_settings[key]
         else:
-            print("AdvancedNewFile[Warning]: Invalid key '%s' in project settings.", key)
+            print("AdvancedNewFile[Warning]: Invalid key " +
+                  "'%s' in project settings.", key)
 
     return local_settings
+
 
 def get_project_folder_data(use_folder_name):
     folders = []

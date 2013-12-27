@@ -6,7 +6,8 @@ from .git.git_command_base import GitCommandBase
 from .command_base import AdvancedNewFileBase
 
 
-class AdvancedNewFileDelete(AdvancedNewFileBase, sublime_plugin.WindowCommand, GitCommandBase):
+class AdvancedNewFileDelete(AdvancedNewFileBase, sublime_plugin.WindowCommand,
+                            GitCommandBase):
     def __init__(self, window):
         super(AdvancedNewFileDelete, self).__init__(window)
 
@@ -25,9 +26,9 @@ class AdvancedNewFileDelete(AdvancedNewFileBase, sublime_plugin.WindowCommand, G
         self._delete_file(path)
 
     def update_status_message(self, creation_path):
-        if self.view != None:
-            self.view.set_status("AdvancedNewFile", "Delete file at %s " % \
-                creation_path)
+        if self.view is not None:
+            self.view.set_status("AdvancedNewFile", "Delete file at %s " %
+                                 creation_path)
         else:
             sublime.status_message("Delete file at %s" % creation_path)
 
@@ -51,7 +52,9 @@ class AdvancedNewFileDelete(AdvancedNewFileBase, sublime_plugin.WindowCommand, G
         if not sublime.ok_cancel_dialog("Delete this file?\n%s" % filepath):
             return
 
-        if self.file_tracked_by_git(filepath) and self.settings.get(VCS_MANAGEMENT_SETTING):
+        vcs_tracking = (self.file_tracked_by_git(filepath) and
+                        self.settings.get(VCS_MANAGEMENT_SETTING))
+        if vcs_tracking:
             self._git_rm(filepath)
         else:
             self.window.run_command("delete_file", {"files": [filepath]})

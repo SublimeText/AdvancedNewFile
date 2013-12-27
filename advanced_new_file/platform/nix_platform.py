@@ -3,6 +3,7 @@ import os
 
 from ..anf_util import *
 
+
 class NixPlatform():
     def split(self, path):
         return None, path
@@ -14,3 +15,6 @@ class NixPlatform():
         if re.search(NIX_ROOT_REGEX, path):
             return os.path.join(root, path)
         return None
+
+    def is_absolute_path(self, path):
+        return re.match(NIX_ROOT_REGEX, path) is not None
