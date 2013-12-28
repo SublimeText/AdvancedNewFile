@@ -54,14 +54,20 @@ class AdvancedNewFileDelete(AdvancedNewFileBase, sublime_plugin.WindowCommand,
 
         vcs_tracking = (self.file_tracked_by_git(filepath) and
                         self.settings.get(VCS_MANAGEMENT_SETTING))
+
+        self.close_view(filepath)
+
         if vcs_tracking:
             self._git_rm(filepath)
         else:
             self.window.run_command("delete_file", {"files": [filepath]})
 
+        self.refresh_sidebar()
+
+    def close_view(self, filepath):
         file_view = self._find_open_file(filepath)
+
         if file_view is not None:
             file_view.set_scratch(True)
             self.window.focus_view(file_view)
             self.window.run_command("close")
-        self.refresh_sidebar()
