@@ -15,7 +15,7 @@ class GenerateCompletionListBase(object):
     def is_home(self, path):
         return re.match(r"^~[/\\]", path)
 
-    def is_alias(self, path_):
+    def is_alias(self, path):
         return self.top_level_split_char in path
 
     def generate_completion_list(self, path_in):

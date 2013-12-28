@@ -261,7 +261,7 @@ class AdvancedNewFileBase(object):
         file_path = generate_creation_path(self.settings, base, path, True)
         # Check for invalid alias specified.
         is_valid = (TOP_LEVEL_SPLIT_CHAR in filename and
-                    self.platform.is_absolute_path(base))
+                    not self.platform.is_absolute_path(base))
         if is_valid:
             if base == "":
                 error_message = "Current file cannot be resolved."

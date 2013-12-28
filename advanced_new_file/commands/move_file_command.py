@@ -21,11 +21,11 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand,
         path = self.settings.get(RENAME_DEFAULT_SETTING)
         current_file = self.view.file_name()
         if current_file:
+            path = path.replace("<filepath>", current_file)
             current_file_name = os.path.basename(self.view.file_name())
         else:
             current_file_name = ""
 
-        path = path.replace("<filepath>", current_file)
         path = path.replace("<filename>", current_file_name)
         self.show_filename_input(
             path if len(path) > 0 else self.generate_initial_path())

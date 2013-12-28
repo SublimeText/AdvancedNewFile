@@ -11,6 +11,7 @@ def _test_paths_for_executable(paths, test_file):
         if os.path.exists(file_path) and os.access(file_path, os.X_OK):
             return file_path
 
+
 def find_git():
     # It turns out to be difficult to reliably run git, with varying paths
     # and subprocess environments across different platforms. So. Let's hack
@@ -42,6 +43,7 @@ def find_git():
 
 GIT = find_git()
 
+
 # Base for git commands
 class GitCommandBase(object):
     def __init__(self, window):
@@ -52,11 +54,11 @@ class GitCommandBase(object):
         git = GIT
         if git is not None:
             path, file_name = os.path.split(filepath)
-            return self.run_command(["ls-files", file_name, "--error-unmatch"], path) == 0
+            return self.run_command(
+                ["ls-files", file_name, "--error-unmatch"], path) == 0
         else:
             return False
 
     def run_command(self, args, cwd):
         use_shell = PLATFORM == "windows"
         return subprocess.call([GIT] + args, cwd=cwd, shell=use_shell)
-
