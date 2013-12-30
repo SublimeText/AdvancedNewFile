@@ -60,6 +60,7 @@ HOME_REGEX = r"^~"
 PLATFORM = sublime.platform()
 TOP_LEVEL_SPLIT_CHAR = ":"
 IS_ST3 = int(sublime.version()) > 3000
+IS_X64 = sublime.arch() == "x64"
 
 
 def generate_creation_path(settings, base, path, append_extension=False):
