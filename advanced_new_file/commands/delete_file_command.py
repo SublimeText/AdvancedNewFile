@@ -61,15 +61,16 @@ class AdvancedNewFileDelete(AdvancedNewFileBase, sublime_plugin.WindowCommand,
         if vcs_tracking:
             self._git_rm(filepath)
         else:
-            command = self._delete_file_command()
-            self.window.run_command(command, {"files": [filepath]})
+            self._execute_delete_file(filepath)
 
         self.refresh_sidebar()
 
-    def _delete_file_command(self):
+    def _execute_delete_file(self, filepath):
         if IS_ST3 and self._side_bar_enhancements_installed():
-            return "side_bar_delete"
-        return "delete_file"
+            import Default.send2trash as send2trash
+            send2trash.send2trash(filepath)
+        else:
+            self.window.run_command("delete_file", {"files": [filepath]})
 
     def _side_bar_enhancements_installed(self):
         return "SideBarEnhancements.SideBar" in sys.modules
