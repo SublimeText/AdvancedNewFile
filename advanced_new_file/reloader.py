@@ -21,6 +21,7 @@ else:
             reload_mods.append(mod)
 
 mods_load_order = [
+    '',
     '.anf_util',
     '.completion_base',
 
@@ -32,10 +33,12 @@ mods_load_order = [
     ".platform.windows_platform",
     ".platform.nix_platform",
 
+    ".vcs",
+    ".vcs.git",
+    ".vcs.git.git_command_base",
+
     ".commands",
     ".commands.command_base",
-    ".commands.git",
-    ".commands.git.git_command_base",
     ".commands.helper_commands",
     '.commands.new_file_command',
     ".commands.move_file_command",

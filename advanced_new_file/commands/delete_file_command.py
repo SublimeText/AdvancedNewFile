@@ -3,7 +3,7 @@ import sublime
 import sublime_plugin
 import sys
 from ..anf_util import *
-from .git.git_command_base import GitCommandBase
+from ..vcs.git.git_command_base import GitCommandBase
 from .command_base import AdvancedNewFileBase
 
 
