@@ -23,33 +23,35 @@ class AdvancedNewFileBase(object):
             self.platform = NixPlatform()
 
     def __generate_default_root(self):
-        default_root = self.__get_default_root(
-            self.settings.get(DEFAULT_ROOT_SETTING))
-        if default_root == "path":
-            self.root = os.path.expanduser(
-                self.settings.get(DEFAULT_PATH_SETTING))
-            default_root = ""
-        return self.split_path(default_root)
+        root_setting = self.settings.get(DEFAULT_ROOT_SETTING)
+        path, folder_index = self.__parse_path_setting(
+            root_setting, DEFAULT_FOLDER_INDEX_SETTING)
+        if path is None and folder_index is None:
+            return os.path.expanduser(self.settings.get(DEFAULT_PATH_SETTING))
+        elif path is None:
+            return self.window.folders()[folder_index]
+        return path
 
     def __generate_alias_root(self):
-        alias_root = self.__get_default_root(
-            self.settings.get(ALIAS_ROOT_SETTING), True)
-        if alias_root == "path":
-            self.alias_root = os.path.expanduser(
-                self.settings.get(ALIAS_PATH_SETTING))
-            alias_root = ""
-        return self.split_path(alias_root, True)
+        path, folder_index = self.__parse_path_setting(
+            self.settings.get(ALIAS_ROOT_SETTING), ALIAS_FOLDER_INDEX_SETTING)
+        if path is None and folder_index is None:
+            return os.path.expanduser(self.settings.get(ALIAS_PATH_SETTING))
+        elif path is None:
+            return self.window.folders()[folder_index]
+        return path
 
     def generate_initial_path(self, initial_path=None):
         # Search for initial string
         if initial_path is not None:
             path = initial_path
         else:
-            _, path = self.__generate_default_root()
             if self.settings.get(USE_CURSOR_TEXT_SETTING, False):
                 cursor_text = self.get_cursor_path()
                 if cursor_text != "":
                     path = cursor_text
+            else:
+                path = self.settings.get(DEFAULT_INITIAL_SETTING)
 
         return path
 
@@ -60,8 +62,8 @@ class AdvancedNewFileBase(object):
         self.alias_root = None
         self.aliases = self.__get_aliases()
 
-        self.root, _ = self.__generate_default_root()
-        self.alias_root, _ = self.__generate_alias_root()
+        self.root = self.__generate_default_root()
+        self.alias_root = self.__generate_alias_root()
 
         # Need to fix this
         debug = self.settings.get(DEBUG_SETTING) or False
@@ -81,34 +83,31 @@ class AdvancedNewFileBase(object):
 
         return aliases
 
-    def __get_default_root(self, string, is_alias=False):
-        root = ""
-        self.alias_folder_index = self.settings.get(ALIAS_FOLDER_INDEX_SETTING)
-        self.default_folder_index = self.settings.get(
-            DEFAULT_FOLDER_INDEX_SETTING)
-        if string == "home":
-            root = "~/"
-        elif string == "current":
-            root = TOP_LEVEL_SPLIT_CHAR
-        elif string == "project_folder":
-            num_folders = len(self.window.folders())
-            if is_alias:
-                if num_folders <= self.alias_folder_index:
-                    self.alias_folder_index = 0
-            elif num_folders <= self.default_folder_index:
-                self.default_folder_index = 0
-        elif string == "top_folder":
-            if is_alias:
-                self.alias_folder_index = 0
+    def __parse_path_setting(self, setting, index_setting):
+        root = None
+        folder_index = None
+        if setting == "home":
+            root = os.path.expanduser("~/")
+        elif setting == "current":
+            filename = self.view.file_name()
+            if filename is not None:
+                root = os.path.dirname(filename)
             else:
-                self.default_folder_index = 0
-        elif string == "path":
-            root = "path"
+                root = os.path.expanduser("~/")
+        elif setting == "project_folder":
+            folder_index = self.settings.get(index_setting)
+            num_folders = len(self.window.folders())
+            if num_folders < folder_index:
+                folder_index = 0
+        elif setting == "top_folder":
+            folder_index = 0
+        elif setting == "path":
+            pass
         else:
-            print("Invalid specifier for \"default_root\"")
-        return root
+            print("Invalid root specifier")
+        return (root, folder_index)
 
-    def split_path(self, path="", is_alias=False):
+    def split_path(self, path=""):
         HOME_REGEX = r"^~[/\\]"
         root = None
         try:
@@ -141,13 +140,7 @@ class AdvancedNewFileBase(object):
 
             # Default
             if root is None:
-                if is_alias:
-                    root = self.alias_root
-                    folder_index = self.alias_folder_index
-                else:
-                    root = self.root
-                    folder_index = self.default_folder_index
-                root = root or self.window.folders()[folder_index]
+                root = self.root
         except IndexError:
             root = os.path.expanduser("~")
 
@@ -190,8 +183,10 @@ class AdvancedNewFileBase(object):
                 join_index -= 1
 
         if root is None:
+            # Nothing found
             return None, path
         elif split_path is None:
+            # Current directory as alias
             return os.path.abspath(root), ""
         else:
             # Add to index so we re
@@ -319,8 +314,8 @@ class AdvancedNewFileBase(object):
             if ex.errno != errno.EEXIST:
                 raise
 
-        file_permissions = self.settings.get("file_permissions", "")
-        folder_permissions = self.settings.get("folder_permissions", "")
+        file_permissions = self.settings.get(FILE_PERMISSIONS_SETTING, "")
+        folder_permissions = self.settings.get(FOLDER_PERMISSIONS_SETTING, "")
         for entry in init_list:
             if self.is_python:
                 creation_path = os.path.join(entry, '__init__.py')
@@ -341,7 +336,8 @@ class AdvancedNewFileBase(object):
             if region.begin() != region.end():
                 path = view.substr(region)
                 break
-            if re.match(".*string.quoted.double", syntax) or re.match(".*string.quoted.single", syntax):
+            if (re.match(".*string.quoted.double", syntax) or
+                    re.match(".*string.quoted.single", syntax)):
                 path = view.substr(view.extract_scope(region.begin()))
                 path = re.sub('^"|\'', '',  re.sub('"|\'$', '', path.strip()))
                 break
