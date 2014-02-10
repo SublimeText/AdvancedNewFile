@@ -13,10 +13,9 @@ Installation through [package control](http://wbond.net/sublime_packages/package
 
 * In the Command Palette, enter `Package Control: Install Package`
 * Search for `AdvancedNewFile`
-* In the Command Palette, enter `Package Control :Enable Package` -> select AdvancedNewFile
 
 ### Manual
-Clone or copy this repository into the packages directory. By default, they are located at:
+Clone or copy this repository into the packages directory. You will need to rename the folder to `AdvancedNewFile` if using this method. By default, the Package directory is located at:
 
 * OS X: ~/Library/Application Support/Sublime Text 2/Packages/
 * Windows: %APPDATA%/Roaming/Sublime Text 2/Packages/
