@@ -26,6 +26,7 @@ FILE_PERMISSIONS_SETTING = "file_permissions"
 FOLDER_PERMISSIONS_SETTING = "folder_permissions"
 RENAME_DEFAULT_SETTING = "rename_default"
 VCS_MANAGEMENT_SETTING = "vcs_management"
+FILE_TEMPLATES_SETTING = "file_templates"
 
 SETTINGS = [
     ALIAS_SETTING,
@@ -51,7 +52,8 @@ SETTINGS = [
     FILE_PERMISSIONS_SETTING,
     FOLDER_PERMISSIONS_SETTING,
     RENAME_DEFAULT_SETTING,
-    VCS_MANAGEMENT_SETTING
+    VCS_MANAGEMENT_SETTING,
+    FILE_TEMPLATES_SETTING
 ]
 
 NIX_ROOT_REGEX = r"^/"
@@ -99,6 +101,10 @@ def get_settings(view):
 
     for setting in SETTINGS:
         local_settings[setting] = settings.get(setting)
+
+    if type(project_settings) != dict:
+        print("Invalid type %s for project settings" % type(project_settings))
+        return local_settings
 
     for key in project_settings:
         if key in SETTINGS:

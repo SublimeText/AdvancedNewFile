@@ -152,6 +152,14 @@ String representing permissions to be applied to newly created files. E.g. "777"
 
 Default input for renaming a file. Special value `<filename>` will be replaced with the current file name. Special value `<filepath>` will be replaced with the absolute path of the current file.
 
+`vcs_management`:
+
+Setting to control if VCS management is used when moving and removing files.
+
+`file_templates`:
+
+An object containing information to use for templates when creating new files. The key values for this object should be a file extension. The value may either be a string of the content to be inserted or a list of paths. If a list of paths is specified, the name of the file will be displayed during selection. The paths must either be absolute, or be from the home directory of the user (`~/`). If a string is used, or the list contains a single entry, it will be automatically inserted into any newly created files.
+
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
 
