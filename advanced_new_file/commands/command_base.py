@@ -2,6 +2,7 @@ import errno
 import os
 import re
 import sublime
+import shlex
 
 from ..anf_util import *
 from ..platform.windows_platform import WindowsPlatform
@@ -124,6 +125,9 @@ class AdvancedNewFileBase(object):
         root = None
         try:
             root, path = self.platform.split(path)
+            if self.settings.get(SHELL_INPUT_SETTING, False) and len(path) > 0:
+                split_path = shlex.split(path)
+                path = " ".join(split_path)
             # Parse if alias
             if TOP_LEVEL_SPLIT_CHAR in path and root is None:
                 parts = path.rsplit(TOP_LEVEL_SPLIT_CHAR, 1)
@@ -157,6 +161,14 @@ class AdvancedNewFileBase(object):
             root = os.path.expanduser("~")
 
         return root, path
+
+    def bash_expansion(self, path):
+        if len(path) == 0:
+            return path
+
+        split_path = shlex.split(path)
+        new_path = " ".join(split_path)
+        return new_path
 
     def __translate_alias(self, path):
         root = None

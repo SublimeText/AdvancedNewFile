@@ -1,6 +1,7 @@
 import sublime
 import sublime_plugin
 import os
+import re
 import xml.etree.ElementTree as ET
 
 from .command_base import AdvancedNewFileBase
@@ -23,6 +24,16 @@ class AdvancedNewFileNew(AdvancedNewFileBase, sublime_plugin.WindowCommand):
         return caption
 
     def entered_file_action(self, path):
+        if self.settings.get(SHELL_INPUT_SETTING, False):
+            self.multi_file_action(self.curly_brace_expansion(path))
+        else:
+            self.single_file_action(path)
+
+    def multi_file_action(self, paths):
+        for path in paths:
+            self.single_file_action(path, False)
+
+    def single_file_action(self, path, apply_template=True):
         attempt_open = True
         file_exist = os.path.exists(path)
         if not file_exist:
@@ -35,8 +46,67 @@ class AdvancedNewFileNew(AdvancedNewFileBase, sublime_plugin.WindowCommand):
                 print("Exception: %s '%s'" % (e.strerror, e.filename))
         if attempt_open:
             file_view = self.open_file(path)
-            if not file_exist:
+            if not file_exist and apply_template:
                 file_view.settings().set("_anf_new", True)
+
+    def curly_brace_expansion(self, path):
+        if not self.curly_braces_balanced(path) or "{" not in path:
+            return [path]
+        paths = self.expand_single_curly_brace(path)
+
+        while True:
+            path_len = len(paths)
+            temp_paths = []
+            for expanded_path in paths:
+                temp_paths.append(self.expand_single_curly_brace(expanded_path))
+            paths = self.flatten_list(temp_paths)
+            if path_len == len(paths):
+                break
+
+        return self.flatten_list(paths)
+
+    def flatten_list(self, initial_list):
+        if isinstance(initial_list, list):
+            return [flattened for entry in initial_list for flattened in self.flatten_list(entry)]
+        else:
+            return [initial_list]
+
+
+    # Assumes curly braces are balanced
+    def expand_single_curly_brace(self, path):
+        if "{" not in path:
+            return [path]
+        start, end = self.curly_brace_indecies(path)
+        all_tokens = path[start + 1:end]
+        paths = []
+        for token in all_tokens.split(","):
+            temp = path[0:start] + token + path[end + 1:]
+            paths.append(temp)
+        return paths
+
+    # Assumes curly braces are balanced.
+    def curly_brace_indecies(self, path, count=0,open_index=None):
+        if len(path) == 0:
+            return None
+        c = path[0]
+        if c == "{":
+            return self.curly_brace_indecies(path[1:], count + 1, count)
+        elif c == "}":
+            return open_index, count
+        else:
+            return self.curly_brace_indecies(path[1:], count + 1, open_index)
+
+    def curly_braces_balanced(self, path, count=0):
+        if len(path) == 0 or count < 0:
+            return count == 0
+
+        c = path[0]
+        if c == "{":
+            return self.curly_braces_balanced(path[1:], count + 1)
+        elif c == "}":
+            return self.curly_braces_balanced(path[1:], count - 1)
+        else:
+            return self.curly_braces_balanced(path[1:], count)
 
     def update_status_message(self, creation_path):
         if self.view is not None:

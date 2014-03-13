@@ -120,5 +120,13 @@
     // must either be absolute, or be from the home directory of the user (`~/`). If a
     // string is used, or the list contains a single entry, it will be automatically
     // inserted into any newly created files.
-    "file_templates": {}
+    "file_templates": {},
+
+    // Setting this value to true will allow you to escape characters as you normally
+    // would when using a shell. For example, given the input string "foo\ bar", false
+    // would result in a file named " bar" in the foo directory. With the value set to
+    // true, a file named "foo bar" would be created. In addition, setting this value
+    // to true will allow for curly brace expansion. Currently, only comma separated
+    // entries are supported.
+    "shell_input": false
 }

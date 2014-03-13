@@ -160,6 +160,10 @@ Setting to control if VCS management is used when moving and removing files.
 
 An object containing information to use for templates when creating new files. The key values for this object should be a file extension. The value may either be a string of the content to be inserted or a list of paths. If a list of paths is specified, the name of the file will be displayed during selection. The paths must either be absolute, or be from the home directory of the user (`~/`). If a string is used, or the list contains a single entry, it will be automatically inserted into any newly created files.
 
+`posix_input`:
+
+Setting this value to true will allow you to escape characters as you normally would when using a shell. For example, given the input string "foo\ bar", false would result in a file named " bar" in the foo directory. With the value set to true, a file named "foo bar" would be created. In addition, setting this value to true will allow for curly brace expansion. Currently, only comma separated entries are supported.
+
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
 
