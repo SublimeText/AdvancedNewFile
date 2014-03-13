@@ -1,0 +1,6 @@
+- Miscellaneous bug fixes.
+
+Enhancements:
+- Bug fixes.
+- Add "shell_input" setting, which allows for curly brace expansion and escaping of characters, such as spaces.
+- Add "file_templates" setting. For more information on this setting, see the README.
