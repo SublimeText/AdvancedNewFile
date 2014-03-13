@@ -1,3 +1,4 @@
+import sublime
 import sublime_plugin
 import os
 import xml.etree.ElementTree as ET
@@ -72,7 +73,7 @@ class AdvancedNewFileNewEventListener(sublime_plugin.EventListener):
                         entries = list(map(self.get_basename, template))
                         self.entries = list(map(self.expand_path, template))
                         self.view = view
-                        view.window().show_quick_panel(entries, self.quick_panel_selection)
+                        sublime.set_timeout(lambda: view.window().show_quick_panel(entries, self.quick_panel_selection), 10)
                 else:
                     view.run_command("insert_snippet", {"contents": template})
             view.settings().set("_anf_new", "")
