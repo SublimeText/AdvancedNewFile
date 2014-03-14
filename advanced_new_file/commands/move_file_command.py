@@ -56,6 +56,8 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand,
 
     def entered_file_action(self, path):
         attempt_open = True
+        path = self.try_append_extension(path)
+
         directory = os.path.dirname(path)
         if not os.path.exists(directory):
             try:
@@ -68,6 +70,22 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand,
 
         if attempt_open:
             self._rename_file(path)
+
+    def is_copy_original_name(self, path):
+        return (os.path.isdir(path) or
+               os.path.basename(path) == "")
+
+    def try_append_extension(self, path):
+        if self.settings.get(APPEND_EXTENSION_ON_MOVE_SETTING, False):
+            if not self.is_copy_original_name(path):
+                _, new_path_extension = os.path.splitext(path)
+                if new_path_extension == "":
+                    if self.rename_filename is None:
+                        _, extension = os.path.splitext(self.view.file_name())
+                    else:
+                        _, extension = os.path.splitext(self.rename_filename)
+                    path += extension
+        return path
 
     def _rename_file(self, file_path):
         if os.path.isdir(file_path) or re.search(r"(/|\\)$", file_path):
@@ -113,10 +131,11 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand,
             shutil.move(from_file, to_file)
 
     def update_status_message(self, creation_path):
+        if self.is_copy_original_name(creation_path):
+            creation_path = os.path.join(creation_path, self.original_name)
+        else:
+            creation_path = self.try_append_extension(creation_path)
         if self.view is not None:
-            if (os.path.isdir(creation_path) or
-               os.path.basename(creation_path) == ""):
-                creation_path = os.path.join(creation_path, self.original_name)
             self.view.set_status("AdvancedNewFile", "Moving file to %s " %
                                  creation_path)
         else:

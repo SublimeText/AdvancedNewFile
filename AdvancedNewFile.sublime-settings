@@ -128,5 +128,8 @@
     // true, a file named "foo bar" would be created. In addition, setting this value
     // to true will allow for curly brace expansion. Currently, only comma separated
     // entries are supported.
-    "shell_input": false
+    "shell_input": false,
+
+    // Setting to control if the extension will be automatically applied to renamed files.
+    "append_extension_on_move": false
 }

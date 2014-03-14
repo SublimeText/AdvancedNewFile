@@ -164,6 +164,10 @@ An object containing information to use for templates when creating new files. T
 
 Setting this value to true will allow you to escape characters as you normally would when using a shell. For example, given the input string "foo\ bar", false would result in a file named " bar" in the foo directory. With the value set to true, a file named "foo bar" would be created. In addition, setting this value to true will allow for curly brace expansion. Currently, only comma separated entries are supported.
 
+`append_extension_on_move`:
+
+Setting to control if the extension will be automatically applied to renamed files.
+
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
 
