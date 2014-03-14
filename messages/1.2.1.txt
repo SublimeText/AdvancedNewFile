@@ -1,0 +1,3 @@
+- Fix issue with shell input breaking auto complete functionality.
+- Support template files to be specified relative to the packages directory in the form "Packages/User/sample.template"
+- Add new setting "append_extension_on_move". This setting will, when set to true, automatically append the extension of the source file when moving if one is not specified.
