@@ -5,6 +5,7 @@ import re
 import xml.etree.ElementTree as ET
 
 from .command_base import AdvancedNewFileBase
+from ..lib.package_resources import get_resource
 from ..anf_util import *
 
 
@@ -160,6 +161,10 @@ class AdvancedNewFileNewEventListener(sublime_plugin.EventListener):
         self.view.run_command("insert_snippet", {"contents": self.get_snippet_from_file(self.entries[index])})
 
     def get_snippet_from_file(self, path):
-        tree = ET.parse(os.path.expanduser(path))
+        match = re.match(r"Packages/([^/]+)/(.+)", path)
+        if match:
+            tree = ET.fromstring(get_resource(match.group(1), match.group(2)))
+        else:
+            tree = ET.parse(os.path.expanduser(path))
         content = tree.find("content")
         return content.text

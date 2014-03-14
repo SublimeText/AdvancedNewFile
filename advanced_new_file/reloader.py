@@ -25,6 +25,9 @@ mods_load_order = [
     '.anf_util',
     '.completion_base',
 
+    ".lib",
+    ".lib.package_resources",
+
     ".completions",
     '.completions.nix_completion',
     '.completions.windows_completion',
