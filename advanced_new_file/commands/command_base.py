@@ -126,7 +126,7 @@ class AdvancedNewFileBase(object):
         try:
             root, path = self.platform.split(path)
             if self.settings.get(SHELL_INPUT_SETTING, False) and len(path) > 0:
-                split_path = shlex.split(path)
+                split_path = shlex.split(str(path))
                 path = " ".join(split_path)
             # Parse if alias
             if TOP_LEVEL_SPLIT_CHAR in path and root is None:
