@@ -168,6 +168,10 @@ Setting this value to true will allow you to escape characters as you normally w
 
 Setting to control if the extension will be automatically applied to renamed files.
 
+`relative_fallback_index`:
+
+An integer value representing a folder index to be used when a relative path cannot be resolved from the current active view. If an index outside of the range  of existing folders is used, it will default to 0 (the top level folder). If no  folders exist as part of the project the home directory will be used.
+
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
 

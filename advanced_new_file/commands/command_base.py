@@ -30,10 +30,7 @@ class AdvancedNewFileBase(object):
         if path is None and folder_index is None:
             return os.path.expanduser(self.settings.get(DEFAULT_PATH_SETTING))
         elif path is None:
-            if folder_index >= 0:
-                return self.window.folders()[folder_index]
-            else:
-                return os.path.expanduser("~/")
+            return self.__project_folder_from_index(folder_index)
         return path
 
     def __generate_alias_root(self):
@@ -93,7 +90,6 @@ class AdvancedNewFileBase(object):
     def __parse_path_setting(self, setting, index_setting):
         root = None
         folder_index = None
-        num_folders = len(self.window.folders())
         if setting == "home":
             root = os.path.expanduser("~/")
         elif setting == "current":
@@ -104,21 +100,23 @@ class AdvancedNewFileBase(object):
                 root = os.path.expanduser("~/")
         elif setting == "project_folder":
             folder_index = self.settings.get(index_setting)
-            if num_folders == 0:
-                folder_index = -1
-            elif num_folders < folder_index:
-                folder_index = 0
+            folder_index = self.__validate_folder_index(folder_index)
         elif setting == "top_folder":
-            if num_folders == 0:
-                folder_index = -1
-            else:
-                folder_index = 0
+            folder_index = self.__validate_folder_index(0)
         elif setting == "path":
             pass
         else:
             print("Invalid root specifier")
 
         return (root, folder_index)
+
+    def __validate_folder_index(self, folder_index):
+        num_folders = len(self.window.folders())
+        if num_folders == 0:
+            folder_index = -1
+        elif num_folders < folder_index:
+            folder_index = 0
+        return folder_index
 
     def split_path(self, path=""):
         HOME_REGEX = r"^~[/\\]"
@@ -148,7 +146,12 @@ class AdvancedNewFileBase(object):
             elif (re.match(r"^\.{1,2}[/\\]", path) and
                   self.settings.get(RELATIVE_FROM_CURRENT_SETTING, False)):
                 path_index = 2
-                root = os.path.dirname(self.view.file_name())
+                if self.view.file_name() is not None:
+                    root = os.path.dirname(self.view.file_name())
+                else:
+                    folder_index = self.settings.get(RELATIVE_FALLBACK_INDEX_SETTING, 0)
+                    folder_index = self.__validate_folder_index(folder_index)
+                    root = self.__project_folder_from_index(folder_index)
                 if re.match(r"^\.{2}[/\\]", path):
                     root = os.path.dirname(root)
                     path_index = 3
@@ -161,6 +164,12 @@ class AdvancedNewFileBase(object):
             root = os.path.expanduser("~")
 
         return root, path
+
+    def __project_folder_from_index(self, folder_index):
+        if folder_index >= 0:
+            return self.window.folders()[folder_index]
+        else:
+            return os.path.expanduser("~/")
 
     def bash_expansion(self, path):
         if len(path) == 0:

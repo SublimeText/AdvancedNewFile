@@ -132,5 +132,11 @@
     "shell_input": false,
 
     // Setting to control if the extension will be automatically applied to renamed files.
-    "append_extension_on_move": false
+    "append_extension_on_move": false,
+
+    // An integer value representing a folder index to be used when a relative path
+    // cannot be resolved from the current active view. If an index outside of the range
+    // of existing folders is used, it will default to 0 (the top level folder). If no
+    // folders exist as part of the project the home directory will be used.
+    "relative_fallback_index": 0
 }
