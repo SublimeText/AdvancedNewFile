@@ -45,7 +45,7 @@ class AdvancedNewFileNew(AdvancedNewFileBase, sublime_plugin.WindowCommand):
                 sublime.error_message("Cannot create '" + path +
                                       "'. See console for details")
                 print("Exception: %s '%s'" % (e.strerror, e.filename))
-        if attempt_open:
+        if attempt_open and os.path.isfile(path):
             file_view = self.open_file(path)
             if not file_exist and apply_template:
                 file_view.settings().set("_anf_new", True)
