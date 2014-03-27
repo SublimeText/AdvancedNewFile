@@ -106,8 +106,9 @@
     // e.g. "777" -> RWX for user, group, and other.
     "file_permissions": "",
 
-    // Default input for renaming a file. Special value <current> will be replaced
-    // with the current file name.
+    // Default input for renaming a file. Special value <filename> will be replaced
+    // with the current file name. Special value <filepath> will be replaced with
+    // the complete filepath (i.e. it already includes the filename).
     "rename_default": "",
 
     // Setting to control if VCS management is used when moving and removing files.
