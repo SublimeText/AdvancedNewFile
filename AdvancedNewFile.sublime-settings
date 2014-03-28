@@ -114,13 +114,14 @@
     "vcs_management": false,
 
     // An object containing information to use for templates when creating new files.
-    // The key values for this object should be a file extension. The value may either
-    // be a string of the content to be inserted or a list of paths. If a list of paths
-    // is specified, the name of the file will be displayed during selection. The paths
-    // must either be absolute, from the home directory of the user (`~/`), or relative
-    // to the Packages directory. These relative files should have the form
-    // "Packages/User/mytest.sublime-snippet". If a string is used, or the list contains
-    // a single entry, it will be automatically inserted into any newly created files.
+    // The key values for this object should be a file extension. Files without extensions
+    // such as "Makefile" or ".bash_profile" use the full file name as the key.
+    // The value may either be a string of the content to be inserted or a list of paths.
+    // If a list of paths is specified, the name of the file will be displayed during
+    // selection. The paths must either be absolute, from the home directory of the
+    // user (`~/`), or relative to the Packages directory. These relative files should have
+    // the form "Packages/User/mytest.sublime-snippet". If a string is used, or the list
+    // contains a single entry, it will be automatically inserted into any newly created files.
     "file_templates": {},
 
     // Setting this value to true will allow you to escape characters as you normally

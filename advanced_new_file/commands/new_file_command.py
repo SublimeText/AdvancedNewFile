@@ -132,8 +132,15 @@ class AdvancedNewFileNewAtCommand(sublime_plugin.WindowCommand):
 class AdvancedNewFileNewEventListener(sublime_plugin.EventListener):
     def on_load(self, view):
         if view.settings().get("_anf_new", False):
-            _, extension = os.path.splitext(view.file_name())
-            extension = extension[1:]
+            absolute_file_path = view.file_name()
+            if absolute_file_path is None:
+                return
+            file_name = self.get_basename(absolute_file_path)
+            _, full_extension = os.path.splitext(file_name)
+            if len(full_extension) == 0:
+                extension = file_name
+            else:
+                extension = full_extension[1:]
             settings = get_settings(view)
             if extension in settings.get(FILE_TEMPLATES_SETTING):
                 template = settings.get(FILE_TEMPLATES_SETTING)[extension]
