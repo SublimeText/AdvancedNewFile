@@ -108,7 +108,10 @@
 
     // Default input for renaming a file. Special value <filename> will be replaced
     // with the current file name. Special value <filepath> will be replaced with
-    // the complete filepath (i.e. it already includes the filename).
+    // the complete filepath, including the filename. Special value <filedirectory>
+    // will be replaced with the filepath, not including the filename. Note that a
+    // colon as the default will resolve to the same path as <filedirectory>, if the
+    // file exists on disk.
     "rename_default": "",
 
     // Setting to control if VCS management is used when moving and removing files.

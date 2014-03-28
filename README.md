@@ -150,7 +150,7 @@ String representing permissions to be applied to newly created files. E.g. "777"
 
 `rename_default`:
 
-Default input for renaming a file. Special value `<filename>` will be replaced with the current file name. Special value `<filepath>` will be replaced with the absolute path of the current file.
+Default input for renaming a file. Special value `<filename>` will be replaced with the current file name. Special value `<filepath>` will be replaced with the complete filepath, including the filename. Special value `<filedirectory>` will be replaced with the filepath, not including the filename. Note that a colon as the default will resolve to the same path as `<filedirectory>`, if the file exists on disk.
 
 `vcs_management`:
 
