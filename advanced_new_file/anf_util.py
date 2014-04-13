@@ -74,7 +74,14 @@ IS_X64 = sublime.arch() == "x64"
 def generate_creation_path(settings, base, path, append_extension=False):
         if PLATFORM == "windows":
             if not re.match(WIN_ROOT_REGEX, base):
-                return base + TOP_LEVEL_SPLIT_CHAR + path
+                if IS_ST3:
+                    drive, _ = os.path.splitdrive(base)
+                else:
+                    drive, _ = os.path.splitunc(base)
+                if len(drive) == 0:
+                    return base + TOP_LEVEL_SPLIT_CHAR + path
+                else:
+                    return os.path.join(base, path)
         else:
             if not re.match(NIX_ROOT_REGEX, base):
                 return base + TOP_LEVEL_SPLIT_CHAR + path
