@@ -62,8 +62,6 @@ class DuplicateFileBase(AdvancedNewFileBase, sublime_plugin.WindowCommand):
 
     def try_append_extension(self, path):
         append_setting = self.get_append_extension_setting()
-        print(append_setting)
-        print(self.settings.get(append_setting))
         if self.settings.get(append_setting, False):
             if not self.is_copy_original_name(path):
                 _, new_path_extension = os.path.splitext(path)

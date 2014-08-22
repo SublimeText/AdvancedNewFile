@@ -34,8 +34,9 @@ class AdvancedNewFileCopy(DuplicateFileBase):
                 print("Exception: %s '%s'" % (e.strerror, e.filename))
 
         if attempt_copy:
-            if self._copy_file(path):
-                self.open_file(path)
+            copy_success, new_file = self._copy_file(path)
+            if copy_success:
+                self.open_file(new_file)
 
     def _copy_file(self, path):
         if os.path.isdir(path) or re.search(r"(/|\\)$", path):
@@ -52,7 +53,7 @@ class AdvancedNewFileCopy(DuplicateFileBase):
             copied = False
             sublime.error_message("Unable to copy file. No source file to move")
 
-        return copied
+        return (copied, path)
 
     def copy_from_view(self, source_view, target):
         source = source_view.file_name()

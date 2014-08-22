@@ -84,10 +84,11 @@ class AdvancedNewFileMove(DuplicateFileBase, GitCommandBase):
         self.open_file(target)
 
     def move_file_from_disk(self, source, target):
+        window = self.window
         self.view.run_command("save")
         window.focus_view(self.view)
         window.run_command("close")
-        self._move_action(filename, file_path)
+        self._move_action(source, target)
 
     def move_file_from_buffer(self, source_view, target):
         window = self.window
