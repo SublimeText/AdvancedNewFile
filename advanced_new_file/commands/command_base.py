@@ -93,10 +93,11 @@ class AdvancedNewFileBase(object):
         if setting == "home":
             root = os.path.expanduser("~/")
         elif setting == "current":
-            filename = self.view.file_name()
-            if filename is not None:
-                root = os.path.dirname(filename)
-            else:
+            if self.view is not None:
+                filename = self.view.file_name()
+                if filename is not None:
+                    root = os.path.dirname(filename)
+            if root is None:
                 root = os.path.expanduser("~/")
         elif setting == "project_folder":
             folder_index = self.settings.get(index_setting)
