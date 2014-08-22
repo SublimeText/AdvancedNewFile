@@ -1,0 +1,2 @@
+- Add new command `advanced_new_file_copy` to copy commands. See the wiki for more details about the command.
+- General bug fixes.

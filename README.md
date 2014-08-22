@@ -27,6 +27,8 @@ or
 * Windows: %APPDATA%/Roaming/Sublime Text 3/Packages/
 * Linux: ~/.config/sublime-text-3/Packages/
 
+Depending on your install on windows, the ST packages path may be `%APPDATA%/Sublime Text 2/...`
+
 ## Usage
 Simply bring up the AdvancedNewFile input through the appropriate [key binding](https://github.com/skuroda/Sublime-AdvancedNewFile). Then, enter the path, along with the file name into the input field. Upon pressing enter, the file will be created. In addition, if the directories specified do not yet exists, they will also be created. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage). By default, the path to the file being created will be filled shown in the status bar as you enter the path information.
 
