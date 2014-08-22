@@ -3,46 +3,20 @@ import re
 import shutil
 import sublime_plugin
 
-from ..vcs.git.git_command_base import GitCommandBase
-from .command_base import AdvancedNewFileBase
+from .duplicate_file_base import DuplicateFileBase
 from ..anf_util import *
+from ..vcs.git.git_command_base import GitCommandBase
 
 
-class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand,
-                          GitCommandBase):
+class AdvancedNewFileMove(DuplicateFileBase, GitCommandBase):
     def __init__(self, window):
         super(AdvancedNewFileMove, self).__init__(window)
 
-    def run(self, is_python=False, initial_path=None, rename_file=None):
-        self.is_python = is_python
-        self.run_setup()
-        self.rename_filename = rename_file
-
-        path = self.settings.get(RENAME_DEFAULT_SETTING)
-        current_file = self.view.file_name()
-        if current_file:
-            directory, current_file_name = os.path.split(current_file)
-            path = path.replace("<filepath>", current_file)
-            path = path.replace("<filedirectory>", directory + os.sep)
-        else:
-            current_file_name = ""
-
-        path = path.replace("<filename>", current_file_name)
-        self.show_filename_input(
-            path if len(path) > 0 else self.generate_initial_path())
+    def get_default_setting(self):
+        return RENAME_DEFAULT_SETTING
 
     def input_panel_caption(self):
         caption = 'Enter a new path for current file'
-        view = self.window.active_view()
-        self.original_name = None
-        if view is not None:
-            view_file_name = view.file_name()
-            if view_file_name:
-                self.original_name = os.path.basename(view_file_name)
-
-        if self.original_name is None:
-            self.original_name = ""
-
         if self.is_python:
             caption = '%s (creates __init__.py in new dirs)' % caption
         return caption
@@ -72,21 +46,8 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand,
         if attempt_open:
             self._rename_file(path)
 
-    def is_copy_original_name(self, path):
-        return (os.path.isdir(path) or
-               os.path.basename(path) == "")
-
-    def try_append_extension(self, path):
-        if self.settings.get(APPEND_EXTENSION_ON_MOVE_SETTING, False):
-            if not self.is_copy_original_name(path):
-                _, new_path_extension = os.path.splitext(path)
-                if new_path_extension == "":
-                    if self.rename_filename is None:
-                        _, extension = os.path.splitext(self.view.file_name())
-                    else:
-                        _, extension = os.path.splitext(self.rename_filename)
-                    path += extension
-        return path
+    def get_append_extension_setting(self):
+        return APPEND_EXTENSION_ON_MOVE_SETTING
 
     def _rename_file(self, file_path):
         if os.path.isdir(file_path) or re.search(r"(/|\\)$", file_path):
@@ -94,14 +55,15 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand,
             file_path = os.path.join(file_path, self.original_name)
 
         window = self.window
-        if self.rename_filename:
-            file_view = self._find_open_file(self.rename_filename)
+        rename_filename = self.get_argument_name()
+        if rename_filename:
+            file_view = self._find_open_file(rename_filename)
             if file_view is not None:
                 self.view.run_command("save")
                 window.focus_view(file_view)
                 window.run_command("close")
 
-            self._move_action(self.rename_filename, file_path)
+            self._move_action(rename_filename, file_path)
 
             if file_view is not None:
                 self.open_file(file_path)
@@ -131,16 +93,8 @@ class AdvancedNewFileMove(AdvancedNewFileBase, sublime_plugin.WindowCommand,
         else:
             shutil.move(from_file, to_file)
 
-    def update_status_message(self, creation_path):
-        if self.is_copy_original_name(creation_path):
-            creation_path = os.path.join(creation_path, self.original_name)
-        else:
-            creation_path = self.try_append_extension(creation_path)
-        if self.view is not None:
-            self.view.set_status("AdvancedNewFile", "Moving file to %s " %
-                                 creation_path)
-        else:
-            sublime.status_message("Moving file to %s" % creation_path)
+    def get_status_prefix(self):
+        return "Moving file to"
 
 
 class AdvancedNewFileMoveAtCommand(sublime_plugin.WindowCommand):

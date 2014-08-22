@@ -42,10 +42,12 @@ mods_load_order = [
 
     ".commands",
     ".commands.command_base",
+    ".commands.duplicate_file_base",
     ".commands.helper_commands",
     '.commands.new_file_command',
     ".commands.move_file_command",
-    ".commands.delete_file_command"
+    ".commands.delete_file_command",
+    ".commands.copy_file_command"
 ]
 
 for suffix in mods_load_order:

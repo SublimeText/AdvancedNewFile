@@ -231,8 +231,9 @@ class AdvancedNewFileBase(object):
         return ""
 
     def show_filename_input(self, initial):
+        caption = self.input_panel_caption()
         self.input_panel_view = self.window.show_input_panel(
-            self.input_panel_caption(), initial,
+            caption, initial,
             self.on_done, self.__update_filename_input, self.clear
         )
 

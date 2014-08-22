@@ -143,5 +143,11 @@
     // cannot be resolved from the current active view. If an index outside of the range
     // of existing folders is used, it will default to 0 (the top level folder). If no
     // folders exist as part of the project the home directory will be used.
-    "relative_fallback_index": 0
+    "relative_fallback_index": 0,
+
+    // Setting to control if the extension will be automatically applied to renamed files.
+    "append_extension_on_copy": true,
+
+    // Same as `rename_default`, but applied to copy command.
+    "copy_default": ""
 }
