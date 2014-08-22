@@ -57,34 +57,46 @@ class AdvancedNewFileMove(DuplicateFileBase, GitCommandBase):
         window = self.window
         rename_filename = self.get_argument_name()
         if rename_filename:
-            file_view = self._find_open_file(rename_filename)
-            if file_view is not None:
-                self.view.run_command("save")
-                window.focus_view(file_view)
-                window.run_command("close")
-
-            self._move_action(rename_filename, file_path)
-
-            if file_view is not None:
-                self.open_file(file_path)
-
-        elif self.view is not None and self.view.file_name() is not None:
-            filename = self.view.file_name()
-            if filename:
-                self.view.run_command("save")
-                window.focus_view(self.view)
-                window.run_command("close")
-                self._move_action(filename, file_path)
-            else:
-                content = self.view.substr(sublime.Region(0, self.view.size()))
-                self.view.set_scratch(True)
-                window.focus_view(self.view)
-                window.run_command("close")
-                with open(file_path, "w") as file_obj:
-                    file_obj.write(content)
-            self.open_file(file_path)
+            self.move_from_argument(rename_filename, file_path)
+        elif self.view is not None:
+            self.move_from_view(self.view, file_path)
         else:
             sublime.error_message("Unable to move file. No file to move.")
+
+    def move_from_argument(self, source, target):
+        file_view = self._find_open_file(source)
+        if file_view is not None:
+            self.view.run_command("save")
+            window.focus_view(file_view)
+            window.run_command("close")
+
+        self._move_action(source, target)
+
+        if file_view is not None:
+            self.open_file(target)
+
+    def move_from_view(self, source_view, target):
+        source = source_view.file_name()
+        if source is None:
+            self.move_file_from_buffer(source_view, target)
+        else:
+            self.move_file_from_disk(source, target)
+        self.open_file(target)
+
+    def move_file_from_disk(self, source, target):
+        self.view.run_command("save")
+        window.focus_view(self.view)
+        window.run_command("close")
+        self._move_action(filename, file_path)
+
+    def move_file_from_buffer(self, source_view, target):
+        window = self.window
+        content = self.view.substr(sublime.Region(0, self.view.size()))
+        self.view.set_scratch(True)
+        window.focus_view(self.view)
+        window.run_command("close")
+        with open(target, "w") as file_obj:
+            file_obj.write(content)
 
     def _move_action(self, from_file, to_file):
         tracked_by_git = self.file_tracked_by_git(from_file)

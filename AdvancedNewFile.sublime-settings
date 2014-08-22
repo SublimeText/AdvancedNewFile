@@ -145,7 +145,7 @@
     // folders exist as part of the project the home directory will be used.
     "relative_fallback_index": 0,
 
-    // Setting to control if the extension will be automatically applied to renamed files.
+    // Setting to control if the extension will be automatically applied to copied files.
     "append_extension_on_copy": true,
 
     // Same as `rename_default`, but applied to copy command.
