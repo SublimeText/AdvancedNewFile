@@ -182,6 +182,9 @@ Setting to control if the extension will be automatically applied to copied file
 
 Same as `rename_default`, applied to copy command.
 
+`cut_to_file_default`:
+
+Same as `rename_default`, applied to cut to file command.
 
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.

@@ -16,15 +16,8 @@ class DuplicateFileBase(AdvancedNewFileBase, sublime_plugin.WindowCommand):
         self.argument_name = rename_file
 
         path = self.settings.get(self.get_default_setting(), "")
-        current_file = self.view.file_name()
-        if current_file:
-            directory, current_file_name = os.path.split(current_file)
-            path = path.replace("<filepath>", current_file)
-            path = path.replace("<filedirectory>", directory + os.sep)
-        else:
-            current_file_name = ""
+        path = self._expand_default_path(path)
 
-        path = path.replace("<filename>", current_file_name)
         self.duplicate_setup()
         self.show_filename_input(
             path if len(path) > 0 else self.generate_initial_path())

@@ -20,3 +20,12 @@ class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
             args["is_python"] = is_python
             args["initial_path"] = initial_path
             self.window.run_command("advanced_new_file_new", args)
+
+
+class AnfRemoveRegionContentAndRegionCommand(sublime_plugin.TextCommand):
+    def run(self, edit, region_key):
+        regions = self.view.get_regions(region_key)
+        for region in regions:
+            self.view.erase(edit, region)
+        self.view.erase_regions(region_key)
+

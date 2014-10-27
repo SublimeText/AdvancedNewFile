@@ -379,6 +379,18 @@ class AdvancedNewFileBase(object):
 
         return path
 
+    def _expand_default_path(self, path):
+        current_file = self.view.file_name()
+        if current_file:
+            directory, current_file_name = os.path.split(current_file)
+            path = path.replace("<filepath>", current_file)
+            path = path.replace("<filedirectory>", directory + os.sep)
+        else:
+            current_file_name = ""
+
+        path = path.replace("<filename>", current_file_name)
+        return path
+
     def _find_open_file(self, file_name):
         window = self.window
         if IS_ST3:
