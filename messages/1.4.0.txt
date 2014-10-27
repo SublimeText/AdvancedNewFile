@@ -1,0 +1,1 @@
+- Add new command `advanced_new_file_cut_to_file` to cut highlighted region to a new file. See the wiki for more details on the command.
