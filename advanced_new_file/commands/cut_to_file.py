@@ -13,7 +13,10 @@ class AdvancedNewFileCutToFile(AdvancedNewFileBase, sublime_plugin.WindowCommand
     def run(self, is_python=False):
         self.is_python = is_python
         self.run_setup()
-        self.view.add_regions(REGION_KEY, self.view.sel(), flags=sublime.HIDDEN)
+        cursors = []
+        for cursor in self.view.sel():
+            cursors.append(cursor)
+        self.view.add_regions(REGION_KEY, cursors, "")
 
         path = self.settings.get(CUT_TO_FILE_DEFAULT_SETTING, "")
         path = self._expand_default_path(path)
