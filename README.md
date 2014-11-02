@@ -253,6 +253,9 @@ To specify the current working directory, simply type a colon, without any prece
 ## Notes
 Thanks to Dima Kukushkin ([xobb1t](https://github.com/xobb1t)) for the original work on this plugin. Also, thank you to [facelessuser](https://github.com/facelessuser), and by extension biermeester and matthjes for the idea of platform specific settings. Additional thanks to [kemayo](https://github.com/kemayo) for the work in identifying git executable.
 
+### Libraries Used
+* [ushlex](https://bitbucket.org/mixmastamyk/ushlex) - Improved version of shlex, supporting unicode characters for Python 2.
+
 ### Contributors
 * [alirezadot](https://github.com/alirezadot)
 * [aventurella](https://github.com/aventurella)
