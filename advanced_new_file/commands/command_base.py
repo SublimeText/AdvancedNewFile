@@ -46,6 +46,7 @@ class AdvancedNewFileBase(object):
         return path
 
     def generate_initial_path(self, initial_path=None):
+        path = None
         # Search for initial string
         if initial_path is not None:
             path = initial_path
@@ -54,7 +55,8 @@ class AdvancedNewFileBase(object):
                 cursor_text = self.get_cursor_path()
                 if cursor_text != "":
                     path = cursor_text
-            else:
+
+            if path is None:
                 path = self.settings.get(DEFAULT_INITIAL_SETTING)
 
         return path
@@ -125,7 +127,7 @@ class AdvancedNewFileBase(object):
         try:
             root, path = self.platform.split(path)
             if self.settings.get(SHELL_INPUT_SETTING, False) and len(path) > 0:
-                split_path = shlex.split(str(path))
+                split_path = shlex.split(path)
                 path = " ".join(split_path)
             # Parse if alias
             if TOP_LEVEL_SPLIT_CHAR in path and root is None:
