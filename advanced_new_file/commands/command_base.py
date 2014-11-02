@@ -138,7 +138,7 @@ class AdvancedNewFileBase(object):
         # Don't really like this....
         try:
             string.decode("ascii")
-        except UnicodeEncodeError, e:
+        except UnicodeEncodeError:
             return True
         return False
 
