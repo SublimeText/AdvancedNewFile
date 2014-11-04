@@ -11,7 +11,11 @@ from ..completions.nix_completion import NixCompletion
 from ..completions.windows_completion import WindowsCompletion
 
 if not IS_ST3:
+    if PLATFORM == "windows":
+        import sys
+        sys.path.append(os.path.dirname(sys.executable))
     from ..lib.ushlex import split as st2_shlex_split
+
 
 VIEW_NAME = "AdvancedNewFileCreation"
 
