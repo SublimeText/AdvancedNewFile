@@ -190,6 +190,10 @@ Same as `rename_default`, applied to cut to file command.
 
 If default_root is set to current, the project folder should be used as the default rather than the home directory.
 
+`warn_overwrite_on_move`:
+
+If a warning should be displayed when trying to overwrite an existing file using the move command.
+
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
 

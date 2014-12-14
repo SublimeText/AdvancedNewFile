@@ -156,5 +156,9 @@
 
     // If default_root is set to current, the project folder should be used as the default
     // rather than the home directory.
-    "current_fallback_to_project": false
+    "current_fallback_to_project": false,
+
+    // If a warning should be displayed when trying to overwrite an existing file using
+    // the move command.
+    "warn_overwrite_on_move": false
 }
