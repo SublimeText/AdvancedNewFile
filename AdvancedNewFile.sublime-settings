@@ -152,5 +152,9 @@
     "copy_default": "",
 
     // Same as `rename_default`, but applied to cut to default command.
-    "cut_to_file_default": ""
+    "cut_to_file_default": "",
+
+    // If default_root is set to current, the project folder should be used as the default
+    // rather than the home directory.
+    "current_fallback_to_project": false
 }

@@ -106,7 +106,12 @@ class AdvancedNewFileBase(object):
                 if filename is not None:
                     root = os.path.dirname(filename)
             if root is None:
-                root = os.path.expanduser("~/")
+                if self.settings.get(CURRENT_FALLBACK_TO_PROJECT_SETTING, False):
+                    folder_index = self.__validate_folder_index(0)
+                    if folder_index == -1:
+                        root = os.path.expanduser("~/")
+                else:
+                    root = os.path.expanduser("~/")
         elif setting == "project_folder":
             folder_index = self.settings.get(index_setting)
             folder_index = self.__validate_folder_index(folder_index)
