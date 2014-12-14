@@ -1,0 +1,8 @@
+Version 1.5.0
+
+- Add option to prompt when overrwriting an existing file on move. Default value is false. To toggle this setting, add "warn_overwrite_on_move" to your user settings.
+- Add optoin to fallback to project folder when current cannot be resolved as default path. Default value is false. To toggle this setting, add "current_fallback_to_project" to your user settings.
+
+Thank you for using AdvancedNewFile. If you notice any bugs, please report them on https://github.com/skuroda/Sublime-AdvancedNewFile/issues.
+
+This update requires a restart of Sublime Text.
