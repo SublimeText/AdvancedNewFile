@@ -1,0 +1,7 @@
+- Add setting "new_file_default_root" to set the default root for new file commands. Default value is "default_root".
+- Add setting "rename_file_default_root" to set the default root for rename file commands. Default value is "default_root". Recommended value is "current"
+- Add setting "copy_file_default_root" to set the default root for copy file commands. Default value is "default_root". Recommended value is "current"
+
+Note that after an update occurs, you will need to restart ST. This is due to how plugins are reloaded in ST.
+
+Thank you for using AdvancedNewFile. Please report any issues to https://github.com/skuroda/Sublime-AdvancedNewFile/issues
