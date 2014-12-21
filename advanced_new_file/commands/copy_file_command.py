@@ -86,6 +86,9 @@ class AdvancedNewFileCopy(DuplicateFileBase):
     def get_append_extension_setting(self):
         return APPEND_EXTENSION_ON_COPY_SETTING
 
+    def get_default_root_setting(self):
+        return COPY_FILE_DEFAULT_ROOT_SETTING
+
 
 class AdvancedNewFileCopyAtCommand(sublime_plugin.WindowCommand):
     def run(self, files):

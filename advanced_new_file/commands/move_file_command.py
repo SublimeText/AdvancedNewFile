@@ -120,6 +120,9 @@ class AdvancedNewFileMove(DuplicateFileBase, GitCommandBase):
     def get_status_prefix(self):
         return "Moving file to"
 
+    def get_default_root_setting(self):
+        return RENAME_FILE_DEFAULT_ROOT_SETTING
+
 
 class AdvancedNewFileMoveAtCommand(sublime_plugin.WindowCommand):
     def run(self, files):

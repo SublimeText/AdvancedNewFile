@@ -30,7 +30,7 @@ class AdvancedNewFileBase(object):
             self.platform = NixPlatform()
 
     def __generate_default_root(self):
-        root_setting = self.settings.get(DEFAULT_ROOT_SETTING)
+        root_setting = self._get_default_root()
         path, folder_index = self.__parse_path_setting(
             root_setting, DEFAULT_FOLDER_INDEX_SETTING)
         if path is None and folder_index is None:
@@ -432,6 +432,17 @@ class AdvancedNewFileBase(object):
                 if view_name != "" and view_name == file_name:
                     return view
         return None
+
+    ## Should be overridden by sub class
+    def get_default_root_setting(self):
+        return DEFAULT_ROOT_SETTING
+
+    def _get_default_root(self):
+        root_setting_value = self.get_default_root_setting()
+        root_setting = self.settings.get(root_setting_value)
+        if root_setting == DEFAULT_ROOT_SETTING:
+            return self.settings.get(DEFAULT_ROOT_SETTING)
+        return root_setting
 
 def test_split(s, comments=False, posix=True):
     is_str = False
