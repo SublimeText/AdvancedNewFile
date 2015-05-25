@@ -304,6 +304,8 @@ class AdvancedNewFileBase(object):
     def on_done(self, input_string):
         if len(input_string) != 0:
             self.entered_filename(input_string)
+        else:
+            self.window.new_file()
 
         self.clear()
         self.refresh_sidebar()
