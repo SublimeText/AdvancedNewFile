@@ -1,0 +1,3 @@
+* New setting "empty_filename_action". With no input specified, an unnamed new file will be created when executing the new file command. Default value is false.
+
+Thanks for using AdvancedNewFile.
