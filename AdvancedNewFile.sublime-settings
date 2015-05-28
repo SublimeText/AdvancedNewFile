@@ -172,5 +172,9 @@
 
     // Same as `default_root` for copy file commands. In addition to the valid values listed
     // for `default_root`, "default_root" will use the value for that setting.
-    "copy_file_default_root": "default_root"
+    "copy_file_default_root": "default_root",
+
+    // On empty input of file name, execute an alternative action.
+    // Currently only implemented for the new file command, which will open a new unnamed file.
+    "empty_filename_action": false
 }

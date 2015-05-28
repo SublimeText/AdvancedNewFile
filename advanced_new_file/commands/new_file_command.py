@@ -119,6 +119,9 @@ class AdvancedNewFileNew(AdvancedNewFileBase, sublime_plugin.WindowCommand):
     def get_default_root_setting(self):
         return NEW_FILE_DEFAULT_ROOT_SETTING
 
+    def empty_file_action(self):
+        self.window.new_file()
+
 
 class AdvancedNewFileNewAtCommand(sublime_plugin.WindowCommand):
     def run(self, dirs):

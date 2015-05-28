@@ -203,6 +203,9 @@ Same as `default_root` for rename file commands. In addition to the valid values
 `copy_file_default_root`:
 Same as `default_root` for copy file commands. In addition to the valid values listed for `default_root`, "default_root" will use the value for that setting.
 
+`empty_filename_action`:
+On empty input of file name, execute an alternative action. Currently only implemented for the new file command, which will open a new unnamed file. Default value is `false`
+
 ### Project Specific Settings
 All of the above settings can also be specified as part of the project specific settings. These values override any previous values set by higher level settings, with aliases being an exception. Alias settings will be merged with higher level configurations for alias. In addition, if the same alias exist for both default/user settings and project settings, the project setting will take precedence.
 

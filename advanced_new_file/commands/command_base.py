@@ -301,11 +301,14 @@ class AdvancedNewFileBase(object):
     def entered_file_action(self, path):
         pass
 
+    def empty_file_action(self):
+        pass
+
     def on_done(self, input_string):
         if len(input_string) != 0:
             self.entered_filename(input_string)
-        else:
-            self.window.new_file()
+        elif self.settings.get(DEFAULT_NEW_FILE, False):
+            self.empty_file_action()
 
         self.clear()
         self.refresh_sidebar()
