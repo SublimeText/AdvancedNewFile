@@ -1,0 +1,4 @@
+* New command `AdvancedNewFileNewAtFileCommand`. This command can be mapped to in "Side Bar.sublime-menu" to allow right clicking on files offer to create a new file from that directory, with the specified file as input.
+* New property `cursor_before_extension` that will place the cursor before the last occurring dot when an initial input is specified. Default value is false.
+
+Thank you for using AdvancedNewFile.

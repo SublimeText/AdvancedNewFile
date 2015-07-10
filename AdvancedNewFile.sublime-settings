@@ -176,5 +176,8 @@
 
     // On empty input of file name, execute an alternative action.
     // Currently only implemented for the new file command, which will open a new unnamed file.
-    "empty_filename_action": false
+    "empty_filename_action": false,
+
+    // When specifying initial input, this boolean will place the cursor prior to the .<content>
+    "cursor_before_extension": false
 }

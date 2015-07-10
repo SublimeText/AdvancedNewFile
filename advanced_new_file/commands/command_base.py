@@ -2,6 +2,7 @@ import errno
 import os
 import re
 import sublime
+import sublime_plugin
 import shlex
 
 from ..anf_util import *
@@ -18,6 +19,7 @@ if not IS_ST3:
 
 
 VIEW_NAME = "AdvancedNewFileCreation"
+
 
 class AdvancedNewFileBase(object):
 
@@ -181,7 +183,8 @@ class AdvancedNewFileBase(object):
                 if self.view.file_name() is not None:
                     root = os.path.dirname(self.view.file_name())
                 else:
-                    folder_index = self.settings.get(RELATIVE_FALLBACK_INDEX_SETTING, 0)
+                    folder_index = self.settings.get(
+                        RELATIVE_FALLBACK_INDEX_SETTING, 0)
                     folder_index = self.__validate_folder_index(folder_index)
                     root = self.__project_folder_from_index(folder_index)
                 if re.match(r"^\.{2}[/\\]", path):
@@ -264,6 +267,7 @@ class AdvancedNewFileBase(object):
 
     def show_filename_input(self, initial):
         caption = self.input_panel_caption()
+
         self.input_panel_view = self.window.show_input_panel(
             caption, initial,
             self.on_done, self.__update_filename_input, self.clear
@@ -275,6 +279,8 @@ class AdvancedNewFileBase(object):
         self.input_panel_view.settings().set("tab_completion", False)
         self.input_panel_view.settings().set("translate_tabs_to_spaces", False)
         self.input_panel_view.settings().set("anf_panel", True)
+        if self.settings.get(CURSOR_BEFORE_EXTENSION_SETTING):
+            self.__place_cursor_before_extension(self.input_panel_view)
 
     def __update_filename_input(self, path_in):
         new_content = path_in
@@ -449,16 +455,14 @@ class AdvancedNewFileBase(object):
             return self.settings.get(DEFAULT_ROOT_SETTING)
         return root_setting
 
-def test_split(s, comments=False, posix=True):
-    is_str = False
-    if type(s) is str:
-        s = unicode(s)
-        is_str = True
-    lex = shlex(s, posix=posix)
-    lex.whitespace_split = True
-    if not comments:
-        lex.commenters = ''
-    if is_str:
-        return [ str(x) for x in list(lex) ]
-    else:
-        return list(lex)
+    def __place_cursor_before_extension(self, view):
+        if view.settings().get("anf_panel", False):
+            cursors = view.sel()
+            cursor = cursors[0]
+            line_region = view.line(cursor)
+            content = view.substr(line_region)
+            matcher = re.match(r"(.+)\..+", content)
+            if matcher:
+                initial_position = len(matcher.group(1))
+                cursors.clear()
+                cursors.add(sublime.Region(initial_position, initial_position))

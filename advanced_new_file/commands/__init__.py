@@ -1,5 +1,5 @@
 from .helper_commands import AnfReplaceCommand, AdvancedNewFileCommand, AnfRemoveRegionContentAndRegionCommand
-from .new_file_command import AdvancedNewFileNew, AdvancedNewFileNewAtCommand, AdvancedNewFileNewEventListener
+from .new_file_command import AdvancedNewFileNew, AdvancedNewFileNewAtCommand, AdvancedNewFileNewAtFileCommand, AdvancedNewFileNewEventListener
 from .delete_file_command import AdvancedNewFileDelete
 from .cut_to_file import AdvancedNewFileCutToFile
 from .move_file_command import AdvancedNewFileMove, AdvancedNewFileMoveAtCommand
@@ -10,6 +10,7 @@ __all__ = [
     "AdvancedNewFileCommand",
     "AdvancedNewFileNew",
     "AdvancedNewFileNewAtCommand",
+    "AdvancedNewFileNewAtFileCommand",
     "AdvancedNewFileNewEventListener",
     "AdvancedNewFileMove",
     "AdvancedNewFileMoveAtCommand",
