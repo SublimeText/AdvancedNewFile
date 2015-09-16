@@ -12,7 +12,7 @@ Note with either method, you may need to restart Sublime Text 2 for the plugin t
 Installation through [package control](http://wbond.net/sublime_packages/package_control) is recommended. It will handle updating your packages as they become available. To install, do the following.
 
 * In the Command Palette, enter `Package Control: Install Package`
-* Search for `AdvancedNewFile`
+* Search for `ANF` to see the list of available commands
 
 ### Manual
 Clone or copy this repository into the packages directory. You will need to rename the folder to `AdvancedNewFile` if using this method. By default, the Package directory is located at:
