@@ -30,7 +30,7 @@ or
 Depending on your install on windows, the ST packages path may be `%APPDATA%/Sublime Text 2/...`
 
 ## Usage
-Simply bring up the AdvancedNewFile input through the appropriate [key binding](https://github.com/skuroda/Sublime-AdvancedNewFile). Then, enter the path, along with the file name into the input field. Upon pressing enter, the file will be created. In addition, if the directories specified do not yet exists, they will also be created. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage). By default, the path to the file being created will be filled shown in the status bar as you enter the path information.
+Simply bring up the AdvancedNewFile input through the appropriate [key binding](https://github.com/skuroda/Sublime-AdvancedNewFile). Then, enter the path, along with the file name into the input field. Upon pressing enter, the file will be created. In addition, if the directories specified do not yet exists, they will also be created. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage). By default, the path to the file being created will be shown in the status bar as you enter the path information.
 
 **Default directory:**
 The default directory is specified by the `default_root` setting. By default, it will be the top directory of the folders listed in the window. If this cannot be resolved, the home directory will be used. See [Settings](https://github.com/skuroda/Sublime-AdvancedNewFile#settings) (`default_root`) for more information.
