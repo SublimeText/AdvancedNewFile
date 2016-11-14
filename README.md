@@ -18,13 +18,13 @@ Installation through [package control](http://wbond.net/sublime_packages/package
 Clone or copy this repository into the packages directory. You will need to rename the folder to `AdvancedNewFile` if using this method. By default, the Package directory is located at:
 
 * OS X: ~/Library/Application Support/Sublime Text 2/Packages/
-* Windows: %APPDATA%/Roaming/Sublime Text 2/Packages/
+* Windows: %APPDATA%/Sublime Text 2/Packages/
 * Linux: ~/.config/sublime-text-2/Packages/
 
 or
 
 * OS X: ~/Library/Application Support/Sublime Text 3/Packages/
-* Windows: %APPDATA%/Roaming/Sublime Text 3/Packages/
+* Windows: %APPDATA%/Sublime Text 3/Packages/
 * Linux: ~/.config/sublime-text-3/Packages/
 
 Depending on your install on windows, the ST packages path may be `%APPDATA%/Sublime Text 2/...`
