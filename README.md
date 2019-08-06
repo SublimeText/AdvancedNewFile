@@ -39,7 +39,7 @@ The default directory is specified by the `default_root` setting. By default, it
 The plugin supports renaming and deleting files. However, these are not, by default bound to any key binding. For more information on the available commands, see the GitHub [wiki](https://github.com/skuroda/Sublime-AdvancedNewFile/wiki/Commands) page.
 
 ### Adding Commands to Menu
-The plugin does not contain any menu commands by default. To add them yourself, please see the GitHub[wiki](https://github.com/skuroda/Sublime-AdvancedNewFile/wiki/Menu-Entries)
+The plugin does not contain any menu commands by default. To add them yourself, please see the GitHub [wiki](https://github.com/skuroda/Sublime-AdvancedNewFile/wiki/Menu-Entries)
 
 ## Keymaps
 If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager. Alternatively, set command logging to true by entering `sublime.log_commands(True)` in the Sublime Text console.
