@@ -55,7 +55,6 @@
     // it will default to 0 (the top level folder).
     "default_folder_index": 0,
 
-
     // This value specifies the root that will be used when resolving relative paths
     // defined in aliases. For more information about valid values, see "default_root".
     // Note that if "default_path" or "default_folder_index" is used,
