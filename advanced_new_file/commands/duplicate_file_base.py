@@ -8,7 +8,7 @@ from ..anf_util import *
 class DuplicateFileBase(AdvancedNewFileBase, sublime_plugin.WindowCommand):
 
     def __init__(self, window):
-        super(DuplicateFileBase, self).__init__(window)
+        super().__init__(window)
 
     def run(self, is_python=False, initial_path=None, rename_file=None):
         self.is_python = is_python
@@ -27,7 +27,7 @@ class DuplicateFileBase(AdvancedNewFileBase, sublime_plugin.WindowCommand):
 
     def duplicate_setup(self):
         view = self.window.active_view()
-        self.original_name = None
+        self.original_name = ""
         if view is not None:
             view_file_name = view.file_name()
             if view_file_name:
@@ -40,10 +40,10 @@ class DuplicateFileBase(AdvancedNewFileBase, sublime_plugin.WindowCommand):
         status_prefix = self.get_status_prefix()
         if self.is_copy_original_name(creation_path):
             creation_path = os.path.join(creation_path, self.original_name)
-        else:
-            creation_path = self.try_append_extension(creation_path)
+        # else:
+        #     creation_path = self.try_append_extension(creation_path)
         if self.view is not None:
-            self.view.set_status("AdvancedNewFile", "%s %s " %
+            self.view.set_status("AdvancedNewFile", "%s %s" %
                                  (status_prefix, creation_path))
         else:
             sublime.status_message("%s %s" %
@@ -67,5 +67,14 @@ class DuplicateFileBase(AdvancedNewFileBase, sublime_plugin.WindowCommand):
                     path += extension
         return path
 
+    def get_default_setting(self):
+        pass
 
+    def get_status_prefix(self):
+        pass
 
+    def get_append_extension_setting(self):
+        pass
+
+    def get_default_root_setting(self):
+        pass

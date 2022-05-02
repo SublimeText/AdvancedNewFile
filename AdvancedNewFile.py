@@ -12,7 +12,7 @@ if VERSION > 3000:
 
 # Make sure all dependencies are reloaded on upgrade
 if reloader in sys.modules:
-    reload(sys.modules[reloader])
+    reload(sys.modules[reloader]) # type: ignore
 
 if VERSION > 3000:
     from .advanced_new_file import reloader

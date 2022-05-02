@@ -8,5 +8,17 @@
 		"context": [{
 			"key": "setting.anf_panel"
 		}]
-	}
+	},
+	{"keys": ["ctrl+n"],"command": "advanced_new_file_next",
+		"context": [{"key": "setting.anf_panel"}]
+	},
+	{"keys": ["ctrl+p"],"command": "advanced_new_file_prev",
+		"context": [{"key": "setting.anf_panel"}]
+	},
+	{"keys": ["ctrl+l"],"command": "advanced_new_file_updir",
+		"context": [{"key": "setting.anf_panel"}]
+	},
+	{"keys": ["ctrl+j"],"command": "insert", "args": {"characters": "\t"},
+		"context": [{"key": "setting.anf_panel"}]
+	},
 ]

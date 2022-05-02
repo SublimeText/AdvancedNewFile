@@ -10,7 +10,7 @@ from ..vcs.git.git_command_base import GitCommandBase
 
 class AdvancedNewFileMove(DuplicateFileBase, GitCommandBase):
     def __init__(self, window):
-        super(AdvancedNewFileMove, self).__init__(window)
+        super().__init__(window)
 
     def get_default_setting(self):
         return RENAME_DEFAULT_SETTING
@@ -122,14 +122,6 @@ class AdvancedNewFileMove(DuplicateFileBase, GitCommandBase):
 
     def get_default_root_setting(self):
         return RENAME_FILE_DEFAULT_ROOT_SETTING
-
-    def generate_initial_path(self):
-        if self.settings.get("autofill_path_the_existing"):
-            file_path = self.window.active_view().file_name()[1:]
-            base, _ = self.split_path(file_path)
-            return file_path[len(base):]
-        else:
-            return super(self.__class__, self).generate_initial_path()
 
 
 class AdvancedNewFileMoveAtCommand(sublime_plugin.WindowCommand):

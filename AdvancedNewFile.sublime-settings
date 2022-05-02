@@ -17,9 +17,6 @@
     // A default initial value to fill the create new file input path with.
     "default_initial": "",
 
-    // When renaming a file it will we pre populated with the file existing filename.
-    "autofill_path_the_existing": false,
-
     // A boolean defining if cursor text should be used. Text bound by single or
     // double quotes or within a region will be used. If multiple cursors
     // are used, the earliest selection containing a region or existing

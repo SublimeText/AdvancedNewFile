@@ -4,7 +4,6 @@ import os
 
 ALIAS_SETTING = "alias"
 DEFAULT_INITIAL_SETTING = "default_initial"
-AUTOFILL_RENAME = "autofill_path_the_existing"
 USE_CURSOR_TEXT_SETTING = "use_cursor_text"
 SHOW_FILES_SETTING = "show_files"
 SHOW_PATH_SETTING = "show_path"
@@ -46,7 +45,6 @@ CURSOR_BEFORE_EXTENSION_SETTING = "cursor_before_extension"
 SETTINGS = [
     ALIAS_SETTING,
     DEFAULT_INITIAL_SETTING,
-    AUTOFILL_RENAME,
     USE_CURSOR_TEXT_SETTING,
     SHOW_FILES_SETTING,
     SHOW_PATH_SETTING,

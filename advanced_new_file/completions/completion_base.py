@@ -1,12 +1,14 @@
 import re
 import os
+
 from ..anf_util import *
+from .pinyin_lib import *
 
 
 class GenerateCompletionListBase(object):
     """docstring for GenerateCompletionListBase"""
     def __init__(self, command):
-        super(GenerateCompletionListBase, self).__init__()
+        super().__init__()
         self.top_level_split_char = ":"
         self.command = command
         self.aliases = command.aliases
@@ -30,6 +32,7 @@ class GenerateCompletionListBase(object):
                 alias_list += self.generate_alias_auto_complete(filename)
                 alias_list += self.generate_project_auto_complete(filename)
         base, path = self.command.split_path(path_in)
+        print("base,path", path_in, base, path)
         full_path = generate_creation_path(self.settings, base, path)
 
         directory, filename = os.path.split(full_path)
@@ -79,8 +82,21 @@ class GenerateCompletionListBase(object):
         return sugg
 
     def compare_entries(self, compare_entry, compare_base):
-        if self.settings.get(IGNORE_CASE_SETTING):
-            compare_entry = compare_entry.lower()
-            compare_base = compare_base.lower()
+        # if self.settings.get(IGNORE_CASE_SETTING):
+        #     compare_entry = compare_entry.lower()
+        #     compare_base = compare_base.lower()
 
-        return compare_entry.startswith(compare_base)
+        # return compare_entry.startswith(compare_base)
+        # turn to fuzzy match
+        pattern = get_str_pattern(compare_base, self.settings.get(IGNORE_CASE_SETTING, True))
+        return re.match(pattern, compare_entry) is not None
+
+    def hint(self, path_in):
+        (completion_list, alias_list,
+            dir_list, file_list) = self.generate_completion_list(path_in)
+        if len(completion_list) > 0:
+            dir_list = map(lambda s: s + "/", dir_list)
+            alias_list = map(lambda s: s + ":", alias_list)
+            completion_list = sorted(list(dir_list) +
+                                         list(alias_list) + file_list)
+        return completion_list

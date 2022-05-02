@@ -30,6 +30,8 @@ mods_load_order = [
     ".lib.ushlex",
 
     ".completions",
+    '.completions.pinyin_lib',
+    '.completions.completion_base',
     '.completions.nix_completion',
     '.completions.windows_completion',
 
