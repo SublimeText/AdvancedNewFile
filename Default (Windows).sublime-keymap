@@ -18,6 +18,9 @@
 	{"keys": ["ctrl+l"],"command": "advanced_new_file_updir",
 		"context": [{"key": "setting.anf_panel"}]
 	},
+	{"keys": ["enter"],"command": "advanced_new_file_confirm",
+		"context": [{"key": "setting.anf_panel"}]
+	},
 	{"keys": ["ctrl+j"],"command": "insert", "args": {"characters": "\t"},
 		"context": [{"key": "setting.anf_panel"}]
 	},

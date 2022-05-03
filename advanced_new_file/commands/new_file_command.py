@@ -180,6 +180,13 @@ class AdvancedNewFileUpdirCommand(AdvancedNewFileBase, sublime_plugin.WindowComm
             new_content = ''
         return new_content
 
+class AdvancedNewFileConfirmCommand(AdvancedNewFileBase, sublime_plugin.WindowCommand):
+    def __init__(self, window):
+        super().__init__(window)
+
+    def run(self):
+        pass
+
 class AdvancedNewFileNewAtCommand(sublime_plugin.WindowCommand):
     def run(self, dirs):
         if len(dirs) != 1:

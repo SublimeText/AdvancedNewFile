@@ -4,6 +4,8 @@ import os
 from ..anf_util import *
 from .pinyin_lib import *
 
+from .fuzzy_sort import sort_by_fuzzy
+
 
 class GenerateCompletionListBase(object):
     """docstring for GenerateCompletionListBase"""
@@ -38,6 +40,8 @@ class GenerateCompletionListBase(object):
         directory, filename = os.path.split(full_path)
         if os.path.isdir(directory):
             for d in os.listdir(directory):
+                if not self.filter_file(d):
+                    continue
                 full_path = os.path.join(directory, d)
                 if os.path.isdir(full_path):
                     is_file = False
@@ -54,7 +58,20 @@ class GenerateCompletionListBase(object):
 
         completion_list = alias_list + dir_list + file_list
 
-        return sorted(completion_list), alias_list, dir_list, file_list
+        return sort_by_fuzzy(filename, completion_list), alias_list, dir_list, file_list
+
+    def filter_file(self, fname):
+        """
+        Returns False if a file should be ignored: If the file matched any of the regular expressions
+        on the settings file
+        """
+        fname = os.path.basename(fname)
+        for regex in self.settings.get('filter_regex', list()):
+            regex = regex.replace('\\\\', '\\')  # Fix backslash escaping on json
+            p = re.compile(regex)
+            if p.match(fname) is not None:
+                return False
+        return True
 
     def generate_project_auto_complete(self, base):
         folder_data = get_project_folder_data(
@@ -94,9 +111,12 @@ class GenerateCompletionListBase(object):
     def hint(self, path_in):
         (completion_list, alias_list,
             dir_list, file_list) = self.generate_completion_list(path_in)
+        new_completion_list = []
         if len(completion_list) > 0:
-            dir_list = map(lambda s: s + "/", dir_list)
-            alias_list = map(lambda s: s + ":", alias_list)
-            completion_list = sorted(list(dir_list) +
-                                         list(alias_list) + file_list)
-        return completion_list
+            for path in completion_list:
+                if path in dir_list:
+                    path += "/"
+                elif path in alias_list:
+                    path += ":"
+                new_completion_list.append(path)
+        return new_completion_list

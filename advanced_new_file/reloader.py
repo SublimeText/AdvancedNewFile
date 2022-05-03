@@ -23,13 +23,13 @@ else:
 mods_load_order = [
     '',
     '.anf_util',
-    '.completion_base',
 
     ".lib",
     ".lib.package_resources",
     ".lib.ushlex",
 
     ".completions",
+    '.completions.fuzzy_sort',
     '.completions.pinyin_lib',
     '.completions.completion_base',
     '.completions.nix_completion',

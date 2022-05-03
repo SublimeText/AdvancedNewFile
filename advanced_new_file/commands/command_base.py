@@ -296,12 +296,21 @@ class AdvancedNewFileBase(object):
                 if self.view is not None:
                     self.view.erase_status("AdvancedNewFile2")
 
+        input_view = AdvancedNewFileBase.static_input_panel_view
         if path_in.endswith("\t"):
             creation_path, candidate, completion_list = self.parse_status_line(self.get_status_line()) # type: ignore
-            print("candidate", candidate, str(completion_list))
-            new_content = self.completion_input(path_in.replace("\t", ""), candidate)
-            print("new_content", new_content)
-            # new_content = candidate
+            new_content = self.completion_input(path_in.replace("\n", "").replace("\t", ""), candidate)
+        elif path_in.endswith("\n"):
+            path_in = path_in.replace("\n", "")
+            if input_view:
+                # print("visible", input_view.is_popup_visible())
+                if input_view.is_popup_visible():
+                    input_view.run_command("insert", {"characters": "\t"})
+                else:
+                    # print("end panel")
+                    self.on_done(path_in)
+                    self.window.run_command("hide_panel", {"cancel": True})
+            return
         else:
             completion_list = self.completion.hint(path_in)
             if completion_list:
@@ -310,7 +319,7 @@ class AdvancedNewFileBase(object):
             else:
                 candidate = ''
 
-        input_view = AdvancedNewFileBase.static_input_panel_view
+
         if input_view:
             input_view.hide_popup()
         if input_view and new_content != path_in:
