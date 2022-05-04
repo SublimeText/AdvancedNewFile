@@ -32,7 +32,7 @@ class AdvancedNewFileNew(AdvancedNewFileBase, sublime_plugin.WindowCommand):
 
     def multi_file_action(self, paths):
         for path in paths:
-            self.single_file_action(path, False)
+            self.single_file_action(path)
 
     def single_file_action(self, path, apply_template=True):
         attempt_open = True
@@ -127,14 +127,18 @@ class AdvancedNewFileNextCommand(AdvancedNewFileBase, sublime_plugin.WindowComma
 
     def run(self):
         self.run_setup()
-        # Creating file at AdvancedNewFile/advanced_new_file/commands/|__init__.py['__init__.py', 'command_base.py']
-        status_line = self.get_status_line()
-        creation_path, candidate, completion_list = self.parse_status_line(status_line) # type: ignore
+        try:
+            creation_path, candidate, completion_list = self.get_input_view_content()
+        except Exception:
+            # if the content is not init, then simulate the new input
+            input_view = self.get_input_view()
+            input_view.run_command("anf_replace", {"content": ""})
+            creation_path, candidate, completion_list = self.get_input_view_content()
+
         candidate, completion_list = self.next_candidate(candidate, completion_list)
+        self.set_input_view_content((creation_path, candidate, completion_list))
         self.update_status_message(self.create_status_line(creation_path, candidate, completion_list))
-        input_view = AdvancedNewFileBase.static_input_panel_view
-        if input_view:
-            input_view.show_popup('<strong>' + candidate + '</strong><br/>' + '<br/>'.join(completion_list))
+        self.show_input_popup(candidate, completion_list)
 
 class AdvancedNewFilePrevCommand(AdvancedNewFileBase, sublime_plugin.WindowCommand):
     def __init__(self, window):
@@ -142,14 +146,18 @@ class AdvancedNewFilePrevCommand(AdvancedNewFileBase, sublime_plugin.WindowComma
 
     def run(self):
         self.run_setup()
-        # Creating file at AdvancedNewFile/advanced_new_file/commands/|__init__.py['__init__.py', 'command_base.py']
-        status_line = self.get_status_line()
-        creation_path, candidate, completion_list = self.parse_status_line(status_line) # type: ignore
+        try:
+            creation_path, candidate, completion_list = self.get_input_view_content()
+        except Exception:
+            # if the content is not init, then simulate the new input
+            input_view = self.get_input_view()
+            input_view.run_command("anf_replace", {"content": ""})
+            creation_path, candidate, completion_list = self.get_input_view_content()
+
         candidate, completion_list = self.prev_candidate(candidate, completion_list)
+        self.set_input_view_content((creation_path, candidate, completion_list))
         self.update_status_message(self.create_status_line(creation_path, candidate, completion_list))
-        input_view = AdvancedNewFileBase.static_input_panel_view
-        if input_view and candidate and completion_list:
-            input_view.show_popup('<strong>' + candidate + '</strong><br/>' + '<br/>'.join(completion_list))
+        self.show_input_popup(candidate, completion_list)
 
 
 class AdvancedNewFileUpdirCommand(AdvancedNewFileBase, sublime_plugin.WindowCommand):
@@ -158,11 +166,11 @@ class AdvancedNewFileUpdirCommand(AdvancedNewFileBase, sublime_plugin.WindowComm
 
     def run(self):
         self.run_setup()
-        view = AdvancedNewFileBase.static_input_panel_view
-        if view:
-            path_in = view.substr(sublime.Region(0, view.size()))
+        input_view = self.get_input_view()
+        if input_view:
+            path_in = input_view.substr(sublime.Region(0, input_view.size()))
             new_content = self.updir(path_in)
-            view.run_command("anf_replace", {"content": new_content})
+            input_view.run_command("anf_replace", {"content": new_content})
 
     def updir(self, path_in):
         if not(path_in):

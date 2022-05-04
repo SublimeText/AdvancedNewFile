@@ -1,7 +1,7 @@
 from operator import itemgetter
 # import numpy as np
 
-def sort_by_fuzzy(query, choices):
+def sort_by_fuzzy(query, choices, limit:int = 0):
     if not query or not choices:
         return choices
     choices_ratio = {}
@@ -9,7 +9,11 @@ def sort_by_fuzzy(query, choices):
         choices_ratio[choice] = levenshtein_ratio(query, choice)
 
     # print(choices_ratio)
-    return [key[0] for key in sorted(choices_ratio.items(), key=itemgetter(1), reverse=True)]
+    result = [key[0] for key in sorted(choices_ratio.items(), key=itemgetter(1), reverse=True)]
+    if limit > 0 and len(result) > limit:
+        return result[0:limit]
+    else:
+        return result
 
 def levenshtein_ratio(s, t):
     """ levenshtein_ratio_and_distance:

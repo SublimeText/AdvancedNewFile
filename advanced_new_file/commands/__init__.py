@@ -4,6 +4,7 @@ from .delete_file_command import AdvancedNewFileDelete
 from .cut_to_file import AdvancedNewFileCutToFile
 from .move_file_command import AdvancedNewFileMove, AdvancedNewFileMoveAtCommand
 from .copy_file_command import AdvancedNewFileCopy, AdvancedNewFileCopyAtCommand
+from .project_file_command import AdvancedNewFileProjectFileCommand
 
 __all__ = [
     "AnfReplaceCommand",
@@ -21,5 +22,6 @@ __all__ = [
     "AdvancedNewFileCopy",
     "AdvancedNewFileCopyAtCommand",
     "AnfRemoveRegionContentAndRegionCommand",
-    "AdvancedNewFileCutToFile"
+    "AdvancedNewFileCutToFile",
+    "AdvancedNewFileProjectFileCommand"
 ]

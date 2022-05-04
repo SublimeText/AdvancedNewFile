@@ -34,7 +34,7 @@ class GenerateCompletionListBase(object):
                 alias_list += self.generate_alias_auto_complete(filename)
                 alias_list += self.generate_project_auto_complete(filename)
         base, path = self.command.split_path(path_in)
-        print("base,path", path_in, base, path)
+        # print("base,path", path_in, base, path)
         full_path = generate_creation_path(self.settings, base, path)
 
         directory, filename = os.path.split(full_path)
@@ -58,7 +58,7 @@ class GenerateCompletionListBase(object):
 
         completion_list = alias_list + dir_list + file_list
 
-        return sort_by_fuzzy(filename, completion_list), alias_list, dir_list, file_list
+        return sort_by_fuzzy(filename, completion_list, 20), alias_list, dir_list, file_list
 
     def filter_file(self, fname):
         """
@@ -108,7 +108,7 @@ class GenerateCompletionListBase(object):
         pattern = get_str_pattern(compare_base, self.settings.get(IGNORE_CASE_SETTING, True))
         return re.match(pattern, compare_entry) is not None
 
-    def hint(self, path_in):
+    def complete_for_folder(self, path_in):
         (completion_list, alias_list,
             dir_list, file_list) = self.generate_completion_list(path_in)
         new_completion_list = []
@@ -120,3 +120,37 @@ class GenerateCompletionListBase(object):
                     path += ":"
                 new_completion_list.append(path)
         return new_completion_list
+
+
+    def complete_for_project(self, path_in):
+        directory = self.command.get_project_folder()
+
+        completion_list = []
+        if os.path.isdir(directory):
+            files = self.command.get_input_view_project_files()
+            if not files:
+                files = self.get_files_recursively(directory, self.filter_file)
+                self.command.set_input_view_project_files(files)
+            else:
+                print("use the old files", str(len(files)))
+            for file in files:
+                if self.compare_entries(os.path.basename(file), path_in):
+                    completion_list.append(file)
+
+        return sort_by_fuzzy(path_in, completion_list, 20)
+
+    def get_files_recursively(self, dir, filter_func=None):
+        if not os.path.isdir(dir):
+            return list(dir)
+        dirlist = os.walk(dir)
+        result = []
+        for root, _, files in dirlist:
+            rel_path = os.path.relpath(root, dir)
+            for file in files:
+                rel_file = os.path.join(rel_path, file)
+                if filter_func:
+                    if filter_func(rel_file):
+                        result.append(rel_file)
+                else:
+                    result.append(rel_file)
+        return result
