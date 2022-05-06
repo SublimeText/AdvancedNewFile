@@ -246,6 +246,7 @@ class AdvancedNewFileNewEventListener(sublime_plugin.EventListener):
                 else:
                     view.run_command("insert_snippet", {"contents": template})
             view.settings().set("_anf_new", "")
+        sublime.active_window().focus_view(view)
 
     def get_basename(self, path):
         return os.path.basename(os.path.expanduser(path))
