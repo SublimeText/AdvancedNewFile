@@ -99,13 +99,9 @@ class GenerateCompletionListBase(object):
         return sugg
 
     def compare_entries(self, compare_entry, compare_base):
-        # if self.settings.get(IGNORE_CASE_SETTING):
-        #     compare_entry = compare_entry.lower()
-        #     compare_base = compare_base.lower()
-
-        # return compare_entry.startswith(compare_base)
-        # turn to fuzzy match
-        pattern = get_str_pattern(compare_base, self.settings.get(IGNORE_CASE_SETTING, True))
+        # fuzzy match
+        pattern = get_str_pattern(compare_base, self.settings.get(IGNORE_CASE_SETTING, True),
+            self.settings.get(USE_PINYIN_TO_FILTER_SETTING, False))
         return re.match(pattern, compare_entry) is not None
 
     def complete_for_folder(self, path_in):
@@ -131,8 +127,7 @@ class GenerateCompletionListBase(object):
             if not files:
                 files = self.get_files_recursively(directory, self.filter_file)
                 self.command.set_input_view_project_files(files)
-            else:
-                print("use the old files", str(len(files)))
+
             for file in files:
                 if self.compare_entries(os.path.basename(file), path_in):
                     completion_list.append(file)

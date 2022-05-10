@@ -35,26 +35,32 @@ for i in range(26):
     PINYINLIB_SIMPLIFIED_CHAR_PATTERN.append('|'.join([c for c in PINYINLIB_SIMPLIFIED_CHAR_LIST[i]]))
     # print('|'.join([c for c in PINYINLIB_SIMPLIFIED_CHAR_LIST[i]]))
 
-def get_char_pattern(ch, ignore_case=True):
+def get_char_pattern(ch, ignore_case=True, use_pinyin=False):
     result = ''
     if ord(ch) >= ord('a') and ord(ch) <= ord('z'):
+        result += ch + '|'
         if ignore_case:
             result += chr(ord(ch) - ord('a') + ord('A')) + '|'
-        result += ch + '|' + PINYINLIB_SIMPLIFIED_CHAR_PATTERN[ord(ch) - ord('a')]
+        if use_pinyin:
+            result += PINYINLIB_SIMPLIFIED_CHAR_PATTERN[ord(ch) - ord('a')]
+        if result.endswith('|'):
+            result = result[0:-1]
     elif ord(ch) >= ord('A') and ord(ch) <= ord('Z'):
+        result += ch + '|'
         if ignore_case:
             result += chr(ord(ch) - ord('A') + ord('a')) + '|'
-        result += ch + '|' + PINYINLIB_SIMPLIFIED_CHAR_PATTERN[ord(ch) - ord('A')]
+        if use_pinyin:
+            result += PINYINLIB_SIMPLIFIED_CHAR_PATTERN[ord(ch) - ord('A')]
+        if result.endswith('|'):
+            result = result[0:-1]
     else:
         result = ch
-    if result.endswith('|'):
-        result = result[0:-1]
     return result
 
-def get_str_pattern(st, ignore_case=True):
+def get_str_pattern(st, ignore_case=True, use_pinyin=False):
     result = '.*'
     for c in st:
-        result += '(' + get_char_pattern(c, ignore_case) + ').*'
+        result += '(' + get_char_pattern(c, ignore_case, use_pinyin) + ').*'
     return result
 
 

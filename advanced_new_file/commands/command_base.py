@@ -1,4 +1,5 @@
 import errno
+import functools
 import os
 import re
 import sublime
@@ -300,9 +301,11 @@ class AdvancedNewFileBase(object):
     def clear_input_view_project_files(self):
         self.get_active_view_settings().erase("anf_input_view_project_files")
 
-    def show_filename_input(self, initial):
+    def show_filename_input(self, initial, completion_delay=0):
         caption = self.input_panel_caption()
 
+        self.input_char_count = 0
+        self.completion_delay = completion_delay
         self.input_panel_view = self.window.show_input_panel(
             caption, initial,
             self.on_done, self.__update_filename_input, self.clear
@@ -320,6 +323,19 @@ class AdvancedNewFileBase(object):
         self.__update_filename_input(initial)
 
     def __update_filename_input(self, path_in):
+        self.input_char_count += 1
+        if not path_in or path_in.endswith("\t") or path_in.endswith("\n"):
+            self.__update_filename_input_lazy(path_in, self.input_char_count)
+        else:
+            sublime.set_timeout(
+                functools.partial(self.__update_filename_input_lazy, path_in, self.input_char_count),
+                self.completion_delay)
+
+    def __update_filename_input_lazy(self, path_in, count):
+        if self.input_char_count != count:
+            return
+        self.input_char_count = 0
+
         new_content = path_in
         if self.settings.get(COMPLETION_TYPE_SETTING) == "windows":
             if "prev_text" in dir(self) and self.prev_text != path_in:
@@ -327,17 +343,25 @@ class AdvancedNewFileBase(object):
                     self.view.erase_status("AdvancedNewFile2")
 
         input_view = self.get_input_view()
+        if '/~/' in path_in:
+            index = path_in.rindex('/~/')
+            new_content = path_in[index + 1:]
+        if '//' in path_in:
+            index = path_in.rindex('//')
+            new_content = path_in[index + 1:]
+        if input_view and new_content != path_in:
+            input_view.run_command("anf_replace", {"content": new_content})
+            return
+
         if path_in.endswith("\t"):
             creation_path, candidate, completion_list = self.get_input_view_content()
             new_content = self.completion_input(path_in.replace("\n", "").replace("\t", ""), candidate)
         elif path_in.endswith("\n"):
-            path_in = path_in.replace("\n", "")
+            path_in = path_in.replace("\t", "").replace("\n", "")
             if input_view:
-                # print("visible", input_view.is_popup_visible())
                 if input_view.is_popup_visible():
                     input_view.run_command("insert", {"characters": "\t"})
                 else:
-                    # print("end panel")
                     self.on_done(path_in)
                     self.window.run_command("hide_panel", {"cancel": True})
             return
@@ -510,7 +534,10 @@ class AdvancedNewFileBase(object):
                 path = re.sub('^"|\'', '',  re.sub('"|\'$', '', path.strip()))
                 break
 
-        return path
+        if "/" in path:
+            return path
+        else:
+            return ""
 
     def _expand_default_path(self, path):
         current_file = self.view.file_name()

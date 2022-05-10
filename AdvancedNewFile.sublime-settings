@@ -181,6 +181,13 @@
     // When specifying initial input, this boolean will place the cursor prior to the .<content>
     "cursor_before_extension": false,
 
-    // Ignore regex patters
-    "filter_regex": ["\\.DS_Store", "\\.git"]
+    // Ignore regex patterns
+    "filter_regex": ["\\.DS_Store", "\\.git"],
+
+    // Use Chinese Pinyin to filter candidate in completion list
+    "use_pinyin_to_filter": false,
+
+    // miliseconds to delay when input char to complete.
+    // This only work for project file, because some projects maybe very large.
+    "completion_after_milliseconds": 100
 }

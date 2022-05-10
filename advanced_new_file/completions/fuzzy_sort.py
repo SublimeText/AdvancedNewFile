@@ -2,14 +2,16 @@ from operator import itemgetter
 # import numpy as np
 
 def sort_by_fuzzy(query, choices, limit:int = 0):
-    if not query or not choices:
-        return choices
-    choices_ratio = {}
-    for choice in choices:
-        choices_ratio[choice] = levenshtein_ratio(query, choice)
+    if not choices:
+        return []
+    if not query:
+        result = choices
+    else:
+        choices_ratio = {}
+        for choice in choices:
+            choices_ratio[choice] = levenshtein_ratio(query, choice)
+        result = [key[0] for key in sorted(choices_ratio.items(), key=itemgetter(1), reverse=True)]
 
-    # print(choices_ratio)
-    result = [key[0] for key in sorted(choices_ratio.items(), key=itemgetter(1), reverse=True)]
     if limit > 0 and len(result) > limit:
         return result[0:limit]
     else:

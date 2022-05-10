@@ -44,6 +44,12 @@ The plugin does not contain any menu commands by default. To add them yourself, 
 ## Keymaps
 If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager. Alternatively, set command logging to true by entering `sublime.log_commands(True)` in the Sublime Text console.
 
+- `tab` or `ctrl+j` to choose the first candidate
+- `ctrl+n` change to the next candidate in the completion list
+- `ctrl+p` change to the prev candidate in the completion list
+- `ctrl+l` change to the updir of the input path
+- `enter` choose the first candidate when popup, otherwise confirm(finish) the operation when no popup
+
 ### Windows
 `ctrl+alt+n`: General keymap to create new files.
 
@@ -272,6 +278,10 @@ In Sublime Text 2, the name of the folder will be the actual name of the folder,
 
 ###### Current Working Directory
 To specify the current working directory, simply type a colon, without any preceding text. Alternatively, set `relative_from_current` to `true` in your settings. Paths specified as relative paths will then begin from the current working directory.
+
+## TODO
+### project scope settings
+`filter_regex` and `use_pinyin_to_filter` settings are project related. We can set these in `.sublime-project` file for project specific.
 
 ## Notes
 Thanks to Dima Kukushkin ([xobb1t](https://github.com/xobb1t)) for the original work on this plugin. Also, thank you to [facelessuser](https://github.com/facelessuser), and by extension biermeester and matthjes for the idea of platform specific settings. Additional thanks to [kemayo](https://github.com/kemayo) for the work in identifying git executable.

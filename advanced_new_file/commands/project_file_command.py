@@ -16,7 +16,10 @@ class AdvancedNewFileProjectFileCommand(AdvancedNewFileNew, sublime_plugin.Windo
     def run(self, is_python=False, initial_path=None):
         self.is_python = is_python
         self.run_setup()
-        self.show_filename_input(self.generate_initial_path(initial_path))
+        print(self.settings)
+        completion_delay = self.settings.get(COMPLETION_DELAY_SETTING, 100)
+        print(completion_delay)
+        self.show_filename_input(self.generate_initial_path(initial_path), completion_delay)
 
     def get_project_folder(self):
         return sublime.active_window().folders()[0]
