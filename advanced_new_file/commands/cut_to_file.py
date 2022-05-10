@@ -8,7 +8,7 @@ from ..anf_util import *
 
 class AdvancedNewFileCutToFile(AdvancedNewFileBase, sublime_plugin.WindowCommand):
     def __init__(self, window):
-        super(AdvancedNewFileCutToFile, self).__init__(window)
+        super().__init__(window)
 
     def run(self, is_python=False):
         self.is_python = is_python
@@ -72,6 +72,8 @@ class AdvancedNewFileCutToFile(AdvancedNewFileBase, sublime_plugin.WindowCommand
 
     def is_enabled(self):
         view = self.window.active_view()
+        if view is None:
+            return False
         cursors = view.sel()
         for cursor in cursors:
             if not cursor.empty():

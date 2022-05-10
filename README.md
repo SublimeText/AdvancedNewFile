@@ -12,25 +12,25 @@ Note with either method, you may need to restart Sublime Text 2 for the plugin t
 Installation through [package control](http://wbond.net/sublime_packages/package_control) is recommended. It will handle updating your packages as they become available. To install, do the following.
 
 * In the Command Palette, enter `Package Control: Install Package`
-* Search for `ANF` to see the list of available commands
+* Search for `AdvancedNewFile`
 
 ### Manual
 Clone or copy this repository into the packages directory. You will need to rename the folder to `AdvancedNewFile` if using this method. By default, the Package directory is located at:
 
 * OS X: ~/Library/Application Support/Sublime Text 2/Packages/
-* Windows: %APPDATA%/Sublime Text 2/Packages/
+* Windows: %APPDATA%/Roaming/Sublime Text 2/Packages/
 * Linux: ~/.config/sublime-text-2/Packages/
 
 or
 
 * OS X: ~/Library/Application Support/Sublime Text 3/Packages/
-* Windows: %APPDATA%/Sublime Text 3/Packages/
+* Windows: %APPDATA%/Roaming/Sublime Text 3/Packages/
 * Linux: ~/.config/sublime-text-3/Packages/
 
 Depending on your install on windows, the ST packages path may be `%APPDATA%/Sublime Text 2/...`
 
 ## Usage
-Simply bring up the AdvancedNewFile input through the appropriate [key binding](https://github.com/skuroda/Sublime-AdvancedNewFile#keymaps). Then, enter the path, along with the file name into the input field. Upon pressing enter, the file will be created. In addition, if the directories specified do not yet exists, they will also be created. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage). By default, the path to the file being created will be filled shown in the status bar as you enter the path information.
+Simply bring up the AdvancedNewFile input through the appropriate [key binding](https://github.com/skuroda/Sublime-AdvancedNewFile). Then, enter the path, along with the file name into the input field. Upon pressing enter, the file will be created. In addition, if the directories specified do not yet exists, they will also be created. For more advanced usage of this plugin, be sure to look at [Advanced Path Usage](https://github.com/skuroda/Sublime-AdvancedNewFile#advanced-path-usage). By default, the path to the file being created will be filled shown in the status bar as you enter the path information.
 
 **Default directory:**
 The default directory is specified by the `default_root` setting. By default, it will be the top directory of the folders listed in the window. If this cannot be resolved, the home directory will be used. See [Settings](https://github.com/skuroda/Sublime-AdvancedNewFile#settings) (`default_root`) for more information.
@@ -43,6 +43,12 @@ The plugin does not contain any menu commands by default. To add them yourself, 
 
 ## Keymaps
 If you have issues with keymaps, consider running [FindKeyConflicts](https://github.com/skuroda/FindKeyConflicts), also available through the package manager. Alternatively, set command logging to true by entering `sublime.log_commands(True)` in the Sublime Text console.
+
+- `tab` or `ctrl+j` to choose the first candidate
+- `ctrl+n` change to the next candidate in the completion list
+- `ctrl+p` change to the prev candidate in the completion list
+- `ctrl+l` change to the updir of the input path
+- `enter` choose the first candidate when popup, otherwise confirm(finish) the operation when no popup
 
 ### Windows
 `ctrl+alt+n`: General keymap to create new files.
@@ -233,7 +239,7 @@ To begin at the home directory simply start with `~/` like you would in the shel
 #### Aliases:
 You can create an alias to quickly navigate to a directory. Simply type in the alias followed by a colon. Then specify the path as you would normally. Note, in an event a specified alias conflicts with a [predefined alias](https://github.com/skuroda/Sublime-AdvancedNewFile#predefined-aliases), the specified alias will take precedence.
 
-Alias paths may be relative or absolute. If a relative path is specified, the `alias_root` setting will be used as the base. When specifying absolute paths, be sure to use the system specific style (e.g. Windows `C:\\Users\\username\\Desktop`, OS X and Linux `/home/username/desktop/`). In addition, you may specify an alias from the home directory by using `~/`.
+Alias paths may be relative or absolute. If a relative path is specified, the `alias_root` setting will be used as the base. When specifying absolute paths, be sure to use the system specific style (e.g. Windows `C:\\Users\\username\\Desktop`, OS X and Linix `/home/username/desktop/`). In addition, you may specify an alias from the home directory by using `~/`.
 
 If an invalid alias is specified, an error pop up will be displayed when trying to create the file.
 
@@ -272,6 +278,10 @@ In Sublime Text 2, the name of the folder will be the actual name of the folder,
 
 ###### Current Working Directory
 To specify the current working directory, simply type a colon, without any preceding text. Alternatively, set `relative_from_current` to `true` in your settings. Paths specified as relative paths will then begin from the current working directory.
+
+## TODO
+### project scope settings
+`filter_regex` and `use_pinyin_to_filter` settings are project related. We can set these in `.sublime-project` file for project specific.
 
 ## Notes
 Thanks to Dima Kukushkin ([xobb1t](https://github.com/xobb1t)) for the original work on this plugin. Also, thank you to [facelessuser](https://github.com/facelessuser), and by extension biermeester and matthjes for the idea of platform specific settings. Additional thanks to [kemayo](https://github.com/kemayo) for the work in identifying git executable.

@@ -23,13 +23,15 @@ else:
 mods_load_order = [
     '',
     '.anf_util',
-    '.completion_base',
 
     ".lib",
     ".lib.package_resources",
     ".lib.ushlex",
 
     ".completions",
+    '.completions.fuzzy_sort',
+    '.completions.pinyin_lib',
+    '.completions.completion_base',
     '.completions.nix_completion',
     '.completions.windows_completion',
 
@@ -46,10 +48,12 @@ mods_load_order = [
     ".commands.duplicate_file_base",
     ".commands.helper_commands",
     '.commands.new_file_command',
+    ".commands.project_file_command",
     ".commands.move_file_command",
     ".commands.delete_file_command",
     ".commands.copy_file_command",
-    ".commands.cut_to_file"
+    ".commands.cut_to_file",
+
 ]
 
 for suffix in mods_load_order:

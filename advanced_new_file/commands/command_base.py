@@ -1,9 +1,11 @@
 import errno
+import functools
 import os
 import re
 import sublime
 import sublime_plugin
 import shlex
+import json
 
 from ..anf_util import *
 from ..platform.windows_platform import WindowsPlatform
@@ -22,9 +24,10 @@ VIEW_NAME = "AdvancedNewFileCreation"
 
 
 class AdvancedNewFileBase(object):
-
     def __init__(self, window):
-        super(AdvancedNewFileBase, self).__init__(window)
+        super()
+        self.window = window
+        self.prev_text = None
 
         if PLATFORM == "windows":
             self.platform = WindowsPlatform(window.active_view())
@@ -91,9 +94,10 @@ class AdvancedNewFileBase(object):
     def __get_aliases(self):
         aliases = self.settings.get(ALIAS_SETTING)
         all_os_aliases = self.settings.get(OS_SPECIFIC_ALIAS_SETTING)
-        for key in all_os_aliases:
-            if PLATFORM in all_os_aliases.get(key):
-                aliases[key] = all_os_aliases.get(key).get(PLATFORM)
+        if all_os_aliases is not None and aliases is not None:
+            for key in all_os_aliases:
+                if PLATFORM in all_os_aliases.get(key):
+                    aliases[key] = all_os_aliases.get(key).get(PLATFORM)
 
         return aliases
 
@@ -265,9 +269,43 @@ class AdvancedNewFileBase(object):
     def input_panel_caption(self):
         return ""
 
-    def show_filename_input(self, initial):
+    def get_active_window_settings(self):
+        return sublime.active_window().settings()
+
+    def set_input_view(self, input_view):
+        self.get_active_window_settings().set("anf_input_view", input_view.id())
+
+    def get_input_view(self):
+        return sublime.View(self.get_active_window_settings().get("anf_input_view"))
+
+
+    def get_active_view_settings(self):
+        view = self.get_input_view()
+        if view:
+            return view.settings()
+        else:
+            return self.get_active_window_settings()
+
+    def clear_input_view(self):
+        self.get_active_view_settings().erase("anf_input_view")
+
+    def set_input_view_content(self, content):
+        self.get_active_view_settings().set("anf_input_view_content", content)
+
+    def get_input_view_content(self):
+        return self.get_active_view_settings().get("anf_input_view_content")
+
+    def clear_input_view_content(self):
+        self.get_active_view_settings().erase("anf_input_view_content")
+
+    def clear_input_view_project_files(self):
+        self.get_active_view_settings().erase("anf_input_view_project_files")
+
+    def show_filename_input(self, initial, completion_delay=0):
         caption = self.input_panel_caption()
 
+        self.input_char_count = 0
+        self.completion_delay = completion_delay
         self.input_panel_view = self.window.show_input_panel(
             caption, initial,
             self.on_done, self.__update_filename_input, self.clear
@@ -281,28 +319,99 @@ class AdvancedNewFileBase(object):
         self.input_panel_view.settings().set("anf_panel", True)
         if self.settings.get(CURSOR_BEFORE_EXTENSION_SETTING):
             self.__place_cursor_before_extension(self.input_panel_view)
+        self.set_input_view(self.input_panel_view)
+        self.__update_filename_input(initial)
 
     def __update_filename_input(self, path_in):
+        self.input_char_count += 1
+        if not path_in or path_in.endswith("\t") or path_in.endswith("\n"):
+            self.__update_filename_input_lazy(path_in, self.input_char_count)
+        else:
+            sublime.set_timeout(
+                functools.partial(self.__update_filename_input_lazy, path_in, self.input_char_count),
+                self.completion_delay)
+
+    def __update_filename_input_lazy(self, path_in, count):
+        if self.input_char_count != count:
+            return
+        self.input_char_count = 0
+
         new_content = path_in
         if self.settings.get(COMPLETION_TYPE_SETTING) == "windows":
             if "prev_text" in dir(self) and self.prev_text != path_in:
                 if self.view is not None:
                     self.view.erase_status("AdvancedNewFile2")
+
+        input_view = self.get_input_view()
+        if '/~/' in path_in:
+            index = path_in.rindex('/~/')
+            new_content = path_in[index + 1:]
+        if '//' in path_in:
+            index = path_in.rindex('//')
+            new_content = path_in[index + 1:]
+        if input_view and new_content != path_in:
+            input_view.run_command("anf_replace", {"content": new_content})
+            return
+
         if path_in.endswith("\t"):
-            new_content = self.completion.completion(path_in.replace("\t", ""))
-        if new_content != path_in:
-            self.input_panel_view.run_command("anf_replace",
-                                              {"content": new_content})
+            creation_path, candidate, completion_list = self.get_input_view_content()
+            new_content = self.completion_input(path_in.replace("\n", "").replace("\t", ""), candidate)
+        elif path_in.endswith("\n"):
+            path_in = path_in.replace("\t", "").replace("\n", "")
+            if input_view:
+                if input_view.is_popup_visible():
+                    input_view.run_command("insert", {"characters": "\t"})
+                else:
+                    self.on_done(path_in)
+                    self.window.run_command("hide_panel", {"cancel": True})
+            return
+        else:
+            completion_list = self.get_completion_list(path_in)
+            if completion_list:
+                candidate = completion_list[0]
+                completion_list.remove(candidate)
+            else:
+                candidate = ''
+
+        if input_view:
+            try:
+                input_view.hide_popup()
+            except Exception as e:
+                print("hide_popup", e)
+        if input_view and new_content != path_in:
+            input_view.run_command("anf_replace", {"content": new_content})
         else:
             base, path = self.split_path(path_in)
+            creation_path = generate_creation_path(self.settings, base, path, True)
+            status_line = self.create_status_line(creation_path, candidate, completion_list)
+            self.set_input_view_content((creation_path, candidate, completion_list))
 
-            creation_path = generate_creation_path(self.settings, base, path,
-                                                   True)
             if self.settings.get(SHOW_PATH_SETTING, False):
-                self.update_status_message(creation_path)
+                self.update_status_message(status_line)
+            if not new_content.endswith(candidate):
+                self.show_input_popup(candidate, completion_list)
 
-    def update_status_message(self, creation_path):
-        pass
+    def show_input_popup(self, candidate, completion_list):
+        try:
+            input_view = self.get_input_view()
+            if input_view and candidate:
+                input_view.show_popup('<strong>' + candidate + '</strong><br/>' + '<br/>'.join(completion_list), max_width=1024)
+        except Exception as e:
+            print("show_popup", e)
+
+    def get_completion_list(self, path_in):
+        return self.completion.complete_for_folder(path_in)
+
+    def completion_input(self, path_in, candidate):
+        pattern = r"(.*[/\\:])(.*)"
+
+        match = re.match(pattern, path_in)
+        if match:
+            new_content = re.sub(pattern, r"\1", path_in)
+            new_content += candidate
+        else:
+            new_content = candidate
+        return new_content
 
     def entered_file_action(self, path):
         pass
@@ -364,6 +473,9 @@ class AdvancedNewFileBase(object):
         if self.view is not None:
             self.view.erase_status("AdvancedNewFile")
             self.view.erase_status("AdvancedNewFile2")
+        self.clear_input_view()
+        self.clear_input_view_content()
+        self.clear_input_view_project_files()
 
     def create(self, filename):
         base, filename = os.path.split(filename)
@@ -415,11 +527,17 @@ class AdvancedNewFileBase(object):
                 break
             if (re.match(".*string.quoted.double", syntax) or
                     re.match(".*string.quoted.single", syntax)):
-                path = view.substr(view.extract_scope(region.begin()))
+                point = region.begin()
+                if (re.match(".*punctuation.definition.string.end", syntax)):
+                    point -= 1
+                path = view.substr(view.extract_scope(point))
                 path = re.sub('^"|\'', '',  re.sub('"|\'$', '', path.strip()))
                 break
 
-        return path
+        if "/" in path:
+            return path
+        else:
+            return ""
 
     def _expand_default_path(self, path):
         current_file = self.view.file_name()
@@ -466,3 +584,48 @@ class AdvancedNewFileBase(object):
                 initial_position = len(matcher.group(1))
                 cursors.clear()
                 cursors.add(sublime.Region(initial_position, initial_position))
+
+    def update_status_message(self, creation_path):
+        if self.view is not None:
+            self.view.set_status("AdvancedNewFile", creation_path)
+        else:
+            sublime.status_message(creation_path)
+
+    def get_status_prefix(self):
+        pass
+
+    def create_status_line(self, creation_path, candidate, completion_list):
+        return creation_path + '|' + candidate + str(completion_list)
+
+    def next_candidate(self, candidate, completion_list):
+        if candidate and completion_list:
+            # replace the candidate with the first, and append the old candidate to the last
+            completion_list.append(candidate)
+            candidate = completion_list[0]
+            completion_list.remove(candidate)
+
+        return (candidate, completion_list)
+
+    def prev_candidate(self, candidate, completion_list):
+        if candidate and completion_list:
+            # replace the candidate with the last, and insert the old candidate to the first
+            completion_list.insert(0, candidate)
+            candidate = completion_list.pop()
+
+        return (candidate, completion_list)
+
+    def create_next_status_line(self, creation_path, candidate, completion_list):
+        if candidate and completion_list:
+            candidate, completion_list = self.next_candidate(candidate, completion_list)
+            return self.create_status_line(creation_path, candidate, completion_list)
+        else:
+            # case1: origin completion_list is empty. case2: origin completion_list contains only 1 item
+            sublime.status_message("Completion list is empty.")
+
+    def create_prev_status_line(self, creation_path, candidate, completion_list):
+        if candidate and completion_list:
+            candidate, completion_list = self.prev_candidate(candidate, completion_list)
+            return self.create_status_line(creation_path, candidate, completion_list)
+        else:
+            # case1: origin completion_list is empty. case2: origin completion_list contains only 1 item
+            sublime.status_message("Completion list is empty.")

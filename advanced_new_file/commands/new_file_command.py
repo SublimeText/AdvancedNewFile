@@ -11,7 +11,7 @@ from ..anf_util import *
 
 class AdvancedNewFileNew(AdvancedNewFileBase, sublime_plugin.WindowCommand):
     def __init__(self, window):
-        super(AdvancedNewFileNew, self).__init__(window)
+        super().__init__(window)
 
     def run(self, is_python=False, initial_path=None):
         self.is_python = is_python
@@ -32,7 +32,7 @@ class AdvancedNewFileNew(AdvancedNewFileBase, sublime_plugin.WindowCommand):
 
     def multi_file_action(self, paths):
         for path in paths:
-            self.single_file_action(path, False)
+            self.single_file_action(path)
 
     def single_file_action(self, path, apply_template=True):
         attempt_open = True
@@ -108,27 +108,99 @@ class AdvancedNewFileNew(AdvancedNewFileBase, sublime_plugin.WindowCommand):
         else:
             return self.curly_braces_balanced(path[1:], count)
 
-    def update_status_message(self, creation_path):
-        if self.view is not None:
-            self.view.set_status("AdvancedNewFile", "Creating file at %s " %
-                                 creation_path)
-        else:
-            sublime.status_message("Creating file at %s" % creation_path)
-
     def get_default_root_setting(self):
         return NEW_FILE_DEFAULT_ROOT_SETTING
 
     def empty_file_action(self):
         self.window.new_file()
 
+    def update_status_message(self, creation_path):
+        if self.view is not None:
+            self.view.set_status("AdvancedNewFile", "Creating file at %s" % creation_path)
+        else:
+            sublime.status_message("Creating file at %s" % creation_path)
+
+
+class AdvancedNewFileNextCommand(AdvancedNewFileBase, sublime_plugin.WindowCommand):
+    def __init__(self, window):
+        super().__init__(window)
+
+    def run(self):
+        self.run_setup()
+        try:
+            creation_path, candidate, completion_list = self.get_input_view_content()
+        except Exception:
+            # if the content is not init, then simulate the new input
+            input_view = self.get_input_view()
+            input_view.run_command("anf_replace", {"content": ""})
+            creation_path, candidate, completion_list = self.get_input_view_content()
+
+        candidate, completion_list = self.next_candidate(candidate, completion_list)
+        self.set_input_view_content((creation_path, candidate, completion_list))
+        self.update_status_message(self.create_status_line(creation_path, candidate, completion_list))
+        self.show_input_popup(candidate, completion_list)
+
+class AdvancedNewFilePrevCommand(AdvancedNewFileBase, sublime_plugin.WindowCommand):
+    def __init__(self, window):
+        super().__init__(window)
+
+    def run(self):
+        self.run_setup()
+        try:
+            creation_path, candidate, completion_list = self.get_input_view_content()
+        except Exception:
+            # if the content is not init, then simulate the new input
+            input_view = self.get_input_view()
+            input_view.run_command("anf_replace", {"content": ""})
+            creation_path, candidate, completion_list = self.get_input_view_content()
+
+        candidate, completion_list = self.prev_candidate(candidate, completion_list)
+        self.set_input_view_content((creation_path, candidate, completion_list))
+        self.update_status_message(self.create_status_line(creation_path, candidate, completion_list))
+        self.show_input_popup(candidate, completion_list)
+
+
+class AdvancedNewFileUpdirCommand(AdvancedNewFileBase, sublime_plugin.WindowCommand):
+    def __init__(self, window):
+        super().__init__(window)
+
+    def run(self):
+        self.run_setup()
+        input_view = self.get_input_view()
+        if input_view:
+            path_in = input_view.substr(sublime.Region(0, input_view.size()))
+            new_content = self.updir(path_in)
+            input_view.run_command("anf_replace", {"content": new_content})
+
+    def updir(self, path_in):
+        if not(path_in):
+            return ''
+        pattern = r"(.*[/\\:])(.*)"
+        match = re.match(pattern, path_in)
+        if match:
+            if path_in.endswith("/"):
+                new_content = os.path.dirname(path_in[0:-1])
+                if new_content:
+                    new_content +=  "/"
+            else:
+                new_content = re.sub(pattern, r"\1", path_in)
+        else:
+            new_content = ''
+        return new_content
+
+class AdvancedNewFileConfirmCommand(AdvancedNewFileBase, sublime_plugin.WindowCommand):
+    def __init__(self, window):
+        super().__init__(window)
+
+    def run(self):
+        pass
 
 class AdvancedNewFileNewAtCommand(sublime_plugin.WindowCommand):
     def run(self, dirs):
         if len(dirs) != 1:
             return
         path = dirs[0] + os.sep
-        self.window.run_command("advanced_new_file_new",
-                                {"initial_path": path})
+        self.window.run_command("advanced_new_file_new", {"initial_path": path})
 
     def is_visible(self, dirs):
         return len(dirs) == 1
@@ -159,18 +231,22 @@ class AdvancedNewFileNewEventListener(sublime_plugin.EventListener):
                 extension = full_extension[1:]
             settings = get_settings(view)
             if extension in settings.get(FILE_TEMPLATES_SETTING):
-                template = settings.get(FILE_TEMPLATES_SETTING)[extension]
+                template = settings.get(FILE_TEMPLATES_SETTING)[extension] # type: ignore
                 if type(template) == list:
                     if len(template) == 1:
-                        view.run_command("insert_snippet", {"contents": self.get_snippet_from_file(template[0])})
+                        view.run_command("insert_snippet",
+                            {"contents": self.get_snippet_from_file(template[0])})
                     else:
                         entries = list(map(self.get_basename, template))
                         self.entries = list(map(self.expand_path, template))
                         self.view = view
-                        sublime.set_timeout(lambda: view.window().show_quick_panel(entries, self.quick_panel_selection), 10)
+                        sublime.set_timeout(
+                            lambda: view.window().show_quick_panel(entries, self.quick_panel_selection),
+                            10)
                 else:
                     view.run_command("insert_snippet", {"contents": template})
             view.settings().set("_anf_new", "")
+        sublime.active_window().focus_view(view)
 
     def get_basename(self, path):
         return os.path.basename(os.path.expanduser(path))

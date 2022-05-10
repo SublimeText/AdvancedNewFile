@@ -10,7 +10,7 @@ from .command_base import AdvancedNewFileBase
 class AdvancedNewFileDelete(AdvancedNewFileBase, sublime_plugin.WindowCommand,
                             GitCommandBase):
     def __init__(self, window):
-        super(AdvancedNewFileDelete, self).__init__(window)
+        super().__init__(window)
 
     def run(self, current=False):
         self.run_setup()

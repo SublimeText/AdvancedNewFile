@@ -5,7 +5,7 @@ from ..anf_util import *
 
 class WindowsCompletion(GenerateCompletionListBase):
     def __init__(self, command):
-        super(WindowsCompletion, self).__init__(command)
+        super().__init__(command)
         self.view = command.view
 
     def completion(self, path_in):
