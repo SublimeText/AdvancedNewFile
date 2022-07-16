@@ -123,6 +123,14 @@ class AdvancedNewFileMove(DuplicateFileBase, GitCommandBase):
     def get_default_root_setting(self):
         return RENAME_FILE_DEFAULT_ROOT_SETTING
 
+    def generate_initial_path(self):
+        if self.settings.get("autofill_path_the_existing"):
+            file_path = self.window.active_view().file_name()[1:]
+            base, _ = self.split_path(file_path)
+            return file_path[len(base):]
+        else:
+            return super(self.__class__, self).generate_initial_path()
+
 
 class AdvancedNewFileMoveAtCommand(sublime_plugin.WindowCommand):
     def run(self, files):

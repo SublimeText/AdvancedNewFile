@@ -18,19 +18,19 @@ Note with either method, you may need to restart Sublime Text 2 for the plugin t
 Installation through [package control](http://wbond.net/sublime_packages/package_control) is recommended. It will handle updating your packages as they become available. To install, do the following.
 
 * In the Command Palette, enter `Package Control: Install Package`
-* Search for `AdvancedNewFile`
+* Search for `ANF` to see the list of available commands
 
 ### Manual
 Clone or copy this repository into the packages directory. You will need to rename the folder to `AdvancedNewFile` if using this method. By default, the Package directory is located at:
 
 * OS X: ~/Library/Application Support/Sublime Text 2/Packages/
-* Windows: %APPDATA%/Roaming/Sublime Text 2/Packages/
+* Windows: %APPDATA%/Sublime Text 2/Packages/
 * Linux: ~/.config/sublime-text-2/Packages/
 
 or
 
 * OS X: ~/Library/Application Support/Sublime Text 3/Packages/
-* Windows: %APPDATA%/Roaming/Sublime Text 3/Packages/
+* Windows: %APPDATA%/Sublime Text 3/Packages/
 * Linux: ~/.config/sublime-text-3/Packages/
 
 Depending on your install on windows, the ST packages path may be `%APPDATA%/Sublime Text 2/...`
@@ -239,7 +239,7 @@ To begin at the home directory simply start with `~/` like you would in the shel
 #### Aliases:
 You can create an alias to quickly navigate to a directory. Simply type in the alias followed by a colon. Then specify the path as you would normally. Note, in an event a specified alias conflicts with a [predefined alias](https://github.com/SublimeText/AdvancedNewFile#predefined-aliases), the specified alias will take precedence.
 
-Alias paths may be relative or absolute. If a relative path is specified, the `alias_root` setting will be used as the base. When specifying absolute paths, be sure to use the system specific style (e.g. Windows `C:\\Users\\username\\Desktop`, OS X and Linix `/home/username/desktop/`). In addition, you may specify an alias from the home directory by using `~/`.
+Alias paths may be relative or absolute. If a relative path is specified, the `alias_root` setting will be used as the base. When specifying absolute paths, be sure to use the system specific style (e.g. Windows `C:\\Users\\username\\Desktop`, OS X and Linux `/home/username/desktop/`). In addition, you may specify an alias from the home directory by using `~/`.
 
 If an invalid alias is specified, an error pop up will be displayed when trying to create the file.
 
