@@ -88,8 +88,8 @@ class AdvancedNewFileMove(DuplicateFileBase, GitCommandBase):
     def _try_prompt_if_dest_exists(self, target):
         if self.settings.get(WARN_OVERWRITE_ON_MOVE_SETTING, False):
             if (os.path.exists(target)):
-                return sublime.ok_cancel_dialog(target + "already exists. " +
-                                                "move will overwrite " +
+                return sublime.ok_cancel_dialog(target + " already exists. " +
+                                                "Move will overwrite " +
                                                 "existing file. Continue?")
 
         return True
