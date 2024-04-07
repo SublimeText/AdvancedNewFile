@@ -38,6 +38,13 @@ class AdvancedNewFileCopy(DuplicateFileBase):
             if copy_success:
                 self.open_file(new_file)
 
+    def _try_prompt_if_dest_exists(self, target):
+        if self.settings.get(WARN_OVERWRITE_ON_COPY_SETTING, False):
+            if (os.path.exists(target)):
+                return sublime.ok_cancel_dialog(target + " already exists. " +
+                                                "Copy will overwrite " +
+                                                "existing file. Continue?")
+
     def _copy_file(self, path):
         if os.path.isdir(path) or re.search(r"(/|\\)$", path):
             # use original name if a directory path has been passed in.
@@ -45,6 +52,8 @@ class AdvancedNewFileCopy(DuplicateFileBase):
 
         window = self.window
         copied = True
+        if not self._try_prompt_if_dest_exists(path):
+            return (False, path)
         if self.get_argument_name():
             self.copy_from_argument(path)
         elif self.view is not None:

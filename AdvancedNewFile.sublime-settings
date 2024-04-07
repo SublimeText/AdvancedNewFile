@@ -165,6 +165,10 @@
 	// the move command.
 	"warn_overwrite_on_move": false,
 
+	// If a warning should be displayed when trying to overwrite an existing file using
+	// the copy command.
+	"warn_overwrite_on_copy": false,
+
 	// Same as `default_root` for new file commands. In addition to the valid values listed
 	// for `default_root`, "default_root" will use the value for that setting.
 	"new_file_default_root": "default_root",
