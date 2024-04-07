@@ -1,8 +1,43 @@
 [
-  { "caption": "ANF: New File", "command": "advanced_new_file_new" },
-  { "caption": "ANF: Rename File", "command": "advanced_new_file_move"},
-  { "caption": "ANF: Delete File", "command": "advanced_new_file_delete"},
-  { "caption": "ANF: Delete Current File", "command": "advanced_new_file_delete", "args": {"current": true}},
-  { "caption": "ANF: Copy Current File", "command": "advanced_new_file_copy" },
-  { "caption": "ANF: Cut to File", "command": "advanced_new_file_cut_to_file" }
+	{
+		"caption": "ANF: New File",
+		"command": "advanced_new_file_new"
+	},
+	{
+		"caption": "ANF: Rename File",
+		"command": "advanced_new_file_move"
+	},
+	{
+		"caption": "ANF: Delete File",
+		"command": "advanced_new_file_delete"
+	},
+	{
+		"caption": "ANF: Delete Current File",
+		"command": "advanced_new_file_delete",
+		"args": {"current": true}
+	},
+	{
+		"caption": "ANF: Copy Current File",
+		"command": "advanced_new_file_copy"
+	},
+	{
+		"caption": "ANF: Cut to File",
+		"command": "advanced_new_file_cut_to_file"
+	},
+	{
+		"caption": "Preferences: AdvancedNewFile Settings",
+		"command": "edit_settings",
+		"args": {
+			"base_file": "${packages}/AdvancedNewFile/AdvancedNewFile.sublime-settings",
+			"default": "// Settings in here override those in \"AdvancedNewFile/AdvancedNewFile.sublime-settings\".\n{\n\t$0\n}\n"
+		}
+	},
+	{
+		"caption": "Preferences: AdvancedNewFile Key Bindings",
+		"command": "edit_settings",
+		"args": {
+			"base_file": "${packages}/AdvancedNewFile/Default ($platform).sublime-keymap",
+			"default": "[\n\t$0\n]\n"
+		}
+	}
 ]
