@@ -1,186 +1,186 @@
 {
-    // This setting contains a dictionary of aliases. The keys represent the
-    // alias names, the values represent the paths.
-    // NOTE: These should be absolute paths. Also, these paths should
-    // match your systems convention. For example, Windows machines should
-    // have paths similar to "C:\\Users\\username\\Desktop". *nix systems should
-    // have paths similar to "/home/username/desktop".
-    "alias": {},
+	// This setting contains a dictionary of aliases. The keys represent the
+	// alias names, the values represent the paths.
+	// NOTE: These should be absolute paths. Also, these paths should
+	// match your systems convention. For example, Windows machines should
+	// have paths similar to "C:\\Users\\username\\Desktop". *nix systems should
+	// have paths similar to "/home/username/desktop".
+	"alias": {},
 
-    // This is a secondary field for aliases. These aliases will be platform specific.
-    // The key for the entry will still represent the name to be used for the alias.
-    // Rather than being just a string path, the value will be a nested dictionary.
-    // The dictionary may have one of three keys, "windows", "linux", or "osx".
-    // The path used for this alias will be based on the operating system being used.
-    "os_specific_alias": {},
+	// This is a secondary field for aliases. These aliases will be platform specific.
+	// The key for the entry will still represent the name to be used for the alias.
+	// Rather than being just a string path, the value will be a nested dictionary.
+	// The dictionary may have one of three keys, "windows", "linux", or "osx".
+	// The path used for this alias will be based on the operating system being used.
+	"os_specific_alias": {},
 
-    // A default initial value to fill the create new file input path with.
-    "default_initial": "",
+	// A default initial value to fill the create new file input path with.
+	"default_initial": "",
 
-    // When renaming a file it will we pre populated with the file existing filename.
-    "autofill_path_the_existing": false,
+	// When renaming a file it will we pre populated with the file existing filename.
+	"autofill_path_the_existing": false,
 
-    // A boolean defining if cursor text should be used. Text bound by single or
-    // double quotes or within a region will be used. If multiple cursors
-    // are used, the earliest selection containing a region or existing
-    // within quotes will be used.
-    // NOTE: A value read from cursor will override the default
-    // initial string setting.
-    "use_cursor_text": false,
+	// A boolean defining if cursor text should be used. Text bound by single or
+	// double quotes or within a region will be used. If multiple cursors
+	// are used, the earliest selection containing a region or existing
+	// within quotes will be used.
+	// NOTE: A value read from cursor will override the default
+	// initial string setting.
+	"use_cursor_text": false,
 
-    // A boolean value specifying if regular files should be included in the auto
-    // complete options.
-    "show_files": false,
+	// A boolean value specifying if regular files should be included in the auto
+	// complete options.
+	"show_files": false,
 
-    // A boolean specifying if the file path being created should be displayed in
-    // the status bar.
-    "show_path": true,
+	// A boolean specifying if the file path being created should be displayed in
+	// the status bar.
+	"show_path": true,
 
-    // This value specifies the default directory when using AdvancedNewFile.
-    // Note it must be one of these values:
-    //  project_folder - Default will be the folder index specified by the "default_folder_index" setting.
-    //  current - Default will be the directory of the current view.
-    //  home - Default will be the home folder (~/)
-    //  path - Default will be defined by the setting "default_path"
-    // If the current view or top folder cannot be resolved, the home directory
-    // will be used.
-    "default_root": "project_folder",
+	// This value specifies the default directory when using AdvancedNewFile.
+	// Note it must be one of these values:
+	//  project_folder - Default will be the folder index specified by the "default_folder_index" setting.
+	//  current - Default will be the directory of the current view.
+	//  home - Default will be the home folder (~/)
+	//  path - Default will be defined by the setting "default_path"
+	// If the current view or top folder cannot be resolved, the home directory
+	// will be used.
+	"default_root": "project_folder",
 
-    // A string specifying the default root to use. For this to be utilized,
-    // "default_root" must be set to "path"
-    "default_path": "~",
+	// A string specifying the default root to use. For this to be utilized,
+	// "default_root" must be set to "path"
+	"default_path": "~",
 
-    // An integer value representing a folder index to be used when "folder" is specified
-    // for "default_root". If an index outside of the range of existing folders is used,
-    // it will default to 0 (the top level folder).
-    "default_folder_index": 0,
+	// An integer value representing a folder index to be used when "folder" is specified
+	// for "default_root". If an index outside of the range of existing folders is used,
+	// it will default to 0 (the top level folder).
+	"default_folder_index": 0,
 
 
-    // This value specifies the root that will be used when resolving relative paths
-    // defined in aliases. For more information about valid values, see "default_root".
-    // Note that if "default_path" or "default_folder_index" is used,
-    // "alias_path" and "alias_folder_index" must be used for the respective entries.
-    "alias_root": "current",
+	// This value specifies the root that will be used when resolving relative paths
+	// defined in aliases. For more information about valid values, see "default_root".
+	// Note that if "default_path" or "default_folder_index" is used,
+	// "alias_path" and "alias_folder_index" must be used for the respective entries.
+	"alias_root": "current",
 
-    // A string specifying the path to use for the alias root. For this to be
-    // utilized, "alias_root" must be set to "path"
-    "alias_path": "~",
+	// A string specifying the path to use for the alias root. For this to be
+	// utilized, "alias_root" must be set to "path"
+	"alias_path": "~",
 
-    // An integer value representing the folder index to use when "folder" is specified
-    // for "alias_root". If an index outside of the range of the existing folders is used,
-    // it will default to 0.
-    "alias_folder_index": 0,
+	// An integer value representing the folder index to use when "folder" is specified
+	// for "alias_root". If an index outside of the range of the existing folders is used,
+	// it will default to 0.
+	"alias_folder_index": 0,
 
-    // A boolean specifying if case should be ignored when building
-    // auto complete list.
-    "ignore_case": false,
+	// A boolean specifying if case should be ignored when building
+	// auto complete list.
+	"ignore_case": false,
 
-    // A boolean specifying if folders should automatically refresh and update the sidebar.
-    // In some builds, the sidebar does not refresh when contents of project folder are updated.
-    // This setting is required to refresh the sidebar in these circumstances.
-    // false by default
-    "auto_refresh_sidebar": false,
+	// A boolean specifying if folders should automatically refresh and update the sidebar.
+	// In some builds, the sidebar does not refresh when contents of project folder are updated.
+	// This setting is required to refresh the sidebar in these circumstances.
+	// false by default
+	"auto_refresh_sidebar": false,
 
-    // A string specifying the type of auto completion to use. Valid values are
-    // "windows" or "nix"
-    "completion_type": "windows",
+	// A string specifying the type of auto completion to use. Valid values are
+	// "windows" or "nix"
+	"completion_type": "windows",
 
-    // A boolean setting specifying if a separator should be inserted when
-    // there is only one completion and completion type is "windows"
-    "complete_single_entry": true,
+	// A boolean setting specifying if a separator should be inserted when
+	// there is only one completion and completion type is "windows"
+	"complete_single_entry": true,
 
-    // A boolean setting specifying if the folder name should be used
-    // or the name specified in the project. This setting only applies to ST3.
-    "use_folder_name": false,
+	// A boolean setting specifying if the folder name should be used
+	// or the name specified in the project. This setting only applies to ST3.
+	"use_folder_name": false,
 
-    // Boolean setting specifying if relative paths should be based on the
-    // current working directory.
-    "relative_from_current": true,
+	// Boolean setting specifying if relative paths should be based on the
+	// current working directory.
+	"relative_from_current": true,
 
-    // String containing the default file extension. Note the extension is only applied
-    // if the specified path does not contain a dot (.) character.
-    "default_extension": "",
+	// String containing the default file extension. Note the extension is only applied
+	// if the specified path does not contain a dot (.) character.
+	"default_extension": "",
 
-    // String representing permissions to be applied to newly created directories.
-    // e.g. "777" -> RWX for user, group, and other.
-    "folder_permissions": "",
+	// String representing permissions to be applied to newly created directories.
+	// e.g. "777" -> RWX for user, group, and other.
+	"folder_permissions": "",
 
-    // String representing permissions to be applied to newly created files.
-    // e.g. "777" -> RWX for user, group, and other.
-    "file_permissions": "",
+	// String representing permissions to be applied to newly created files.
+	// e.g. "777" -> RWX for user, group, and other.
+	"file_permissions": "",
 
-    // Default input for renaming a file. Special value <filename> will be replaced
-    // with the current file name. Special value <filepath> will be replaced with
-    // the complete filepath, including the filename. Special value <filedirectory>
-    // will be replaced with the filepath, not including the filename. Note that a
-    // colon as the default will resolve to the same path as <filedirectory>, if the
-    // file exists on disk.
-    "rename_default": "",
+	// Default input for renaming a file. Special value <filename> will be replaced
+	// with the current file name. Special value <filepath> will be replaced with
+	// the complete filepath, including the filename. Special value <filedirectory>
+	// will be replaced with the filepath, not including the filename. Note that a
+	// colon as the default will resolve to the same path as <filedirectory>, if the
+	// file exists on disk.
+	"rename_default": "",
 
-    // Setting to control if VCS management is used when moving and removing files.
-    "vcs_management": false,
+	// Setting to control if VCS management is used when moving and removing files.
+	"vcs_management": false,
 
-    // An object containing information to use for templates when creating new files.
-    // The key values for this object should be a file extension. Files without extensions
-    // such as "Makefile" or ".bash_profile" use the full file name as the key.
-    // The value may either be a string of the content to be inserted or a list of paths.
-    // If a list of paths is specified, the name of the file will be displayed during
-    // selection. The paths must either be absolute, from the home directory of the
-    // user (`~/`), or relative to the Packages directory. These relative files should have
-    // the form "Packages/User/mytest.sublime-snippet". If a string is used, or the list
-    // contains a single entry, it will be automatically inserted into any newly created files.
-    "file_templates": {},
+	// An object containing information to use for templates when creating new files.
+	// The key values for this object should be a file extension. Files without extensions
+	// such as "Makefile" or ".bash_profile" use the full file name as the key.
+	// The value may either be a string of the content to be inserted or a list of paths.
+	// If a list of paths is specified, the name of the file will be displayed during
+	// selection. The paths must either be absolute, from the home directory of the
+	// user (`~/`), or relative to the Packages directory. These relative files should have
+	// the form "Packages/User/mytest.sublime-snippet". If a string is used, or the list
+	// contains a single entry, it will be automatically inserted into any newly created files.
+	"file_templates": {},
 
-    // Setting this value to true will allow you to escape characters as you normally
-    // would when using a shell. For example, given the input string "foo\ bar", false
-    // would result in a file named " bar" in the foo directory. With the value set to
-    // true, a file named "foo bar" would be created. In addition, setting this value
-    // to true will allow for curly brace expansion. Currently, only comma separated
-    // entries are supported.
-    "shell_input": false,
+	// Setting this value to true will allow you to escape characters as you normally
+	// would when using a shell. For example, given the input string "foo\ bar", false
+	// would result in a file named " bar" in the foo directory. With the value set to
+	// true, a file named "foo bar" would be created. In addition, setting this value
+	// to true will allow for curly brace expansion. Currently, only comma separated
+	// entries are supported.
+	"shell_input": false,
 
-    // Setting to control if the extension will be automatically applied to renamed files.
-    "append_extension_on_move": false,
+	// Setting to control if the extension will be automatically applied to renamed files.
+	"append_extension_on_move": false,
 
-    // An integer value representing a folder index to be used when a relative path
-    // cannot be resolved from the current active view. If an index outside of the range
-    // of existing folders is used, it will default to 0 (the top level folder). If no
-    // folders exist as part of the project the home directory will be used.
-    "relative_fallback_index": 0,
+	// An integer value representing a folder index to be used when a relative path
+	// cannot be resolved from the current active view. If an index outside of the range
+	// of existing folders is used, it will default to 0 (the top level folder). If no
+	// folders exist as part of the project the home directory will be used.
+	"relative_fallback_index": 0,
 
-    // Setting to control if the extension will be automatically applied to copied files.
-    "append_extension_on_copy": true,
+	// Setting to control if the extension will be automatically applied to copied files.
+	"append_extension_on_copy": true,
 
-    // Same as `rename_default`, but applied to copy command.
-    "copy_default": "",
+	// Same as `rename_default`, but applied to copy command.
+	"copy_default": "",
 
-    // Same as `rename_default`, but applied to cut to default command.
-    "cut_to_file_default": "",
+	// Same as `rename_default`, but applied to cut to default command.
+	"cut_to_file_default": "",
 
-    // If default_root is set to current, the project folder should be used as the default
-    // rather than the home directory.
-    "current_fallback_to_project": false,
+	// If default_root is set to current, the project folder should be used as the default
+	// rather than the home directory.
+	"current_fallback_to_project": false,
 
-    // If a warning should be displayed when trying to overwrite an existing file using
-    // the move command.
-    "warn_overwrite_on_move": false,
+	// If a warning should be displayed when trying to overwrite an existing file using
+	// the move command.
+	"warn_overwrite_on_move": false,
 
-    // Same as `default_root` for new file commands. In addition to the valid values listed
-    // for `default_root`, "default_root" will use the value for that setting.
-    "new_file_default_root": "default_root",
+	// Same as `default_root` for new file commands. In addition to the valid values listed
+	// for `default_root`, "default_root" will use the value for that setting.
+	"new_file_default_root": "default_root",
 
-    // Same as `default_root` for rename file commands. In addition to the valid values listed
-    // for `default_root`, "default_root" will use the value for that setting.
-    "rename_file_default_root": "default_root",
+	// Same as `default_root` for rename file commands. In addition to the valid values listed
+	// for `default_root`, "default_root" will use the value for that setting.
+	"rename_file_default_root": "default_root",
 
-    // Same as `default_root` for copy file commands. In addition to the valid values listed
-    // for `default_root`, "default_root" will use the value for that setting.
-    "copy_file_default_root": "default_root",
+	// Same as `default_root` for copy file commands. In addition to the valid values listed
+	// for `default_root`, "default_root" will use the value for that setting.
+	"copy_file_default_root": "default_root",
 
-    // On empty input of file name, execute an alternative action.
-    // Currently only implemented for the new file command, which will open a new unnamed file.
-    "empty_filename_action": false,
+	// On empty input of file name, execute an alternative action.
+	// Currently only implemented for the new file command, which will open a new unnamed file.
+	"empty_filename_action": false,
 
-    // When specifying initial input, this boolean will place the cursor prior to the .<content>
-    "cursor_before_extension": false
+	// When specifying initial input, this boolean will place the cursor prior to the .<content>
+	"cursor_before_extension": false
 }
