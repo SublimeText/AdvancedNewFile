@@ -25,9 +25,6 @@ __all__ = [
 ]
 
 
-VERSION = int(sublime.version())
-
-
 def get_resource(package_name, resource, encoding="utf-8"):
     return _get_resource(package_name, resource, encoding=encoding)
 
@@ -37,47 +34,13 @@ def get_binary_resource(package_name, resource):
 
 
 def _get_resource(package_name, resource, return_binary=False, encoding="utf-8"):
-    packages_path = sublime.packages_path()
-    content = None
-    if VERSION > 3013:
-        try:
-            if return_binary:
-                content = sublime.load_binary_resource("Packages/" + package_name + "/" + resource)
-            else:
-                content = sublime.load_resource("Packages/" + package_name + "/" + resource)
-        except IOError:
-            pass
-    else:
-        path = None
-        if os.path.exists(os.path.join(packages_path, package_name, resource)):
-            path = os.path.join(packages_path, package_name, resource)
-            content = _get_directory_item_content(path, return_binary, encoding)
-
-        if VERSION >= 3006:
-            sublime_package = package_name + ".sublime-package"
-
-            packages_path = sublime.installed_packages_path()
-            if content is None:
-                if os.path.exists(os.path.join(packages_path, sublime_package)):
-                    content = _get_zip_item_content(
-                        os.path.join(packages_path, sublime_package),
-                        resource,
-                        return_binary,
-                        encoding,
-                    )
-
-            packages_path = os.path.dirname(sublime.executable_path()) + os.sep + "Packages"
-
-            if content is None:
-                if os.path.exists(os.path.join(packages_path, sublime_package)):
-                    content = _get_zip_item_content(
-                        os.path.join(packages_path, sublime_package),
-                        resource,
-                        return_binary,
-                        encoding,
-                    )
-
-    return content
+    try:
+        if return_binary:
+            return sublime.load_binary_resource("Packages/" + package_name + "/" + resource)
+        else:
+            return sublime.load_resource("Packages/" + package_name + "/" + resource)
+    except OSError:
+        return None
 
 
 def find_resource(resource_pattern, package=None):
@@ -94,17 +57,14 @@ def find_resource(resource_pattern, package=None):
             )
         )
 
-        if VERSION >= 3006:
-            zip_location = os.path.join(
-                sublime.installed_packages_path(), package + ".sublime-package"
-            )
-            file_set.update(_find_zip_resource(zip_location, resource_pattern))
-            zip_location = os.path.join(
-                os.path.dirname(sublime.executable_path()),
-                "Packages",
-                package + ".sublime-package",
-            )
-            file_set.update(_find_zip_resource(zip_location, resource_pattern))
+        zip_location = os.path.join(sublime.installed_packages_path(), package + ".sublime-package")
+        file_set.update(_find_zip_resource(zip_location, resource_pattern))
+        zip_location = os.path.join(
+            os.path.dirname(sublime.executable_path()),
+            "Packages",
+            package + ".sublime-package",
+        )
+        file_set.update(_find_zip_resource(zip_location, resource_pattern))
         ret_list = map(lambda e: package + "/" + e, file_set)
 
     return sorted(ret_list)
@@ -115,7 +75,6 @@ def list_package_files(package, ignore_patterns=[]):
     List files in the specified package.
     """
     package_path = os.path.join(sublime.packages_path(), package, "")
-    path = None
     file_set = set()
     file_list = []
     if os.path.exists(package_path):
@@ -126,17 +85,16 @@ def list_package_files(package, ignore_patterns=[]):
 
     file_set.update(file_list)
 
-    if VERSION >= 3006:
-        sublime_package = package + ".sublime-package"
-        packages_path = sublime.installed_packages_path()
+    sublime_package = package + ".sublime-package"
+    packages_path = sublime.installed_packages_path()
 
-        if os.path.exists(os.path.join(packages_path, sublime_package)):
-            file_set.update(_list_files_in_zip(packages_path, sublime_package))
+    if os.path.exists(os.path.join(packages_path, sublime_package)):
+        file_set.update(_list_files_in_zip(packages_path, sublime_package))
 
-        packages_path = os.path.dirname(sublime.executable_path()) + os.sep + "Packages"
+    packages_path = os.path.dirname(sublime.executable_path()) + os.sep + "Packages"
 
-        if os.path.exists(os.path.join(packages_path, sublime_package)):
-            file_set.update(_list_files_in_zip(packages_path, sublime_package))
+    if os.path.exists(os.path.join(packages_path, sublime_package)):
+        file_set.update(_list_files_in_zip(packages_path, sublime_package))
 
     file_list = []
 
@@ -182,16 +140,16 @@ def get_package_and_resource_name(path):
         if path.startswith(packages_path):
             package, resource = _search_for_package_and_resource(path, packages_path)
 
-        if int(sublime.version()) >= 3006:
-            packages_path = _normalize_to_sublime_path(sublime.installed_packages_path())
-            if path.startswith(packages_path):
-                package, resource = _search_for_package_and_resource(path, packages_path)
+        packages_path = _normalize_to_sublime_path(sublime.installed_packages_path())
+        if path.startswith(packages_path):
+            package, resource = _search_for_package_and_resource(path, packages_path)
 
-            packages_path = _normalize_to_sublime_path(
-                os.path.dirname(sublime.executable_path()) + os.sep + "Packages"
-            )
-            if path.startswith(packages_path):
-                package, resource = _search_for_package_and_resource(path, packages_path)
+        packages_path = _normalize_to_sublime_path(
+            os.path.dirname(sublime.executable_path()) + os.sep + "Packages"
+        )
+        if path.startswith(packages_path):
+            package, resource = _search_for_package_and_resource(path, packages_path)
+
     else:
         path = re.sub(r"^Packages/", "", path)
         split = re.split(r"/", path, 1)
@@ -209,15 +167,12 @@ def get_packages_list(ignore_packages=True, ignore_patterns=[]):
     package_set = set()
     package_set.update(_get_packages_from_directory(sublime.packages_path()))
 
-    if int(sublime.version()) >= 3006:
-        package_set.update(
-            _get_packages_from_directory(sublime.installed_packages_path(), ".sublime-package")
-        )
+    package_set.update(
+        _get_packages_from_directory(sublime.installed_packages_path(), ".sublime-package")
+    )
 
-        executable_package_path = os.path.dirname(sublime.executable_path()) + os.sep + "Packages"
-        package_set.update(
-            _get_packages_from_directory(executable_package_path, ".sublime-package")
-        )
+    executable_package_path = os.path.dirname(sublime.executable_path()) + os.sep + "Packages"
+    package_set.update(_get_packages_from_directory(executable_package_path, ".sublime-package"))
 
     if ignore_packages:
         ignored_list = sublime.load_settings("Preferences.sublime-settings").get(
@@ -343,19 +298,16 @@ def extract_zip_resource(path_to_zip, resource, extract_dir=None):
 
 
 def extract_package(package):
-    if VERSION >= 3006:
+    package_location = os.path.join(sublime.installed_packages_path(), package + ".sublime-package")
+    if not os.path.exists(package_location):
         package_location = os.path.join(
-            sublime.installed_packages_path(), package + ".sublime-package"
+            os.path.dirname(sublime.executable_path()),
+            "Packages",
+            package + ".sublime-package",
         )
         if not os.path.exists(package_location):
-            package_location = os.path.join(
-                os.path.dirname(sublime.executable_path()),
-                "Packages",
-                package + ".sublime-package",
-            )
-            if not os.path.exists(package_location):
-                package_location = None
-        if package_location:
-            with zipfile.ZipFile(package_location) as zip_file:
-                extract_location = os.path.join(sublime.packages_path(), package)
-                zip_file.extractall(extract_location)
+            package_location = None
+    if package_location:
+        with zipfile.ZipFile(package_location) as zip_file:
+            extract_location = os.path.join(sublime.packages_path(), package)
+            zip_file.extractall(extract_location)
