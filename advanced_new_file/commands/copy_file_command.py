@@ -5,10 +5,10 @@ import shutil
 import sublime_plugin
 
 from ..anf_util import *
-from .duplicate_file_base import DuplicateFileBase
+from .duplicate_file_base import DuplicateFileBaseCommand
 
 
-class AdvancedNewFileCopy(DuplicateFileBase):
+class AdvancedNewFileCopyCommand(DuplicateFileBaseCommand):
     def get_default_setting(self):
         return COPY_DEFAULT_SETTING
 
