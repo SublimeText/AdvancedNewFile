@@ -4,10 +4,10 @@ import re
 from ..anf_util import *
 
 
-class GenerateCompletionListBase(object):
+class GenerateCompletionListBase:
     """docstring for GenerateCompletionListBase"""
     def __init__(self, command):
-        super(GenerateCompletionListBase, self).__init__()
+        super().__init__()
         self.top_level_split_char = ":"
         self.command = command
         self.aliases = command.aliases

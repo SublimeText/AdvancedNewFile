@@ -10,9 +10,6 @@ from .duplicate_file_base import DuplicateFileBase
 
 
 class AdvancedNewFileMove(DuplicateFileBase, GitCommandBase):
-    def __init__(self, window):
-        super(AdvancedNewFileMove, self).__init__(window)
-
     def get_default_setting(self):
         return RENAME_DEFAULT_SETTING
 

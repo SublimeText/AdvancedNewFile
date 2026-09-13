@@ -4,6 +4,7 @@ import re
 import shlex
 
 import sublime
+import sublime_plugin
 
 from ..anf_util import *
 from ..completions.nix_completion import NixCompletion
@@ -14,10 +15,9 @@ from ..platform.windows_platform import WindowsPlatform
 VIEW_NAME = "AdvancedNewFileCreation"
 
 
-class AdvancedNewFileBase(object):
-
+class AdvancedNewFileBase(sublime_plugin.WindowCommand):
     def __init__(self, window):
-        super(AdvancedNewFileBase, self).__init__(window)
+        super().__init__(window)
 
         if PLATFORM == "windows":
             self.platform = WindowsPlatform(window.active_view())
