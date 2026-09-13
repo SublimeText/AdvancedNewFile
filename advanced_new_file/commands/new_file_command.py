@@ -1,12 +1,13 @@
-import sublime
-import sublime_plugin
 import os
 import re
 import xml.etree.ElementTree as ET
 
-from .command_base import AdvancedNewFileBase
-from ..lib.package_resources import get_resource
+import sublime
+import sublime_plugin
+
 from ..anf_util import *
+from ..lib.package_resources import get_resource
+from .command_base import AdvancedNewFileBase
 
 
 class AdvancedNewFileNew(AdvancedNewFileBase, sublime_plugin.WindowCommand):

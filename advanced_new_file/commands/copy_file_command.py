@@ -1,10 +1,12 @@
 import os
 import re
 import shutil
+
 import sublime_plugin
 
-from .duplicate_file_base import DuplicateFileBase
 from ..anf_util import *
+from .duplicate_file_base import DuplicateFileBase
+
 
 class AdvancedNewFileCopy(DuplicateFileBase):
     def __init__(self, window):

@@ -1,6 +1,7 @@
-import sublime
-import re
 import os
+import re
+
+import sublime
 
 ALIAS_SETTING = "alias"
 DEFAULT_INITIAL_SETTING = "default_initial"

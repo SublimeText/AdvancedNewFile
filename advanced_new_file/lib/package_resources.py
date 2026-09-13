@@ -4,22 +4,23 @@ Copyright (c) 2014 Scott Kuroda <scott.kuroda@gmail.com>
 
 SHA: 623a4c1ec46dbbf3268bd88131bf0dfc845af787
 """
-import sublime
-import os
-import zipfile
-import tempfile
-import re
 import codecs
+import os
+import re
+import tempfile
+import zipfile
+
+import sublime
 
 __all__ = [
-    "get_resource",
-    "get_binary_resource",
+    "extract_package",
     "find_resource",
-    "list_package_files",
+    "get_binary_resource",
     "get_package_and_resource_name",
     "get_packages_list",
-    "extract_package",
-    "get_sublime_packages"
+    "get_resource",
+    "get_sublime_packages",
+    "list_package_files"
 ]
 
 
