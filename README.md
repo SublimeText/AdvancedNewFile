@@ -138,7 +138,7 @@ A boolean setting specifying if a separator should be inserted when there is onl
 
 `use_folder_name`:
 
-A boolean setting specifying if the folder name should be used or the name specified in the project. This setting only applies to ST3.
+A boolean setting specifying if the folder name should be used or the name specified in the project.
 
 `relative_from_current`:
 
@@ -281,9 +281,6 @@ To specify the current working directory, simply type a colon, without any prece
 
 ## Notes
 Thanks to Dima Kukushkin ([xobb1t](https://github.com/xobb1t)) for the original work on this plugin. Also, thank you to [facelessuser](https://github.com/facelessuser), and by extension biermeester and matthjes for the idea of platform specific settings. Additional thanks to [kemayo](https://github.com/kemayo) for the work in identifying git executable.
-
-### Libraries Used
-* [ushlex](https://bitbucket.org/mixmastamyk/ushlex) - Improved version of shlex, supporting unicode characters for Python 2.
 
 ### Contributors
 * [alirezadot](https://github.com/alirezadot)

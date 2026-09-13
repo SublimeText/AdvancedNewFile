@@ -92,7 +92,6 @@ WIN_ROOT_REGEX = r"[a-zA-Z]:(/|\\)"
 HOME_REGEX = r"^~"
 PLATFORM = sublime.platform()
 TOP_LEVEL_SPLIT_CHAR = ":"
-IS_ST3 = int(sublime.version()) > 3000
 IS_X64 = sublime.arch() == "x64"
 REGION_KEY = "anf_cut_to_file"
 
@@ -100,10 +99,7 @@ REGION_KEY = "anf_cut_to_file"
 def generate_creation_path(settings, base, path, append_extension=False):
         if PLATFORM == "windows":
             if not re.match(WIN_ROOT_REGEX, base):
-                if IS_ST3:
-                    drive, _ = os.path.splitdrive(base)
-                else:
-                    drive, _ = os.path.splitunc(base)
+                drive, _ = os.path.splitdrive(base)
                 if len(drive) == 0:
                     return base + TOP_LEVEL_SPLIT_CHAR + path
                 else:
@@ -148,16 +144,10 @@ def get_settings(view):
     for key in project_settings:
         if key in SETTINGS:
             if key == "alias":
-                if IS_ST3:
-                    local_settings[key] = dict(
-                        local_settings[key].items() |
-                        project_settings.get(key).items()
-                    )
-                else:
-                    local_settings[key] = dict(
-                        local_settings[key].items() +
-                        project_settings.get(key).items()
-                    )
+                local_settings[key] = dict(
+                    local_settings[key].items() |
+                    project_settings.get(key).items()
+                )
             else:
                 local_settings[key] = project_settings[key]
         else:
@@ -172,19 +162,15 @@ def get_project_folder_data(use_folder_name):
     folder_entries = []
     window = sublime.active_window()
     project_folders = window.folders()
+    project_data = window.project_data()
 
-    if IS_ST3:
-        project_data = window.project_data()
+    if project_data is not None:
+        if use_folder_name:
+            for folder in project_data.get("folders", []):
+                folder_entries.append({})
+        else:
+            folder_entries = project_data.get("folders", [])
 
-        if project_data is not None:
-            if use_folder_name:
-                for folder in project_data.get("folders", []):
-                    folder_entries.append({})
-            else:
-                folder_entries = project_data.get("folders", [])
-    else:
-        for folder in project_folders:
-            folder_entries.append({})
     for index in range(len(folder_entries)):
         folder_path = project_folders[index]
         folder_entry = folder_entries[index]

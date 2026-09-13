@@ -11,13 +11,6 @@ from ..platform.nix_platform import NixPlatform
 from ..completions.nix_completion import NixCompletion
 from ..completions.windows_completion import WindowsCompletion
 
-if not IS_ST3:
-    if PLATFORM == "windows":
-        import sys
-        sys.path.append(os.path.dirname(sys.executable))
-    from ..lib.ushlex import split as st2_shlex_split
-
-
 VIEW_NAME = "AdvancedNewFileCreation"
 
 
@@ -135,23 +128,8 @@ class AdvancedNewFileBase(object):
         return folder_index
 
     def __parse_for_shell_input(self, path):
-        if not IS_ST3 and self.__contains_non_ascii(path):
-            split_path = self.__split_shell_input_for_st2_non_ascii(path)
-        else:
-            split_path = shlex.split(str(path))
-
+        split_path = shlex.split(str(path))
         return " ".join(split_path)
-
-    def __split_shell_input_for_st2_non_ascii(self, path):
-        return st2_shlex_split(path)
-
-    def __contains_non_ascii(self, string):
-        # Don't really like this....
-        try:
-            string.decode("ascii")
-        except UnicodeEncodeError:
-            return True
-        return False
 
     def split_path(self, path=""):
         HOME_REGEX = r"^~[/\\]"
@@ -434,15 +412,7 @@ class AdvancedNewFileBase(object):
         return path
 
     def _find_open_file(self, file_name):
-        window = self.window
-        if IS_ST3:
-            return window.find_open_file(file_name)
-        else:
-            for view in window.views():
-                view_name = view.file_name()
-                if view_name != "" and view_name == file_name:
-                    return view
-        return None
+        return self.window.find_open_file(file_name)
 
     ## Should be overridden by sub class
     def get_default_root_setting(self):

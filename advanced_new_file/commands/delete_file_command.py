@@ -66,14 +66,7 @@ class AdvancedNewFileDelete(AdvancedNewFileBase, sublime_plugin.WindowCommand,
         self.refresh_sidebar()
 
     def _execute_delete_file(self, filepath):
-        if IS_ST3 and self._side_bar_enhancements_installed():
-            import Default.send2trash as send2trash
-            send2trash.send2trash(filepath)
-        else:
-            self.window.run_command("delete_file", {"files": [filepath]})
-
-    def _side_bar_enhancements_installed(self):
-        return "SideBarEnhancements.SideBar" in sys.modules
+        self.window.run_command("delete_file", {"files": [filepath]})
 
     def close_view(self, filepath):
         file_view = self._find_open_file(filepath)
