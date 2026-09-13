@@ -50,7 +50,7 @@ GIT = find_git()
 
 
 # Base for git commands
-class GitCommandBase:
+class GitCommandMixin:
     # Command specific
     def file_tracked_by_git(self, filepath):
         git = GIT

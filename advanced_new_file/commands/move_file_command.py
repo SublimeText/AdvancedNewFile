@@ -5,11 +5,11 @@ import shutil
 import sublime_plugin
 
 from ..anf_util import *
-from ..vcs.git.git_command_base import GitCommandBase
+from ..vcs.git.git_command_base import GitCommandMixin
 from .duplicate_file_base import DuplicateFileBaseCommand
 
 
-class AdvancedNewFileMoveCommand(DuplicateFileBaseCommand, GitCommandBase):
+class AdvancedNewFileMoveCommand(DuplicateFileBaseCommand, GitCommandMixin):
     def get_default_setting(self):
         return RENAME_DEFAULT_SETTING
 

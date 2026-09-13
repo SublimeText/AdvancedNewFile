@@ -3,11 +3,11 @@ import os
 import sublime
 
 from ..anf_util import *
-from ..vcs.git.git_command_base import GitCommandBase
+from ..vcs.git.git_command_base import GitCommandMixin
 from .command_base import AdvancedNewFileBaseCommand
 
 
-class AdvancedNewFileDeleteCommand(AdvancedNewFileBaseCommand, GitCommandBase):
+class AdvancedNewFileDeleteCommand(AdvancedNewFileBaseCommand, GitCommandMixin):
     def run(self, current=False):
         self.run_setup()
         if current:
