@@ -1,11 +1,12 @@
 import os
 import re
 import shutil
+
 import sublime_plugin
 
-from .duplicate_file_base import DuplicateFileBase
 from ..anf_util import *
 from ..vcs.git.git_command_base import GitCommandBase
+from .duplicate_file_base import DuplicateFileBase
 
 
 class AdvancedNewFileMove(DuplicateFileBase, GitCommandBase):

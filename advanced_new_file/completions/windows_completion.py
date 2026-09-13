@@ -1,6 +1,7 @@
 import re
-from .completion_base import GenerateCompletionListBase
+
 from ..anf_util import *
+from .completion_base import GenerateCompletionListBase
 
 
 class WindowsCompletion(GenerateCompletionListBase):

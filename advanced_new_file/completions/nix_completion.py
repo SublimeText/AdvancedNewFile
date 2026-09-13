@@ -1,9 +1,10 @@
 import os
 import re
+
 import sublime
 
-from .completion_base import GenerateCompletionListBase
 from ..anf_util import *
+from .completion_base import GenerateCompletionListBase
 
 
 class NixCompletion(GenerateCompletionListBase):

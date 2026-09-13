@@ -1,9 +1,10 @@
 import os
-import re
+
 import sublime_plugin
 
-from .command_base import AdvancedNewFileBase
 from ..anf_util import *
+from .command_base import AdvancedNewFileBase
+
 
 class DuplicateFileBase(AdvancedNewFileBase, sublime_plugin.WindowCommand):
 

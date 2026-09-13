@@ -1,15 +1,15 @@
 import errno
 import os
 import re
-import sublime
-import sublime_plugin
 import shlex
 
+import sublime
+
 from ..anf_util import *
-from ..platform.windows_platform import WindowsPlatform
-from ..platform.nix_platform import NixPlatform
 from ..completions.nix_completion import NixCompletion
 from ..completions.windows_completion import WindowsCompletion
+from ..platform.nix_platform import NixPlatform
+from ..platform.windows_platform import WindowsPlatform
 
 VIEW_NAME = "AdvancedNewFileCreation"
 

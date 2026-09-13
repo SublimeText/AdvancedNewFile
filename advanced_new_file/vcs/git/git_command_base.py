@@ -1,6 +1,6 @@
-import sublime
-import subprocess
 import os
+import subprocess
+
 from ...anf_util import *
 
 

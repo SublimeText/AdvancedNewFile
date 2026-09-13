@@ -1,9 +1,10 @@
-import sublime
-import sublime_plugin
 import os
 
-from .command_base import AdvancedNewFileBase
+import sublime
+import sublime_plugin
+
 from ..anf_util import *
+from .command_base import AdvancedNewFileBase
 
 
 class AdvancedNewFileCutToFile(AdvancedNewFileBase, sublime_plugin.WindowCommand):
