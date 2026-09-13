@@ -10,10 +10,7 @@ from ..lib.package_resources import get_resource
 from .command_base import AdvancedNewFileBase
 
 
-class AdvancedNewFileNew(AdvancedNewFileBase, sublime_plugin.WindowCommand):
-    def __init__(self, window):
-        super(AdvancedNewFileNew, self).__init__(window)
-
+class AdvancedNewFileNew(AdvancedNewFileBase):
     def run(self, is_python=False, initial_path=None):
         self.is_python = is_python
         self.run_setup()

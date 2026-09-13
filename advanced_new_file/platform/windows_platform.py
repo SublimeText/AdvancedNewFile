@@ -4,10 +4,10 @@ import re
 from ..anf_util import *
 
 
-class WindowsPlatform(object):
+class WindowsPlatform:
     """docstring for WindowsPlatform"""
     def __init__(self, view):
-        super(WindowsPlatform, self).__init__()
+        super().__init__()
         self.view = view
 
     def split(self, path):

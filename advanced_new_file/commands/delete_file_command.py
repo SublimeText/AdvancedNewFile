@@ -1,19 +1,13 @@
 import os
-import sys
 
 import sublime
-import sublime_plugin
 
 from ..anf_util import *
 from ..vcs.git.git_command_base import GitCommandBase
 from .command_base import AdvancedNewFileBase
 
 
-class AdvancedNewFileDelete(AdvancedNewFileBase, sublime_plugin.WindowCommand,
-                            GitCommandBase):
-    def __init__(self, window):
-        super(AdvancedNewFileDelete, self).__init__(window)
-
+class AdvancedNewFileDelete(AdvancedNewFileBase, GitCommandBase):
     def run(self, current=False):
         self.run_setup()
         if current:

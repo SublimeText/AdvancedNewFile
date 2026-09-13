@@ -8,9 +8,6 @@ from .completion_base import GenerateCompletionListBase
 
 
 class NixCompletion(GenerateCompletionListBase):
-    def __init__(self, command):
-        super(NixCompletion, self).__init__(command)
-
     def completion(self, path_in):
         pattern = r"(.*[/\\:])(.*)"
 

@@ -4,7 +4,7 @@ import re
 from ..anf_util import *
 
 
-class NixPlatform():
+class NixPlatform:
     def split(self, path):
         return None, path
 

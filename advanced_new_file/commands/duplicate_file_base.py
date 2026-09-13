@@ -1,16 +1,10 @@
 import os
 
-import sublime_plugin
-
 from ..anf_util import *
 from .command_base import AdvancedNewFileBase
 
 
-class DuplicateFileBase(AdvancedNewFileBase, sublime_plugin.WindowCommand):
-
-    def __init__(self, window):
-        super(DuplicateFileBase, self).__init__(window)
-
+class DuplicateFileBase(AdvancedNewFileBase):
     def run(self, is_python=False, initial_path=None, rename_file=None):
         self.is_python = is_python
         self.run_setup()

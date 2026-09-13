@@ -50,10 +50,7 @@ GIT = find_git()
 
 
 # Base for git commands
-class GitCommandBase(object):
-    def __init__(self, window):
-        pass
-
+class GitCommandBase:
     # Command specific
     def file_tracked_by_git(self, filepath):
         git = GIT

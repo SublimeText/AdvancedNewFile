@@ -9,9 +9,6 @@ from .duplicate_file_base import DuplicateFileBase
 
 
 class AdvancedNewFileCopy(DuplicateFileBase):
-    def __init__(self, window):
-        super(AdvancedNewFileCopy, self).__init__(window)
-
     def get_default_setting(self):
         return COPY_DEFAULT_SETTING
 

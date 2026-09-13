@@ -1,16 +1,12 @@
 import os
 
 import sublime
-import sublime_plugin
 
 from ..anf_util import *
 from .command_base import AdvancedNewFileBase
 
 
-class AdvancedNewFileCutToFile(AdvancedNewFileBase, sublime_plugin.WindowCommand):
-    def __init__(self, window):
-        super(AdvancedNewFileCutToFile, self).__init__(window)
-
+class AdvancedNewFileCutToFile(AdvancedNewFileBase):
     def run(self, is_python=False):
         self.is_python = is_python
         self.run_setup()
