@@ -90,7 +90,7 @@
 	"complete_single_entry": true,
 
 	// A boolean setting specifying if the folder name should be used
-	// or the name specified in the project. This setting only applies to ST3.
+	// or the name specified in the project.
 	"use_folder_name": false,
 
 	// Boolean setting specifying if relative paths should be based on the

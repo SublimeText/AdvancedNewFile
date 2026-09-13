@@ -138,7 +138,7 @@ A boolean setting specifying if a separator should be inserted when there is onl
 
 `use_folder_name`:
 
-A boolean setting specifying if the folder name should be used or the name specified in the project. This setting only applies to ST3.
+A boolean setting specifying if the folder name should be used or the name specified in the project.
 
 `relative_from_current`:
 
