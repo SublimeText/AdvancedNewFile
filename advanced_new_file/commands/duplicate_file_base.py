@@ -14,8 +14,7 @@ class DuplicateFileBaseCommand(AdvancedNewFileBaseCommand):
         path = self._expand_default_path(path)
 
         self.duplicate_setup()
-        self.show_filename_input(
-            path if len(path) > 0 else self.generate_initial_path())
+        self.show_filename_input(path if len(path) > 0 else self.generate_initial_path())
 
     def get_argument_name(self):
         return self.argument_name
@@ -38,15 +37,12 @@ class DuplicateFileBaseCommand(AdvancedNewFileBaseCommand):
         else:
             creation_path = self.try_append_extension(creation_path)
         if self.view is not None:
-            self.view.set_status("AdvancedNewFile", "%s %s " %
-                                 (status_prefix, creation_path))
+            self.view.set_status("AdvancedNewFile", "%s %s " % (status_prefix, creation_path))
         else:
-            sublime.status_message("%s %s" %
-                                   (status_prefix, creation_path))
+            sublime.status_message("%s %s" % (status_prefix, creation_path))
 
     def is_copy_original_name(self, path):
-        return (os.path.isdir(path) or
-               os.path.basename(path) == "")
+        return os.path.isdir(path) or os.path.basename(path) == ""
 
     def try_append_extension(self, path):
         append_setting = self.get_append_extension_setting()
@@ -61,6 +57,3 @@ class DuplicateFileBaseCommand(AdvancedNewFileBaseCommand):
                         _, extension = os.path.splitext(argument_name)
                     path += extension
         return path
-
-
-

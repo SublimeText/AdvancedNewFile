@@ -27,5 +27,5 @@ __all__ = [
     "AdvancedNewFileNewCommand",
     "AdvancedNewFileNewEventListener",
     "AnfRemoveRegionContentAndRegionCommand",
-    "AnfReplaceCommand"
+    "AnfReplaceCommand",
 ]

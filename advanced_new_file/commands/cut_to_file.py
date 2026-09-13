@@ -18,20 +18,18 @@ class AdvancedNewFileCutToFileCommand(AdvancedNewFileBaseCommand):
         path = self.settings.get(CUT_TO_FILE_DEFAULT_SETTING, "")
         path = self._expand_default_path(path)
 
-        self.show_filename_input(
-            path if len(path) > 0 else self.generate_initial_path())
+        self.show_filename_input(path if len(path) > 0 else self.generate_initial_path())
 
     def input_panel_caption(self):
-        caption = 'Move selection to'
+        caption = "Move selection to"
         if self.is_python:
-            caption = '%s (creates __init__.py in new dirs)' % caption
+            caption = "%s (creates __init__.py in new dirs)" % caption
         return caption
 
     def update_status_message(self, creation_path):
         status_base = "Cutting selection to"
         if self.view is not None:
-            self.view.set_status("AdvancedNewFile", "%s %s " %
-                                 (status_base, creation_path))
+            self.view.set_status("AdvancedNewFile", "%s %s " % (status_base, creation_path))
         else:
             sublime.status_message("%s %s" % (status_base, creation_path))
 
@@ -42,9 +40,8 @@ class AdvancedNewFileCutToFileCommand(AdvancedNewFileBaseCommand):
             attempt_open = self._create_new_file(path)
         if attempt_open:
             self._open_and_add_content_to_file(path)
-        self.view.run_command("anf_remove_region_content_and_region", { "region_key": REGION_KEY})
+        self.view.run_command("anf_remove_region_content_and_region", {"region_key": REGION_KEY})
         self.open_file(path)
-
 
     def _create_new_file(self, path):
         attempt_open = True
@@ -53,8 +50,7 @@ class AdvancedNewFileCutToFileCommand(AdvancedNewFileBaseCommand):
             self.create(path)
         except OSError as e:
             attempt_open = False
-            sublime.error_message("Cannot create '" + path +
-                                  "'. See console for details")
+            sublime.error_message("Cannot create '" + path + "'. See console for details")
         return attempt_open
 
     def _open_and_add_content_to_file(self, path):
@@ -75,4 +71,3 @@ class AdvancedNewFileCutToFileCommand(AdvancedNewFileBaseCommand):
                 return True
 
         return False
-

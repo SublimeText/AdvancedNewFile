@@ -17,9 +17,9 @@ class AdvancedNewFileNewCommand(AdvancedNewFileBaseCommand):
         self.show_filename_input(self.generate_initial_path(initial_path))
 
     def input_panel_caption(self):
-        caption = 'Enter a path for a new file'
+        caption = "Enter a path for a new file"
         if self.is_python:
-            caption = '%s (creates __init__.py in new dirs)' % caption
+            caption = "%s (creates __init__.py in new dirs)" % caption
         return caption
 
     def entered_file_action(self, path):
@@ -40,8 +40,7 @@ class AdvancedNewFileNewCommand(AdvancedNewFileBaseCommand):
                 self.create(path)
             except OSError as e:
                 attempt_open = False
-                sublime.error_message("Cannot create '" + path +
-                                      "'. See console for details")
+                sublime.error_message("Cannot create '" + path + "'. See console for details")
                 print("Exception: %s '%s'" % (e.strerror, e.filename))
         if attempt_open and os.path.isfile(path):
             file_view = self.open_file(path)
@@ -75,15 +74,15 @@ class AdvancedNewFileNewCommand(AdvancedNewFileBaseCommand):
         if "{" not in path:
             return [path]
         start, end = self.curly_brace_indecies(path)
-        all_tokens = path[start + 1:end]
+        all_tokens = path[start + 1 : end]
         paths = []
         for token in all_tokens.split(","):
-            temp = path[0:start] + token + path[end + 1:]
+            temp = path[0:start] + token + path[end + 1 :]
             paths.append(temp)
         return paths
 
     # Assumes curly braces are balanced.
-    def curly_brace_indecies(self, path, count=0,open_index=None):
+    def curly_brace_indecies(self, path, count=0, open_index=None):
         if len(path) == 0:
             return None
         c = path[0]
@@ -108,8 +107,7 @@ class AdvancedNewFileNewCommand(AdvancedNewFileBaseCommand):
 
     def update_status_message(self, creation_path):
         if self.view is not None:
-            self.view.set_status("AdvancedNewFile", "Creating file at %s " %
-                                 creation_path)
+            self.view.set_status("AdvancedNewFile", "Creating file at %s " % creation_path)
         else:
             sublime.status_message("Creating file at %s" % creation_path)
 
@@ -125,8 +123,7 @@ class AdvancedNewFileNewAtCommand(sublime_plugin.WindowCommand):
         if len(dirs) != 1:
             return
         path = dirs[0] + os.sep
-        self.window.run_command("advanced_new_file_new",
-                                {"initial_path": path})
+        self.window.run_command("advanced_new_file_new", {"initial_path": path})
 
     def is_visible(self, dirs):
         return len(dirs) == 1
@@ -136,8 +133,7 @@ class AdvancedNewFileNewAtFileCommand(sublime_plugin.WindowCommand):
     def run(self, files):
         if len(files) != 1:
             return
-        self.window.run_command("advanced_new_file_new",
-                                {"initial_path": files[0]})
+        self.window.run_command("advanced_new_file_new", {"initial_path": files[0]})
 
     def is_visible(self, files):
         return len(files) == 1
@@ -160,12 +156,20 @@ class AdvancedNewFileNewEventListener(sublime_plugin.EventListener):
                 template = settings.get(FILE_TEMPLATES_SETTING)[extension]
                 if type(template) == list:
                     if len(template) == 1:
-                        view.run_command("insert_snippet", {"contents": self.get_snippet_from_file(template[0])})
+                        view.run_command(
+                            "insert_snippet",
+                            {"contents": self.get_snippet_from_file(template[0])},
+                        )
                     else:
                         entries = list(map(self.get_basename, template))
                         self.entries = list(map(self.expand_path, template))
                         self.view = view
-                        sublime.set_timeout(lambda: view.window().show_quick_panel(entries, self.quick_panel_selection), 10)
+                        sublime.set_timeout(
+                            lambda: view.window().show_quick_panel(
+                                entries, self.quick_panel_selection
+                            ),
+                            10,
+                        )
                 else:
                     view.run_command("insert_snippet", {"contents": template})
             view.settings().set("_anf_new", "")
@@ -179,7 +183,10 @@ class AdvancedNewFileNewEventListener(sublime_plugin.EventListener):
     def quick_panel_selection(self, index):
         if index < 0:
             return
-        self.view.run_command("insert_snippet", {"contents": self.get_snippet_from_file(self.entries[index])})
+        self.view.run_command(
+            "insert_snippet",
+            {"contents": self.get_snippet_from_file(self.entries[index])},
+        )
 
     def get_snippet_from_file(self, path):
         match = re.match(r"Packages/([^/]+)/(.+)", path)

@@ -8,8 +8,7 @@ class AnfReplaceCommand(sublime_plugin.TextCommand):
 
 
 class AdvancedNewFileCommand(sublime_plugin.WindowCommand):
-    def run(self, is_python=False, initial_path=None,
-            rename=False, rename_file=None):
+    def run(self, is_python=False, initial_path=None, rename=False, rename_file=None):
         args = {}
         if rename:
             args["is_python"] = is_python
@@ -28,4 +27,3 @@ class AnfRemoveRegionContentAndRegionCommand(sublime_plugin.TextCommand):
         for region in regions:
             self.view.erase(edit, region)
         self.view.erase_regions(region_key)
-

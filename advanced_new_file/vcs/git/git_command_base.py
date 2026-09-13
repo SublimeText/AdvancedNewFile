@@ -19,32 +19,30 @@ def find_git():
     # this a bit.
     # (Yes, I could fall back on a hardline "set your system path properly"
     # attitude. But that involves a lot more arguing with people.)
-    path = os.environ.get('PATH', '').split(os.pathsep)
-    if os.name == 'nt':
-        git_cmd = 'git.exe'
+    path = os.environ.get("PATH", "").split(os.pathsep)
+    if os.name == "nt":
+        git_cmd = "git.exe"
     else:
-        git_cmd = 'git'
+        git_cmd = "git"
 
     git_path = _test_paths_for_executable(path, git_cmd)
 
     if not git_path:
         # /usr/local/bin:/usr/local/git/bin
-        if os.name == 'nt':
-            extra_paths = (
-                os.path.join(os.environ["ProgramFiles"], "Git", "bin"),
-            )
+        if os.name == "nt":
+            extra_paths = (os.path.join(os.environ["ProgramFiles"], "Git", "bin"),)
             if IS_X64:
                 extra_paths = extra_paths + (
-                    os.path.join(
-                        os.environ["ProgramFiles(x86)"], "Git", "bin"),
+                    os.path.join(os.environ["ProgramFiles(x86)"], "Git", "bin"),
                 )
         else:
             extra_paths = (
-                '/usr/local/bin',
-                '/usr/local/git/bin',
+                "/usr/local/bin",
+                "/usr/local/git/bin",
             )
         git_path = _test_paths_for_executable(extra_paths, git_cmd)
     return git_path
+
 
 GIT = find_git()
 
@@ -56,8 +54,7 @@ class GitCommandMixin:
         git = GIT
         if git is not None:
             path, file_name = os.path.split(filepath)
-            return self.run_command(
-                ["ls-files", file_name, "--error-unmatch"], path) == 0
+            return self.run_command(["ls-files", file_name, "--error-unmatch"], path) == 0
         else:
             return False
 

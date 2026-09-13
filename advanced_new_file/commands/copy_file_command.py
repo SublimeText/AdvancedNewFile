@@ -13,9 +13,9 @@ class AdvancedNewFileCopyCommand(DuplicateFileBaseCommand):
         return COPY_DEFAULT_SETTING
 
     def input_panel_caption(self):
-        caption = 'Enter a new path to copy file'
+        caption = "Enter a new path to copy file"
         if self.is_python:
-            caption = '%s (creates __init__.py in new dirs)' % caption
+            caption = "%s (creates __init__.py in new dirs)" % caption
         return caption
 
     def entered_file_action(self, path):
@@ -28,8 +28,7 @@ class AdvancedNewFileCopyCommand(DuplicateFileBaseCommand):
                 self.create_folder(directory)
             except OSError as e:
                 attempt_copy = False
-                sublime.error_message("Cannot create '" + path + "'." +
-                                      " See console for details")
+                sublime.error_message("Cannot create '" + path + "'." + " See console for details")
                 print("Exception: %s '%s'" % (e.strerror, e.filename))
 
         if attempt_copy:
@@ -39,10 +38,10 @@ class AdvancedNewFileCopyCommand(DuplicateFileBaseCommand):
 
     def _try_prompt_if_dest_exists(self, target):
         if self.settings.get(WARN_OVERWRITE_ON_COPY_SETTING, False):
-            if (os.path.exists(target)):
-                return sublime.ok_cancel_dialog(target + " already exists. " +
-                                                "Copy will overwrite " +
-                                                "existing file. Continue?")
+            if os.path.exists(target):
+                return sublime.ok_cancel_dialog(
+                    target + " already exists. Copy will overwrite existing file. Continue?"
+                )
 
     def _copy_file(self, path):
         if os.path.isdir(path) or re.search(r"(/|\\)$", path):
@@ -84,7 +83,6 @@ class AdvancedNewFileCopyCommand(DuplicateFileBaseCommand):
 
         self._copy_file_action(source_name, target)
 
-
     def _copy_file_action(self, source, target):
         shutil.copy(source, target)
 
@@ -102,8 +100,7 @@ class AdvancedNewFileCopyAtCommand(sublime_plugin.WindowCommand):
     def run(self, files):
         if len(files) != 1:
             return
-        self.window.run_command("advanced_new_file_copy",
-                                {"rename_file": files[0]})
+        self.window.run_command("advanced_new_file_copy", {"rename_file": files[0]})
 
     def is_visible(self, files):
         return len(files) == 1

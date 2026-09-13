@@ -14,9 +14,9 @@ class AdvancedNewFileMoveCommand(DuplicateFileBaseCommand, GitCommandMixin):
         return RENAME_DEFAULT_SETTING
 
     def input_panel_caption(self):
-        caption = 'Enter a new path for current file'
+        caption = "Enter a new path for current file"
         if self.is_python:
-            caption = '%s (creates __init__.py in new dirs)' % caption
+            caption = "%s (creates __init__.py in new dirs)" % caption
         return caption
 
     def _git_mv(self, from_filepath, to_filepath):
@@ -24,8 +24,7 @@ class AdvancedNewFileMoveCommand(DuplicateFileBaseCommand, GitCommandMixin):
         args = ["mv", filename, to_filepath]
         result = self.run_command(args, path)
         if result != 0:
-            sublime.error_message("Git move of %s to %s failed" %
-                                 (from_filepath, to_filepath))
+            sublime.error_message("Git move of %s to %s failed" % (from_filepath, to_filepath))
 
     def entered_file_action(self, path):
         attempt_open = True
@@ -37,8 +36,7 @@ class AdvancedNewFileMoveCommand(DuplicateFileBaseCommand, GitCommandMixin):
                 self.create_folder(directory)
             except OSError as e:
                 attempt_open = False
-                sublime.error_message("Cannot create '" + path + "'." +
-                                      " See console for details")
+                sublime.error_message("Cannot create '" + path + "'." + " See console for details")
                 print("Exception: %s '%s'" % (e.strerror, e.filename))
 
         if attempt_open:
@@ -85,10 +83,10 @@ class AdvancedNewFileMoveCommand(DuplicateFileBaseCommand, GitCommandMixin):
 
     def _try_prompt_if_dest_exists(self, target):
         if self.settings.get(WARN_OVERWRITE_ON_MOVE_SETTING, False):
-            if (os.path.exists(target)):
-                return sublime.ok_cancel_dialog(target + " already exists. " +
-                                                "Move will overwrite " +
-                                                "existing file. Continue?")
+            if os.path.exists(target):
+                return sublime.ok_cancel_dialog(
+                    target + " already exists. Move will overwrite existing file. Continue?"
+                )
 
         return True
 
@@ -125,7 +123,7 @@ class AdvancedNewFileMoveCommand(DuplicateFileBaseCommand, GitCommandMixin):
         if self.settings.get("autofill_path_the_existing"):
             file_path = self.window.active_view().file_name()[1:]
             base, _ = self.split_path(file_path)
-            return file_path[len(base):]
+            return file_path[len(base) :]
         else:
             return super(self.__class__, self).generate_initial_path()
 
@@ -134,8 +132,7 @@ class AdvancedNewFileMoveAtCommand(sublime_plugin.WindowCommand):
     def run(self, files):
         if len(files) != 1:
             return
-        self.window.run_command("advanced_new_file_move",
-                                {"rename_file": files[0]})
+        self.window.run_command("advanced_new_file_move", {"rename_file": files[0]})
 
     def is_visible(self, files):
         return len(files) == 1

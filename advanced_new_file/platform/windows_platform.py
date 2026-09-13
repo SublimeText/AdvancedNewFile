@@ -6,6 +6,7 @@ from ..anf_util import *
 
 class WindowsPlatform:
     """docstring for WindowsPlatform"""
+
     def __init__(self, view):
         super().__init__()
         self.view = view

@@ -6,6 +6,7 @@ from ..anf_util import *
 
 class GenerateCompletionListBase:
     """docstring for GenerateCompletionListBase"""
+
     def __init__(self, command):
         super().__init__()
         self.top_level_split_char = ":"
@@ -55,8 +56,7 @@ class GenerateCompletionListBase:
         return sorted(completion_list), alias_list, dir_list, file_list
 
     def generate_project_auto_complete(self, base):
-        folder_data = get_project_folder_data(
-            self.settings.get(USE_FOLDER_NAME_SETTING))
+        folder_data = get_project_folder_data(self.settings.get(USE_FOLDER_NAME_SETTING))
         if len(folder_data) > 1:
             folders = [x[0] for x in folder_data]
             return self.generate_auto_complete(base, folders)

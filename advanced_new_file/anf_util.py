@@ -85,7 +85,7 @@ SETTINGS = [
     RENAME_FILE_DEFAULT_ROOT_SETTING,
     COPY_FILE_DEFAULT_ROOT_SETTING,
     DEFAULT_NEW_FILE,
-    CURSOR_BEFORE_EXTENSION_SETTING
+    CURSOR_BEFORE_EXTENSION_SETTING,
 ]
 
 NIX_ROOT_REGEX = r"^/"
@@ -98,34 +98,34 @@ REGION_KEY = "anf_cut_to_file"
 
 
 def generate_creation_path(settings, base, path, append_extension=False):
-        if PLATFORM == "windows":
-            if not re.match(WIN_ROOT_REGEX, base):
-                drive, _ = os.path.splitdrive(base)
-                if len(drive) == 0:
-                    return base + TOP_LEVEL_SPLIT_CHAR + path
-                else:
-                    return os.path.join(base, path)
-        else:
-            if not re.match(NIX_ROOT_REGEX, base):
+    if PLATFORM == "windows":
+        if not re.match(WIN_ROOT_REGEX, base):
+            drive, _ = os.path.splitdrive(base)
+            if len(drive) == 0:
                 return base + TOP_LEVEL_SPLIT_CHAR + path
+            else:
+                return os.path.join(base, path)
+    else:
+        if not re.match(NIX_ROOT_REGEX, base):
+            return base + TOP_LEVEL_SPLIT_CHAR + path
 
-        tokens = re.split(r"[/\\]", base) + re.split(r"[/\\]", path)
-        if tokens[0] == "":
-            tokens[0] = "/"
-        if PLATFORM == "windows":
-            tokens[0] = base[0:3]
+    tokens = re.split(r"[/\\]", base) + re.split(r"[/\\]", path)
+    if tokens[0] == "":
+        tokens[0] = "/"
+    if PLATFORM == "windows":
+        tokens[0] = base[0:3]
 
-        full_path = os.path.abspath(os.path.join(*tokens))
-        if re.search(r"[/\\]$", path) or len(path) == 0:
-            full_path += os.path.sep
-        elif re.search(r"\.", tokens[-1]):
-            if re.search(r"\.$", tokens[-1]):
-                full_path += "."
-        elif append_extension:
-            filename = os.path.basename(full_path)
-            if not os.path.exists(full_path):
-                full_path += settings.get(DEFAULT_EXTENSION_SETTING)
-        return full_path
+    full_path = os.path.abspath(os.path.join(*tokens))
+    if re.search(r"[/\\]$", path) or len(path) == 0:
+        full_path += os.path.sep
+    elif re.search(r"\.", tokens[-1]):
+        if re.search(r"\.$", tokens[-1]):
+            full_path += "."
+    elif append_extension:
+        filename = os.path.basename(full_path)
+        if not os.path.exists(full_path):
+            full_path += settings.get(DEFAULT_EXTENSION_SETTING)
+    return full_path
 
 
 def get_settings(view):
@@ -133,7 +133,7 @@ def get_settings(view):
     project_settings = {}
     local_settings = {}
     if view is not None:
-        project_settings = view.settings().get('AdvancedNewFile', {})
+        project_settings = view.settings().get("AdvancedNewFile", {})
 
     for setting in SETTINGS:
         local_settings[setting] = settings.get(setting)
@@ -146,14 +146,15 @@ def get_settings(view):
         if key in SETTINGS:
             if key == "alias":
                 local_settings[key] = dict(
-                    local_settings[key].items() |
-                    project_settings.get(key).items()
+                    local_settings[key].items() | project_settings.get(key).items()
                 )
             else:
                 local_settings[key] = project_settings[key]
         else:
-            print("AdvancedNewFile[Warning]: Invalid key " +
-                  "'%s' in project settings.", key)
+            print(
+                "AdvancedNewFile[Warning]: Invalid key " + "'%s' in project settings.",
+                key,
+            )
 
     return local_settings
 

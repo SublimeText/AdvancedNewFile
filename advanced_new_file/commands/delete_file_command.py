@@ -17,15 +17,14 @@ class AdvancedNewFileDeleteCommand(AdvancedNewFileBaseCommand, GitCommandMixin):
             self.show_filename_input("")
 
     def input_panel_caption(self):
-        return 'Enter path of file to delete'
+        return "Enter path of file to delete"
 
     def entered_file_action(self, path):
         self._delete_file(path)
 
     def update_status_message(self, creation_path):
         if self.view is not None:
-            self.view.set_status("AdvancedNewFile", "Delete file at %s " %
-                                 creation_path)
+            self.view.set_status("AdvancedNewFile", "Delete file at %s " % creation_path)
         else:
             sublime.status_message("Delete file at %s" % creation_path)
 
@@ -49,8 +48,9 @@ class AdvancedNewFileDeleteCommand(AdvancedNewFileBaseCommand, GitCommandMixin):
         if not sublime.ok_cancel_dialog("Delete this file?\n%s" % filepath):
             return
 
-        vcs_tracking = (self.file_tracked_by_git(filepath) and
-                        self.settings.get(VCS_MANAGEMENT_SETTING))
+        vcs_tracking = self.file_tracked_by_git(filepath) and self.settings.get(
+            VCS_MANAGEMENT_SETTING
+        )
 
         self.close_view(filepath)
 

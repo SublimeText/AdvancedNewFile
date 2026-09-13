@@ -26,8 +26,7 @@ class AdvancedNewFileBaseCommand(sublime_plugin.WindowCommand):
 
     def __generate_default_root(self):
         root_setting = self._get_default_root()
-        path, folder_index = self.__parse_path_setting(
-            root_setting, DEFAULT_FOLDER_INDEX_SETTING)
+        path, folder_index = self.__parse_path_setting(root_setting, DEFAULT_FOLDER_INDEX_SETTING)
         if path is None and folder_index is None:
             return os.path.expanduser(self.settings.get(DEFAULT_PATH_SETTING))
         elif path is None:
@@ -36,7 +35,8 @@ class AdvancedNewFileBaseCommand(sublime_plugin.WindowCommand):
 
     def __generate_alias_root(self):
         path, folder_index = self.__parse_path_setting(
-            self.settings.get(ALIAS_ROOT_SETTING), ALIAS_FOLDER_INDEX_SETTING)
+            self.settings.get(ALIAS_ROOT_SETTING), ALIAS_FOLDER_INDEX_SETTING
+        )
         if path is None and folder_index is None:
             return os.path.expanduser(self.settings.get(ALIAS_PATH_SETTING))
         elif path is None:
@@ -155,14 +155,14 @@ class AdvancedNewFileBaseCommand(sublime_plugin.WindowCommand):
             elif re.match(HOME_REGEX, path) and root is None:
                 root = os.path.expanduser("~")
                 path = path[2:]
-            elif (re.match(r"^\.{1,2}[/\\]", path) and
-                  self.settings.get(RELATIVE_FROM_CURRENT_SETTING, False)):
+            elif re.match(r"^\.{1,2}[/\\]", path) and self.settings.get(
+                RELATIVE_FROM_CURRENT_SETTING, False
+            ):
                 path_index = 2
                 if self.view.file_name() is not None:
                     root = os.path.dirname(self.view.file_name())
                 else:
-                    folder_index = self.settings.get(
-                        RELATIVE_FALLBACK_INDEX_SETTING, 0)
+                    folder_index = self.settings.get(RELATIVE_FALLBACK_INDEX_SETTING, 0)
                     folder_index = self.__validate_folder_index(folder_index)
                     root = self.__project_folder_from_index(folder_index)
                 if re.match(r"^\.{2}[/\\]", path):
@@ -218,7 +218,8 @@ class AdvancedNewFileBaseCommand(sublime_plugin.WindowCommand):
                         alias_path = self.aliases.get(alias)
                         if re.search(HOME_REGEX, alias_path) is None:
                             root = self.platform.get_alias_absolute_path(
-                                self.alias_root, alias_path)
+                                self.alias_root, alias_path
+                            )
                             if root is not None:
                                 break
                         root = os.path.expanduser(alias_path)
@@ -237,8 +238,10 @@ class AdvancedNewFileBaseCommand(sublime_plugin.WindowCommand):
         else:
             # Add to index so we re
             join_index += 2
-            return (os.path.abspath(root),
-                    TOP_LEVEL_SPLIT_CHAR.join(split_path[join_index:]))
+            return (
+                os.path.abspath(root),
+                TOP_LEVEL_SPLIT_CHAR.join(split_path[join_index:]),
+            )
 
     def input_panel_caption(self):
         return ""
@@ -247,13 +250,11 @@ class AdvancedNewFileBaseCommand(sublime_plugin.WindowCommand):
         caption = self.input_panel_caption()
 
         self.input_panel_view = self.window.show_input_panel(
-            caption, initial,
-            self.on_done, self.__update_filename_input, self.clear
+            caption, initial, self.on_done, self.__update_filename_input, self.clear
         )
 
         self.input_panel_view.set_name(VIEW_NAME)
-        self.input_panel_view.settings().set("auto_complete_commit_on_tab",
-                                             False)
+        self.input_panel_view.settings().set("auto_complete_commit_on_tab", False)
         self.input_panel_view.settings().set("tab_completion", False)
         self.input_panel_view.settings().set("translate_tabs_to_spaces", False)
         self.input_panel_view.settings().set("anf_panel", True)
@@ -269,13 +270,11 @@ class AdvancedNewFileBaseCommand(sublime_plugin.WindowCommand):
         if path_in.endswith("\t"):
             new_content = self.completion.completion(path_in.replace("\t", ""))
         if new_content != path_in:
-            self.input_panel_view.run_command("anf_replace",
-                                              {"content": new_content})
+            self.input_panel_view.run_command("anf_replace", {"content": new_content})
         else:
             base, path = self.split_path(path_in)
 
-            creation_path = generate_creation_path(self.settings, base, path,
-                                                   True)
+            creation_path = generate_creation_path(self.settings, base, path, True)
             if self.settings.get(SHOW_PATH_SETTING, False):
                 self.update_status_message(creation_path)
 
@@ -310,8 +309,7 @@ class AdvancedNewFileBaseCommand(sublime_plugin.WindowCommand):
         base, path = self.split_path(filename)
         file_path = generate_creation_path(self.settings, base, path, True)
         # Check for invalid alias specified.
-        is_valid = (TOP_LEVEL_SPLIT_CHAR in filename and
-                    not self.platform.is_absolute_path(base))
+        is_valid = TOP_LEVEL_SPLIT_CHAR in filename and not self.platform.is_absolute_path(base)
         if is_valid:
             if base == "":
                 error_message = "Current file cannot be resolved."
@@ -325,8 +323,9 @@ class AdvancedNewFileBaseCommand(sublime_plugin.WindowCommand):
         new_view = None
         if os.path.isdir(file_path):
             if not re.search(r"(/|\\)$", file_path):
-                sublime.error_message("Cannot open view for '" + file_path +
-                                      "'. It is a directory. ")
+                sublime.error_message(
+                    "Cannot open view for '" + file_path + "'. It is a directory. "
+                )
         else:
             new_view = self.window.open_file(file_path)
         return new_view
@@ -373,8 +372,8 @@ class AdvancedNewFileBaseCommand(sublime_plugin.WindowCommand):
         folder_permissions = self.settings.get(FOLDER_PERMISSIONS_SETTING, "")
         for entry in init_list:
             if self.is_python:
-                creation_path = os.path.join(entry, '__init__.py')
-                open(creation_path, 'a').close()
+                creation_path = os.path.join(entry, "__init__.py")
+                open(creation_path, "a").close()
                 if file_permissions != "":
                     os.chmod(creation_path, int(file_permissions, 8))
             if folder_permissions != "":
@@ -391,10 +390,11 @@ class AdvancedNewFileBaseCommand(sublime_plugin.WindowCommand):
             if region.begin() != region.end():
                 path = view.substr(region)
                 break
-            if (re.match(".*string.quoted.double", syntax) or
-                    re.match(".*string.quoted.single", syntax)):
+            if re.match(".*string.quoted.double", syntax) or re.match(
+                ".*string.quoted.single", syntax
+            ):
                 path = view.substr(view.extract_scope(region.begin()))
-                path = re.sub('^"|\'', '',  re.sub('"|\'$', '', path.strip()))
+                path = re.sub(r"^[\"']", "", re.sub(r"[\"']$", "", path.strip()))
                 break
 
         return path
