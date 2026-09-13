@@ -1,30 +1,30 @@
-from .copy_file_command import AdvancedNewFileCopy, AdvancedNewFileCopyAtCommand
-from .cut_to_file import AdvancedNewFileCutToFile
-from .delete_file_command import AdvancedNewFileDelete
+from .copy_file_command import AdvancedNewFileCopyAtCommand, AdvancedNewFileCopyCommand
+from .cut_to_file import AdvancedNewFileCutToFileCommand
+from .delete_file_command import AdvancedNewFileDeleteCommand
 from .helper_commands import (
     AdvancedNewFileCommand,
     AnfRemoveRegionContentAndRegionCommand,
     AnfReplaceCommand,
 )
-from .move_file_command import AdvancedNewFileMove, AdvancedNewFileMoveAtCommand
+from .move_file_command import AdvancedNewFileMoveAtCommand, AdvancedNewFileMoveCommand
 from .new_file_command import (
-    AdvancedNewFileNew,
     AdvancedNewFileNewAtCommand,
     AdvancedNewFileNewAtFileCommand,
+    AdvancedNewFileNewCommand,
     AdvancedNewFileNewEventListener,
 )
 
 __all__ = [
     "AdvancedNewFileCommand",
-    "AdvancedNewFileCopy",
     "AdvancedNewFileCopyAtCommand",
-    "AdvancedNewFileCutToFile",
-    "AdvancedNewFileDelete",
-    "AdvancedNewFileMove",
+    "AdvancedNewFileCopyCommand",
+    "AdvancedNewFileCutToFileCommand",
+    "AdvancedNewFileDeleteCommand",
     "AdvancedNewFileMoveAtCommand",
-    "AdvancedNewFileNew",
+    "AdvancedNewFileMoveCommand",
     "AdvancedNewFileNewAtCommand",
     "AdvancedNewFileNewAtFileCommand",
+    "AdvancedNewFileNewCommand",
     "AdvancedNewFileNewEventListener",
     "AnfRemoveRegionContentAndRegionCommand",
     "AnfReplaceCommand"

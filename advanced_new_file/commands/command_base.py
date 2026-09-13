@@ -15,7 +15,7 @@ from ..platform.windows_platform import WindowsPlatform
 VIEW_NAME = "AdvancedNewFileCreation"
 
 
-class AdvancedNewFileBase(sublime_plugin.WindowCommand):
+class AdvancedNewFileBaseCommand(sublime_plugin.WindowCommand):
     def __init__(self, window):
         super().__init__(window)
 

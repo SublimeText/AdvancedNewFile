@@ -1,10 +1,10 @@
 import os
 
 from ..anf_util import *
-from .command_base import AdvancedNewFileBase
+from .command_base import AdvancedNewFileBaseCommand
 
 
-class DuplicateFileBase(AdvancedNewFileBase):
+class DuplicateFileBaseCommand(AdvancedNewFileBaseCommand):
     def run(self, is_python=False, initial_path=None, rename_file=None):
         self.is_python = is_python
         self.run_setup()

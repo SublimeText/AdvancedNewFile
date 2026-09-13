@@ -3,10 +3,10 @@ import os
 import sublime
 
 from ..anf_util import *
-from .command_base import AdvancedNewFileBase
+from .command_base import AdvancedNewFileBaseCommand
 
 
-class AdvancedNewFileCutToFile(AdvancedNewFileBase):
+class AdvancedNewFileCutToFileCommand(AdvancedNewFileBaseCommand):
     def run(self, is_python=False):
         self.is_python = is_python
         self.run_setup()
